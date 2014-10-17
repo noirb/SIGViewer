@@ -17,8 +17,8 @@
 class SgvMain : public BaseApplication
 {
 public:
-    SgvMain(void);
-    virtual ~SgvMain(void);
+	SgvMain(void);
+	virtual ~SgvMain(void);
 
 	enum RequestType{
 		GET_ALL_ENTITIES  = 1, // get all entity data.
@@ -50,46 +50,46 @@ public:
 	};
 
 protected:
-    CEGUI::OgreRenderer* mRenderer;
+	CEGUI::OgreRenderer* mRenderer;
  
-    virtual void createScene(void);
-    virtual void destroyScene(void);
+	virtual void createScene(void);
+	virtual void destroyScene(void);
  
 	virtual void chooseSceneManager(void);
-    virtual void createFrameListener(void);
+	virtual void createFrameListener(void);
  
-    // Ogre::FrameListener
-    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	// Ogre::FrameListener
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
  
-    // OIS::KeyListener
-    virtual bool keyPressed( const OIS::KeyEvent &arg );
-    virtual bool keyReleased( const OIS::KeyEvent &arg );
-    // OIS::MouseListener
-    virtual bool mouseMoved( const OIS::MouseEvent &arg );
-    virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-    virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+	// OIS::KeyListener
+	virtual bool keyPressed( const OIS::KeyEvent &arg );
+	virtual bool keyReleased( const OIS::KeyEvent &arg );
+	// OIS::MouseListener
+	virtual bool mouseMoved( const OIS::MouseEvent &arg );
+	virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+	virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
-    virtual void windowResized(Ogre::RenderWindow* rw);
+	virtual void windowResized(Ogre::RenderWindow* rw);
 
-    bool quit(const CEGUI::EventArgs &e);
+	bool quit(const CEGUI::EventArgs &e);
 
-    bool connect(const CEGUI::EventArgs &e);
+	bool connect(const CEGUI::EventArgs &e);
 
-    bool disconnect(const CEGUI::EventArgs &e);
+	bool disconnect(const CEGUI::EventArgs &e);
 
-    bool closeRecvMessageTray(const CEGUI::EventArgs &e);
+	bool closeRecvMessageTray(const CEGUI::EventArgs &e);
 
-    bool closeSendMessageTray(const CEGUI::EventArgs &e);
+	bool closeSendMessageTray(const CEGUI::EventArgs &e);
 
-    bool addService(const CEGUI::EventArgs &e);
+	bool addService(const CEGUI::EventArgs &e);
 
-    bool editService(const CEGUI::EventArgs &e);
+	bool editService(const CEGUI::EventArgs &e);
 
-    bool removeService(const CEGUI::EventArgs &e);
+	bool removeService(const CEGUI::EventArgs &e);
 
-    bool okService(const CEGUI::EventArgs &e);
+	bool okService(const CEGUI::EventArgs &e);
 
-    bool createAllEntities();   
+	bool createAllEntities();   
 
 	void closeChAndSock(LIBSSH2_CHANNEL *channel, SOCKET sock);
 
@@ -99,20 +99,20 @@ protected:
 		else return (*it).second;
 	}
 
-    bool startRequest(const CEGUI::EventArgs &e);
+	bool startRequest(const CEGUI::EventArgs &e);
 
-    bool agentView1(const CEGUI::EventArgs &e);
-    bool agentView2(const CEGUI::EventArgs &e);
-    bool agentView3(const CEGUI::EventArgs &e);
-    bool agentView4(const CEGUI::EventArgs &e);
+	bool agentView1(const CEGUI::EventArgs &e);
+	bool agentView2(const CEGUI::EventArgs &e);
+	bool agentView3(const CEGUI::EventArgs &e);
+	bool agentView4(const CEGUI::EventArgs &e);
 
 	bool cameraView_Down  (const CEGUI::EventArgs &e);
 	bool cameraView_Move  (const CEGUI::EventArgs &e);
 	bool cameraView_Up    (const CEGUI::EventArgs &e);
-    bool cameraView_Sized (const CEGUI::EventArgs &e);
-    bool cameraView_Sizing(const CEGUI::EventArgs &e);
+	bool cameraView_Sized (const CEGUI::EventArgs &e);
+	bool cameraView_Sizing(const CEGUI::EventArgs &e);
 
-    int cameraView_Select(const CEGUI::EventArgs &e, int *result);
+	int cameraView_Select(const CEGUI::EventArgs &e, int *result);
 
 	bool startService1(const CEGUI::EventArgs &e);
 	bool startService2(const CEGUI::EventArgs &e);
@@ -123,15 +123,15 @@ protected:
 
 	bool startService(std::string fullpath);
 
-    bool sshCheckONOFF(const CEGUI::EventArgs &e);
+	bool sshCheckONOFF(const CEGUI::EventArgs &e);
 
-    bool subView(const CEGUI::EventArgs &e);
+	bool subView(const CEGUI::EventArgs &e);
 
-    bool overwriteShape(const CEGUI::EventArgs &e);
+	bool overwriteShape(const CEGUI::EventArgs &e);
 
-    bool dynamicsView(const CEGUI::EventArgs &e);
+	bool dynamicsView(const CEGUI::EventArgs &e);
 
-    bool changeTimeUnit(const CEGUI::EventArgs &e);
+	bool changeTimeUnit(const CEGUI::EventArgs &e);
 
 	bool messageTray(const CEGUI::EventArgs &e);
 
@@ -190,26 +190,26 @@ ass, const char *host);
 
 protected:
 	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
-	bool mLMouseDown, mRMouseDown;		
-	bool mShift;                		
-	bool mCtrl;                 		
-	int mCount;							// The number of robots on the screen
-	Ogre::SceneNode *mCurrentObject;	// pointer to our currently selected object
-	Ogre::SceneNode *mHeadNode;	
-	float mRotateSpeed;		
-	float mMoveXYSpeed;		
-	float mMoveZSpeed;		
-	bool  mConnectServer;               
-	bool  mSimRun;                      
-	bool  mSubView;                     
-	std::string mHost;                  
-	std::string mPort;                  
+	bool mLMouseDown, mRMouseDown;
+	bool mShift;
+	bool mCtrl;
+	int mCount;                         // The number of robots on the screen
+	Ogre::SceneNode *mCurrentObject;    // pointer to our currently selected object
+	Ogre::SceneNode *mHeadNode;
+	float mRotateSpeed;
+	float mMoveXYSpeed;
+	float mMoveZSpeed;
+	bool  mConnectServer;
+	bool  mSimRun;
+	bool  mSubView;
+	std::string mHost;
+	std::string mPort;
 	CEGUI::Renderer *mGUIRenderer;      // our CEGUI renderer
 
-    bool mMove;                         
-    int  mTidx;                         
-    int  mBm[2];                        
-                          
+	bool mMove;
+	int  mTidx;
+	int  mBm[2];
+
 	sigverse::SgvSocket *mSock;
 
 	Sgv::ViewerService *mService;
@@ -294,6 +294,5 @@ protected:
 	std::vector<Ogre::ManualObject*>  mCameraArrows;
 
 };
- 
 #endif // #ifndef __SgvMain_h_
 
