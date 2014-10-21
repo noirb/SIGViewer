@@ -1,23 +1,15 @@
-
 #include <memory>
-
 #include "SgvLog.h"
-
-
 
 namespace Sgv{
 
-
-
 using namespace std;
 
-//
 LogFactory::LogMap LogFactory::m_logMap;
-
 
 //DelayFileWriterBase--------------------------------------
 
-
+// Create file for temporary save
 void DelayFileWriterBase::createTmpFile()
 {
 	m_tmpfile = createFileName();
@@ -25,12 +17,14 @@ void DelayFileWriterBase::createTmpFile()
 	m_isStart = true;
 };
 
+// Create file name for temporary save
 const string DelayFileWriterBase::createFileName() const
 {
 	srand((unsigned int)time(NULL));
 	ostringstream oss;
 	oss << hex << uppercase << setfill('0');
 	
+	// Set date not to duplicate thd ID
 	char tmp[30];
 	time_t t = time(NULL);
 	tm ti;
@@ -38,10 +32,12 @@ const string DelayFileWriterBase::createFileName() const
 	//tm ti = *localtime(&t);
 	strftime(tmp, 30, "%Y%m%d%H%M%S", &ti);
 
+	// Pointer value by 'new' is used in order to create different string for each execution
 	oss << tmp << '_' << (void*)auto_ptr<char>(new char).get();
 
-	for(int i=0; i<5; ++i){
-		int c = (int)((float)rand()/RAND_MAX*255);
+	// Add random value to the string to avoid the conflict of same string for each execution file
+	for (int i=0; i<5; ++i) {
+		int c = (int)((float)rand()/RAND_MAX*255); //TODO: magic number
 		oss << setw(2) << c;
 	}
 	return oss.str();
@@ -54,6 +50,7 @@ void DelayFileWriterBase::writeLog()
 {
 	m_ofs.close();
 
+	// Copy of contents of temporary file
 	ofstream ofs(m_file.c_str(), ios_base::app);
 	ifstream ifs(m_tmpfile.c_str());
 	ofs << ifs.rdbuf();
