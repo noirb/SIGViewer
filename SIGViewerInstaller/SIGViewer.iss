@@ -4,11 +4,11 @@ AppId={{4D44B5AC-17CB-4514-97D3-732165A5732F}}
 // Application name
 AppName=SIGViewer
 // Application name and version number
-AppVerName=SIGViewer 2.3.0
+AppVerName=SIGViewer 2.3.0
 AppPublisher=National Institute of Informatics
-AppPublisherURL=http://inamura.ex.nii.ac.jp/
-AppSupportURL=http://inamura.ex.nii.ac.jp/
-AppUpdatesURL=http://inamura.ex.nii.ac.jp/
+AppPublisherURL=http://www.sigverse.org/
+AppSupportURL=http://www.sigverse.org/
+AppUpdatesURL=http://www.sigverse.org/
 DefaultDirName={pf}\SIGViewer_2.3.0
 DefaultGroupName=SIGViewer
 OutputBaseFilename=setup
@@ -20,7 +20,8 @@ ChangesEnvironment=true
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
-[Tasks]Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
+[Tasks]
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}";
 Name: modifypath; Description: &Add Java install directory to your environmental path; GroupDescription: "Settings:";
 
 [Dirs]
@@ -31,10 +32,10 @@ Name: "{app}\SIGViewer/bin/shape";Permissions: users-full
 [Files]
 Source: "../Release/SIGViewer.exe" ; DestDir:{app}/SIGViewer/bin;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "C:/SIGVerse/src/OgreSDK_vc9_v1-8-0/media/*" ; DestDir:{app}/SIGViewer/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/GitHub/SIGVerse_test/SIGViewer/SIGViewer/OgreSDK_additions/media/*" ; DestDir:{app}/SIGViewer/media_additions/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGVerse/Client/SIGViewer/SIGViewer/OgreSDK_additions/media/*" ; DestDir:{app}/SIGViewer/media_additions/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "C:/SIGVerse/src/OgreSDK_vc9_v1-8-0/bin/Release/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "C:/SIGVerse/src/CEGUI-0.7.6/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
-Source: "C:/SIGVerse/GitHub/SIGVerse_test/SIGViewer/SIGViewer/CEGUI_additions/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles_additions/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGVerse/Client/SIGViewer/SIGViewer/CEGUI_additions/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles_additions/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
 Source: "C:/SIGVerse/src/CEGUI-0.7.6/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "C:/SIGVerse/src/zlib/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "C:/SIGVerse/src/libssh2-1.4.2-openssl-x86-win32nt-msvc/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
@@ -44,7 +45,7 @@ Source: "ogre.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "plugins.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "X3DParser.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "SIGVerse.ini" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
-Source: "C:/SIGVerse/GitHub/SIGVerse_test/SIGViewer/SIGViewer/OculusResources/*" ; DestDir:{app}/SIGViewer/bin/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGVerse/Client/SIGViewer/SIGViewer/OculusResources/*" ; DestDir:{app}/SIGViewer/bin/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "../SIGViewer/shape/*" ; DestDir:{app}/SIGViewer/bin/shape/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "../SIGViewer/x3d/*" ; DestDir:{app}/SIGViewer/bin/x3d/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "../SIGViewer/Xj3D/*" ; DestDir:{app}/SIGViewer/bin/Xj3D/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
@@ -52,7 +53,7 @@ Source: "../SIGViewer/Xj3D/*" ; DestDir:{app}/SIGViewer/bin/Xj3D/;  Flags: recur
 [Icons]
 Name: "{group}\SIGViewer"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"
 Name: "{commondesktop}\SIGViewer 2.3.0"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"; Tasks: desktopicon
-; begin(add)(2010/2/24) install SIGWorldEditor.exe
+; begin(add)(2010/2/24) install SIGWorldEditor.exe
 
 
 
@@ -108,7 +109,7 @@ begin
                 True, False);
         OpenALPage.Add('Yes. please install OpenAL runtime');
         OpenALPage.Add('No. skip OpenAL runtime install');
-        OpenALPage.Values[0]:=True;
+        OpenALPage.Values[0]:=True;
         // -----------------------------------------------
         //      JRE Install Page
         // -----------------------------------------------
@@ -116,12 +117,12 @@ begin
                 OpenALPage.ID,
                 'Install Library for SIGViewer',
                 'JRE (Java Runtime Environment) install',
-                'SIGViewer needs to install JRE 6.0. Do you accept it?',
+                'SIGViewer needs to install JRE 7.0 or later. Do you accept it?',
                 True, False);
-        JREPage.Add('Yes. please install JRE 6.0');
-        JREPage.Add('No. I have already installed JRE 6.0 No need to install it again.');
+        JREPage.Add('Yes. please install JRE 7.0');
+        JREPage.Add('No. I have already installed JRE 7.0 No need to install it again.');
         JREPage.Values[0]:=True;
-        jvmpath := '{pf}\Java\jre6\bin\client\';
+        jvmpath := '{pf}\Java\jre7\bin\client\';
 end;
 
 // **************************************************************
@@ -244,7 +245,7 @@ begin
                 // ------------------------------------
                 //      get path of the installer
                 // ------------------------------------
-                JREInstellerPath := ExpandConstant('{src}\downloads\JRE6\jre-6u27-windows-i586-s.exe');
+                JREInstellerPath := ExpandConstant('{src}\downloads\jre-7u71-windows-i586.exe');
 
                 // ------------------------------------
                 //      run installer
@@ -258,7 +259,7 @@ begin
                 begin
                         // ------------------------------------
                         // ------------------------------------
-                        //JREPosPage.Values[0] := ExpandConstant('{pf}\Java\jre6');
+                        //JREPosPage.Values[0] := ExpandConstant('{pf}\Java\jre7');
                         
 
                 //end else begin
