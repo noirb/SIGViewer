@@ -408,7 +408,7 @@ namespace Sgv
 		// Create a child node for Transform
 		//Ogre::SceneNode *node = (Ogre::SceneNode*)parent->createChild(ovec, qua);
 		char tmp[MAX_STRING_NUM];
-		sprintf_s(tmp, 16, "%d", count);
+		sprintf_s(tmp, MAX_STRING_NUM, "%d", count);
 		Ogre::String tname = "/trans" + Ogre::String(tmp);
 
 		Ogre::String pname = parent->getName();

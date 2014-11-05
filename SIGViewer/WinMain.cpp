@@ -101,17 +101,17 @@ void SgvMain::destroyScene()
 //-------------------------------------------------------------------------------------
 void SgvMain::createScene(void)
 {
-	char dir[128];
-	GetCurrentDirectory(128, dir);
+	char dir[MAX_STRING_NUM];
+	GetCurrentDirectory(MAX_STRING_NUM, dir);
 	std::string inipath = std::string(dir) + "/SIGVerse.ini";
 
-	sprintf_s(mSettingPath, 128, inipath.c_str());
+	sprintf_s(mSettingPath, MAX_STRING_NUM, inipath.c_str());
 
 	Sgv::LogFactory::setLog(0, Sgv::LogPtr(new Sgv::Log(Sgv::Log::DEBUG, "main", 
 		Sgv::LogFileWriterAutoPtr(new Sgv::DelayFileWriter<Sgv::FileLock>("SIGVerse.log")))) );
 	mLog = Sgv::LogFactory::getLog(0);
 
-	TCHAR pathText[256];
+	TCHAR pathText[MAX_STRING_NUM];
 
 	GetPrivateProfileString("SHAPEFILE","OVERWRITE",'\0', pathText, 1024, mSettingPath);
 	if (strcmp(pathText,"true") == 0)  mOverWrite = true;
@@ -313,7 +313,7 @@ void SgvMain::createInitWindow()
 	sname->setSize(CEGUI::UVector2(CEGUI::UDim(0.4f, 0.0f), CEGUI::UDim(0.11f, 0.0f)));
 	sname->setPosition(CEGUI::UVector2(CEGUI::UDim(0.55f, 0.0f), CEGUI::UDim(0.00f, 0.0f)));
 
-	TCHAR strText[128];
+	TCHAR strText[MAX_STRING_NUM];
 	GetPrivateProfileString("LOGIN","SERVICE_NAME", '\0',strText, 1024, mSettingPath);
 
 	if (strText[0] == '\0') sname->setText("SIGViewer");
@@ -528,7 +528,7 @@ void SgvMain::createInitWindow()
 	if (!mPSrvs.empty()) mPSrvs.clear();
 	int count = 0;
 	while (1) {
-		TCHAR pathText[256];
+		TCHAR pathText[MAX_STRING_NUM];
 
 		char tmp[2];
 		sprintf_s(tmp, 2, "%d", count);
@@ -659,7 +659,7 @@ void SgvMain::createInitWindow()
 	std::vector<CEGUI::Window*> tmp_subwin;
 
 	mTidx = -1;
-	char tmp_name1[32], tmp_name2[32], tmp_name3[32];
+	char tmp_name1[MAX_STRING_NUM], tmp_name2[MAX_STRING_NUM], tmp_name3[MAX_STRING_NUM];
 
 	for (int i = 0; i < MAX_SUBVIEW; i++) {
 		sprintf(tmp_name1, "RTT_%d",i);
@@ -1035,8 +1035,8 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		if (mEntityData != NULL) {
 
 			Ogre::Vector3 pos = mEntityData->getHeadNode()->getPosition();
-			char tmp[64];
-			sprintf_s(tmp, 64, "position : (%g, %g, %g)", pos.x, pos.y, pos.z);
+			char tmp[MAX_STRING_NUM];
+			sprintf_s(tmp, MAX_STRING_NUM, "position : (%g, %g, %g)", pos.x, pos.y, pos.z);
 			mEntityDataList[1]->setText(tmp);
 
 			CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
@@ -1321,15 +1321,15 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 								//entname->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.0f, 1.0f)));
 
 								Ogre::Vector3 pos = (*it).second->getHeadNode()->getPosition();
-								char pos_tmp[128];
-								sprintf_s(pos_tmp, 128, "Position : (%.3g, %.3g, %.3g)", pos.x, pos.y, pos.z);
+								char pos_tmp[MAX_STRING_NUM];
+								sprintf_s(pos_tmp, MAX_STRING_NUM, "Position : (%.3g, %.3g, %.3g)", pos.x, pos.y, pos.z);
 								CEGUI::ListboxTextItem *entpos = new CEGUI::ListboxTextItem(pos_tmp);
 								entpos->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.0f, 0.0f)));
 
 								Ogre::Quaternion qua = (*it).second->getHeadNode()->getOrientation();
 
-								char qua_tmp[128];
-								sprintf_s(qua_tmp, 128, "Quaternion : (%.3g, %.3g, %.3g, %.3g)", qua.w, qua.x, qua.y, qua.z);
+								char qua_tmp[MAX_STRING_NUM];
+								sprintf_s(qua_tmp, MAX_STRING_NUM, "Quaternion : (%.3g, %.3g, %.3g, %.3g)", qua.w, qua.x, qua.y, qua.z);
 								CEGUI::ListboxTextItem *qua_item = new CEGUI::ListboxTextItem(qua_tmp);
 
 								eDataList->addItem(entname);
@@ -1342,8 +1342,8 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 								if (!(*it).second->isRobot()) {
 									Ogre::Vector3 bsize = (*it).second->getBBoxSize();
 									Ogre::Vector3 scale = (*it).second->getScale();
-									char bbox_tmp[128];
-									sprintf_s(bbox_tmp, 128, "BBoxSize : (%.3g, %.3g, %.3g)", bsize.x*scale.x, bsize.y*scale.y, bsize.z*scale.z);
+									char bbox_tmp[MAX_STRING_NUM];
+									sprintf_s(bbox_tmp, MAX_STRING_NUM, "BBoxSize : (%.3g, %.3g, %.3g)", bsize.x*scale.x, bsize.y*scale.y, bsize.z*scale.z);
 									CEGUI::ListboxTextItem *bbox = new CEGUI::ListboxTextItem(bbox_tmp);
 									eDataList->addItem(bbox);
 									mEntityDataList.push_back(bbox);
@@ -1387,12 +1387,12 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 									CEGUI::ListboxTextItem *separate1 = new CEGUI::ListboxTextItem("-----------------------------------");
 									CEGUI::ListboxTextItem *separate2 = new CEGUI::ListboxTextItem("-----------------------------------");
 
-									char parts_name[128];
-									sprintf_s(parts_name, 128, "Parts name : %s", partsname.c_str());
+									char parts_name[MAX_STRING_NUM];
+									sprintf_s(parts_name, MAX_STRING_NUM, "Parts name : %s", partsname.c_str());
 									CEGUI::ListboxTextItem *parts_name_item = new CEGUI::ListboxTextItem(parts_name);
 
-									char parts_pos[128];
-									sprintf_s(parts_pos, 128, "Parts pos : (%.1f, %.1f, %.1f)", ppos.x, ppos.y, ppos.z);
+									char parts_pos[MAX_STRING_NUM];
+									sprintf_s(parts_pos, MAX_STRING_NUM, "Parts pos : (%.1f, %.1f, %.1f)", ppos.x, ppos.y, ppos.z);
 									CEGUI::ListboxTextItem *parts_pos_item = new CEGUI::ListboxTextItem(parts_pos);
 
 									//char joint_name[128];
@@ -1431,8 +1431,8 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 
 												Ogre::Vector3 cam_pos = cam->getRealPosition();
 
-												char camera_name[128];
-												sprintf_s(camera_name, 128, "%s pos : (%.1f, %.1f, %.1f)", camname.c_str(), cam_pos.x, cam_pos.y, cam_pos.z);
+												char camera_name[MAX_STRING_NUM];
+												sprintf_s(camera_name, MAX_STRING_NUM, "%s pos : (%.1f, %.1f, %.1f)", camname.c_str(), cam_pos.x, cam_pos.y, cam_pos.z);
 												CEGUI::ListboxTextItem *camera_name_item = new CEGUI::ListboxTextItem(camera_name);
 												camera_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.4f, 0.0f)));
 
@@ -1807,8 +1807,8 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 		int srvsize = (int)mPSrvs.size();
 		for (int i = 0; i < srvsize; i++) {
 			if (!startService(mPSrvs[i])) {
-				char tmp[256];
-				sprintf_s(tmp, 256, "Cannot start service [%s]",mPSrvs[i].c_str());
+				char tmp[MAX_STRING_NUM];
+				sprintf_s(tmp, MAX_STRING_NUM, "Cannot start service [%s]",mPSrvs[i].c_str());
 				MessageBox(NULL, tmp, _T("Error"), MB_OKCANCEL); 
 			}
 		}
@@ -1912,7 +1912,7 @@ bool SgvMain::createAllEntities()
 			if (!PathFileExists(sfile.c_str()) || mOverWrite)
 			{
 				if (!downloadFileRequest(tmp_sfile)) {
-					char tmp[128];
+					char tmp[MAX_STRING_NUM];
 					sprintf(tmp, "Failed to download shape file [%s]", tmp_sfile);
 					MessageBox( NULL, tmp, _T("Error"), MB_OK);
 				}
@@ -1946,7 +1946,7 @@ bool SgvMain::createAllEntities()
 			if (shapes[i] == "nothing") continue;
 			CX3DParser* parser =m_pX3D->loadX3DFromFile(shapes[i].c_str());
 			if (!parser) {
-				char tmp[128];
+				char tmp[MAX_STRING_NUM];
 				sprintf(tmp, "Failed to load shape file. [%s]",shapes[i].c_str());
 				MessageBox( NULL, tmp, _T("Error"), MB_OK);
 				mHeadNode->removeAllChildren();
@@ -2022,8 +2022,8 @@ bool SgvMain::createAllEntities()
 
 				double r = atof(strtok_s(NULL, delim, &ctx));
 
-				char tmp_name[32];
-				sprintf_s(tmp_name, 32, "%s/ODEShape%d",name.c_str(), i);
+				char tmp_name[MAX_STRING_NUM];
+				sprintf_s(tmp_name, MAX_STRING_NUM, "%s/ODEShape%d",name.c_str(), i);
 				//Ogre::Entity *oent = mSceneMgr->createEntity(tmp_name, "MySphere.mesh");
 				Ogre::Entity *oent = mSceneMgr->createEntity(tmp_name, "pSphere1.mesh");
 				Ogre::MaterialPtr mtr = Ogre::MaterialManager::getSingleton().getByName("MA_Red_Clone");
@@ -2052,8 +2052,8 @@ bool SgvMain::createAllEntities()
 				double sy = atof(strtok_s(NULL, delim, &ctx));
 				double sz = atof(strtok_s(NULL, delim, &ctx));
 
-				char tmp_name[32];
-				sprintf_s(tmp_name, 32, "%s/ODEShape%d",name.c_str(), i);
+				char tmp_name[MAX_STRING_NUM];
+				sprintf_s(tmp_name, MAX_STRING_NUM, "%s/ODEShape%d",name.c_str(), i);
 				Ogre::Entity *oent = mSceneMgr->createEntity(tmp_name, "MyBox.mesh");
 				Ogre::MaterialPtr mtr = Ogre::MaterialManager::getSingleton().getByName("MA_Green_Clone");
 
@@ -2080,8 +2080,8 @@ bool SgvMain::createAllEntities()
 				double radius = atof(strtok_s(NULL, delim, &ctx));
 				double length = atof(strtok_s(NULL, delim, &ctx));
 
-				char tmp_name[32];
-				sprintf_s(tmp_name, 32, "%s/ODEShape%d",name.c_str(), i);
+				char tmp_name[MAX_STRING_NUM];
+				sprintf_s(tmp_name, MAX_STRING_NUM, "%s/ODEShape%d",name.c_str(), i);
 				//Ogre::Entity *oent = mSceneMgr->createEntity(tmp_name, "MyCylinder.mesh");
 				Ogre::Entity *oent = mSceneMgr->createEntity(tmp_name, "pCylinder1.mesh");
 
@@ -2819,14 +2819,14 @@ bool SgvMain::recvMoveEntities()
 	else if (uni == "min") {
 		float ftime = atof(stime.c_str());
 		ftime /= 60.0f;
-		char tmp[32];
+		char tmp[MAX_STRING_NUM];
 		sprintf(tmp, "%.2f",ftime);
 		time->setText(tmp);
 	} 
 	else if (uni == "h") {
 		float ftime = atof(stime.c_str());
 		ftime /= 3600.0f;
-		char tmp[32];
+		char tmp[MAX_STRING_NUM];
 		sprintf(tmp, "%.2f",ftime);
 		time->setText(tmp);
 	} 
@@ -3049,7 +3049,7 @@ bool SgvMain::recvMoveEntities()
 
 bool SgvMain::downloadFileRequest(std::string name)
 {
-	char msg[128];
+	char msg[MAX_STRING_NUM];
 	char *p = msg;
 
 	unsigned short ssize = name.size();
@@ -4052,8 +4052,8 @@ bool SgvMain::sshCheckONOFF(const CEGUI::EventArgs &e)
 
 bool SgvMain::addService(const CEGUI::EventArgs &e)
 {
-	char curr[256];
-	GetCurrentDirectory(256, curr);
+	char curr[MAX_STRING_NUM];
+	GetCurrentDirectory(MAX_STRING_NUM, curr);
 
 	static OPENFILENAME ofn;
 	static TCHAR filename_full[MAX_PATH];
@@ -4081,8 +4081,8 @@ bool SgvMain::addService(const CEGUI::EventArgs &e)
 	it = std::find(mPSrvs.begin(), mPSrvs.end(), filename_full);
 
 	if (it != mPSrvs.end()) {
-		char msg[128];
-		sprintf_s(msg, 128, "Service \"%s\" already exist", filename);
+		char msg[MAX_STRING_NUM];
+		sprintf_s(msg, MAX_STRING_NUM, "Service \"%s\" already exist", filename);
 		MessageBox( NULL, msg, _T("Error"), MB_OK);
 		return false;
 	}
@@ -4178,8 +4178,8 @@ bool SgvMain::startService6(const CEGUI::EventArgs &e)
 
 bool SgvMain::startService(std::string fullpath)
 {
-	char curr[256];
-	GetCurrentDirectory(256, curr);
+	char curr[MAX_STRING_NUM];
+	GetCurrentDirectory(MAX_STRING_NUM, curr);
 
 	std::string tmp_path = fullpath;
 	char *fpath = (char*)tmp_path.c_str();
@@ -4243,7 +4243,7 @@ bool SgvMain::editService(const CEGUI::EventArgs &e)
 
 		int count = 0;
 		while (1) {
-			TCHAR pathText[256];
+			TCHAR pathText[MAX_STRING_NUM];
 
 			char tmp[2];
 			sprintf_s(tmp, 2, "%d", count);
