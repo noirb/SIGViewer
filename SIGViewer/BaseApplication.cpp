@@ -247,8 +247,8 @@ void BaseApplication::go(void)
 //-------------------------------------------------------------------------------------
 bool BaseApplication::setup(void)
 {
-	char dir[128];
-	GetCurrentDirectory(128, dir);
+	char dir[MAX_STRING_NUM];
+	GetCurrentDirectory(MAX_STRING_NUM, dir);
 	std::string inipath = std::string(dir) + "/SIGVerse.ini";
 	TCHAR SettingPath[256];
 	sprintf_s(SettingPath, 128, inipath.c_str());

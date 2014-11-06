@@ -1,8 +1,11 @@
-
 #ifndef __VIEWER_SERVICE__
 #define __VIEWER_SERVICE__
 
 #include "SIGService.h"
+
+#define VIEWER_REQUEST_TYPE_CAPTUREVIEW			1
+#define VIEWER_REQUEST_TYPE_DISTANCE_SENSOR		2
+#define VIEWER_REQUEST_TYPE_DETECT_ENTITIES		3
 
 namespace Sgv
 {
@@ -17,17 +20,19 @@ namespace Sgv
 			//delete sgvSock;
 		}
 
-
+		// Receiving message
 		void recvMsg(sigverse::RecvMsgEvent &evt);
-
+		
 		void recvCaptureView(sigverse::RecvCptEvent &evt);
 
 		void recvDistanceSensor(sigverse::RecvDstEvent &evt);
 
 		void recvDetectEntities(sigverse::RecvDtcEvent &evt);
 
+		// Confirm whether message event exist or not
 		bool isMsg(){return m_isMsg;}
 
+		// Receiving the message event
 		sigverse::RecvMsgEvent *getRecvMsgEvent(){ 
 			if(!m_isMsg) return NULL;
 			else { 

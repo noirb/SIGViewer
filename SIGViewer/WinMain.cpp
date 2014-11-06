@@ -1048,7 +1048,7 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 			char msg[4];
 			char *p = msg;
 			//unsigned short tmp = htons(GET_MOVE_ENTITIES);
-			BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0004);
+			BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0004); // TODO: Magic number
 			BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0004); 
 			//memcpy(msg, (char*)&tmp, 2); 
 			SOCKET sock = mSock->getSocket();
@@ -1064,15 +1064,15 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 		if (requestType != NULL) {
 			switch(requestType) {
-			case 1: {
+			case VIEWER_REQUEST_TYPE_CAPTUREVIEW: {
 					captureView();
 					break;
 				}
-			case 2: {
+			case VIEWER_REQUEST_TYPE_DISTANCE_SENSOR: {
 					distanceSensor();
 					break;
 				}
-			case 3: {
+			case VIEWER_REQUEST_TYPE_DETECT_ENTITIES: {
 					detectEntities();
 					break;
 				}
@@ -1081,10 +1081,10 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		if (mServices.size() != 0) 
 			checkRequestFromService();
 
-		Sleep(8);
+		Sleep(8); // TODO: Magic number
 
 	} else {
-		Sleep(8);
+		Sleep(8); // TODO: Magic number
 	}
 
 
@@ -1572,7 +1572,7 @@ bool SgvMain::quit(const CEGUI::EventArgs &e)
 	it = mServices.begin();
 	char tmp[4];
 	char *p = tmp;
-	BINARY_SET_DATA_S_INCR(p,unsigned short, 0x0005);
+	BINARY_SET_DATA_S_INCR(p,unsigned short, 0x0005); // TODO: Magic number
 	BINARY_SET_DATA_S(p,unsigned short, 0x0004);
 	while (it != mServices.end()) {
 		(*it).second->sendData(tmp, 4);
@@ -2182,7 +2182,7 @@ bool SgvMain::createAllEntities()
 				Ogre::Camera *cam = mSceneMgr->createCamera(cam_name);
 				//cam->setPosition(posx, posy, posz);
 				cam->setDirection(0.0, 0.0, 1.0);
-				cam->setFOVy(Ogre::Radian(3.1415f * fov / 180.0f));
+				cam->setFOVy(Ogre::Radian(M_PI * fov / 180.0f));
 				cam->setAspectRatio(ar);
 				cam->setNearClipDistance(Ogre::Real(1.0f));
 				cam->setFarClipDistance(Ogre::Real(3000.0f));
@@ -2963,7 +2963,7 @@ bool SgvMain::recvMoveEntities()
 			if (chfov) {
 				char *fov =strtok_s(NULL, delim, &ctx);
 				float FOV = atof(fov);
-				cam->setFOVy(Ogre::Radian(3.1415f * FOV / 180.0f));
+				cam->setFOVy(Ogre::Radian(M_PI * FOV / 180.0f));
 			}
 
 			char *tmp_as =strtok_s(NULL, delim, &ctx);
@@ -3203,7 +3203,7 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
 	it = mServices.begin();
 	char tmp[4];
 	char *p = tmp;
-	BINARY_SET_DATA_S_INCR(p,unsigned short, 0x0005);
+	BINARY_SET_DATA_S_INCR(p,unsigned short, 0x0005); // TODO: Magic number
 	BINARY_SET_DATA_S(p,unsigned short, 0x0004);
 	while (it != mServices.end()) {
 		(*it).second->sendData(tmp, 4);
@@ -3324,7 +3324,7 @@ bool SgvMain::captureView()
 		char tmp[sizeof(unsigned short)*2];
 		char *p = tmp;
 
-		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0005);
+		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0005); // TODO: Magic number
 		BINARY_SET_DATA_S_INCR(p, unsigned short, sizeof(unsigned short)*2);
 		mService->getControllerSocket(ename)->sendData(tmp, sizeof(unsigned short)*2);
 		mService->setRequestType(NULL);
@@ -3339,7 +3339,7 @@ bool SgvMain::captureView()
 	getImage(cam, bitImage);
 
 	unsigned char *p = bitImage;
-	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0003);
+	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0003); // TODO: Magic number
 
 	BINARY_SET_DATA_S_INCR(p, unsigned short, 1);
 
@@ -3380,7 +3380,7 @@ bool SgvMain::distanceSensor()
 		char tmp[sizeof(unsigned short)*2];
 		char *p = tmp;
 
-		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0006);
+		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0006); // TODO: Magic number
 		BINARY_SET_DATA_S_INCR(p, unsigned short, sizeof(unsigned short)*2);
 		mService->getControllerSocket(ename)->sendData(tmp, sizeof(unsigned short)*2);
 		mService->setRequestType(NULL);
@@ -3412,7 +3412,7 @@ bool SgvMain::distanceSensor()
 	unsigned char *sendImage = new unsigned char[sendSize];
 	unsigned char *p = sendImage;
 
-	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0003);
+	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0003); // TODO: Magic number
 
 	BINARY_SET_DATA_S_INCR(p, unsigned short, type + 2);
 
@@ -3456,7 +3456,7 @@ bool SgvMain::detectEntities()
 		char tmp[sizeof(unsigned short)*2];
 		char *p = tmp;
 
-		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0006);
+		BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0006); // TODO: Magic number
 		BINARY_SET_DATA_S_INCR(p, unsigned short, sizeof(unsigned short)*2);
 		mService->getControllerSocket(ename)->sendData(tmp, sizeof(unsigned short)*2);
 		mService->setRequestType(NULL);
@@ -3628,7 +3628,7 @@ bool SgvMain::detectEntities()
 	char *sendBuff = new char[sendSize];
 	char *p = sendBuff;
 
-	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0008);
+	BINARY_SET_DATA_S_INCR(p, unsigned short, 0x0008); // TODO: Magic number
 	BINARY_SET_DATA_S_INCR(p, unsigned short, sendSize);
 
 	memcpy(p,sendData.c_str(),sendData.size());
@@ -5112,6 +5112,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
-
-
