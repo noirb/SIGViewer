@@ -1,4 +1,6 @@
 #include "SgvEntity.h"
+#include "SIGVerse.h"
+
 //#include "Geometrik/Mesh_sphere.h"
 //#include "Geometrik/Mesh_Cube.h"
 //#include "CX3DAppearanceNode.h"

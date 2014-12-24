@@ -6,6 +6,7 @@
 #include "RenderService.h"
 #include "SIGService.h"
 #include "binary.h"
+#include "SIGVerse.h"
 
 #include <commdlg.h>
 #include <tchar.h>

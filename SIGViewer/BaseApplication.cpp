@@ -15,6 +15,7 @@ This source file is part of the
 -----------------------------------------------------------------------------
 */
 #include "BaseApplication.h"
+#include "SIGVerse.h"
 
 //-------------------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
