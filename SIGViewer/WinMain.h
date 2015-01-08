@@ -6,6 +6,7 @@
 #include "SgvEntity.h"
 #include "SgvX3D.h"
 #include "ViewerService.h"
+#include "SIGVerse.h"
 
 #include <stdio.h> 
 #include <map>
