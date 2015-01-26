@@ -1,0 +1,191 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="BaseApplication.h" />
+    <ClInclude Include="OgreOculus\euler.h" />
+    <ClInclude Include="OgreOculus\OgreOculus.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="SgvEntity.h" />
+    <ClInclude Include="SgvLog.h" />
+    <ClInclude Include="SgvX3D.h" />
+    <ClInclude Include="SIGVerse.h" />
+    <ClInclude Include="ViewerService.h" />
+    <ClInclude Include="WinMain.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CJNIUtil.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CSimplifiedShape.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CVRMLFieldData.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DAppearanceNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DBoxNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DColorNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DConeNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DCoordinateNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DCylinderNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DDirectionalLightNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DField.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DGroupNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DHAnimDisplacerNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DHAnimHumanoidNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DHAnimJointNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DHAnimSegmentNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DHAnimSiteNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DImageTextureNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DIndexedFaceSetNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DIndexedLineSetNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DMaterial.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DMaterialNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DNodeType.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DNormalNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPHumanoidNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPJointNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPSegmentNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DParser.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DParserUtil.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DPointLightNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DShapeNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DSphereNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DSpotLightNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DTextureCoordinateNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DTextureTransformNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DTransformNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\CX3DViewpointNode.h" />
+    <ClInclude Include="x3d\parser\cpp\X3DParser\SgvConfigFile.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="BaseApplication.cpp" />
+    <ClCompile Include="OgreOculus\OgreOculus.cpp" />
+    <ClCompile Include="SgvEntity.cpp" />
+    <ClCompile Include="SgvLog.cpp" />
+    <ClCompile Include="SgvX3D.cpp" />
+    <ClCompile Include="ViewerService.cpp" />
+    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CJNIUtil.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CSimplifiedShape.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CVRMLFieldData.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DAppearanceNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DBoxNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DColorNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DConeNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DCoordinateNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DCylinderNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DDirectionalLightNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DField.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DGroupNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DHAnimDisplacerNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DHAnimHumanoidNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DHAnimJointNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DHAnimSegmentNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DHAnimSiteNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DImageTextureNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DIndexedFaceSetNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DIndexedLineSetNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DMaterialNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DNormalNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPHumanoidNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPJointNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DOpenHRPSegmentNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DParser.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DParserUtil.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DPointLightNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DShapeNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DSphereNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DSpotLightNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DTextureCoordinateNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DTextureTransformNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DTransformNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\CX3DViewpointNode.cpp" />
+    <ClCompile Include="x3d\parser\cpp\X3DParser\SgvConfigFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="SIGViewer.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="x3d\parser\cpp\X3DParser\Makefile" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{350505AC-7D68-4474-AA63-03C08DAD5A5C}</ProjectGuid>
+    <RootNamespace>SIGViewer</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)_2010\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IntDir>$(Configuration)_2010\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)_2010\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IntDir>$(Configuration)_2010\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include\OIS;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include\OGRE;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\Samples\Common\include;C:\SIGVerse\src\CEGUI-0.7.6\cegui\include;C:\SIGVerse\src\jdk\include;C:\SIGVerse\src\jdk\include\win32;.\x3d\parser\cpp\X3DParser;C:\SIGVerse\src\libssh2-1.4.2-openssl-x86-win32nt-msvc\include;C:\SIGVerse\src\zlib\include;C:\SIGVerse\GitHub\Client\SIGService\Windows\SIGService;C:\SIGVerse\src\boost_1_55_0;C:\SIGVerse\src\OculusSDK\LibOVR\Include</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\lib\$(ConfigurationName);C:\SIGVerse\src\CEGUI-0.7.6\lib;C:\SIGVerse\src\jdk\lib;C:\SIGVerse\src\boost_1_55_0\lib32-msvc-10.0;C:\SIGVerse\src\libssh2-1.4.2-openssl-x86-win32nt-msvc\lib;C:\SIGVerse\src\zlib\lib;C:\SIGVerse\GitHub\Client\SIGService\Windows\Release_2010;C:\SIGVerse\src\OculusSDK\LibOVR\Lib\Win32</AdditionalLibraryDirectories>
+      <AdditionalDependencies>OgreMain.lib OIS.lib OgreTerrain.lib comctl32.lib ws2_32.lib winmm.lib CEGUIBase.lib CEGUIOgreRenderer.lib jvm.lib zlib.lib SIGService.lib libovr.lib</AdditionalDependencies>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include\OIS;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\include\OGRE;C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\Samples\Common\include;C:\SIGVerse\src\CEGUI-0.7.6\cegui\include;C:\SIGVerse\src\jdk\include;C:\SIGVerse\src\jdk\include\win32;.\x3d\parser\cpp\X3DParser;C:\SIGVerse\src\libssh2-1.4.2-openssl-x86-win32nt-msvc\include;C:\SIGVerse\src\zlib\include;C:\SIGVerse\GitHub\Client\SIGService\Windows\SIGService;C:\SIGVerse\src\boost_1_55_0;C:\SIGVerse\src\OculusSDK\LibOVR\Include</AdditionalIncludeDirectories>
+      <CompileAs>CompileAsCpp</CompileAs>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>OgreMain.lib;OIS.lib;OgreTerrain.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase.lib;CEGUIOgreRenderer.lib;jvm.lib;zlib.lib;SIGService.lib;libovr.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\SIGVerse\src\OgreSDK_vc10_v1-8-0\lib\$(Configuration);C:\SIGVerse\src\CEGUI-0.7.6\lib;C:\SIGVerse\src\jdk\lib;C:\SIGVerse\src\boost_1_55_0\lib32-msvc-10.0;C:\SIGVerse\src\libssh2-1.4.2-openssl-x86-win32nt-msvc\lib;C:\SIGVerse\src\zlib\lib;C:\SIGVerse\GitHub\Client\SIGService\Windows\Release_2010;C:\SIGVerse\src\OculusSDK\LibOVR\Lib\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
