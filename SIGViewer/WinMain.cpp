@@ -971,8 +971,8 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		oculus.m_cameras[0]->setPosition(0.0f,0.0f,0.0f);
 		oculus.m_cameras[1]->setPosition(0.0f,0.0f,0.0f);
 		oculus.getCameraNode()->setPosition(OculusCamera->getRealPosition());
-		oculus.m_cameras[0]->setDirection(OculusCamera->getRealDirection());
-		oculus.m_cameras[1]->setDirection(OculusCamera->getRealDirection());
+		oculus.m_cameras[0]->setOrientation(OculusCamera->getRealOrientation());
+		oculus.m_cameras[1]->setOrientation(OculusCamera->getRealOrientation());
 	}
 
 	//static bool sended;
