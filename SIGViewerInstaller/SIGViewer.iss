@@ -1,15 +1,15 @@
 [Setup]
 
-AppId={{F8C22B70-32DA-4CDC-BBBD-A3B7BD46F595}}
+AppId={{E043678D-C2F9-45B3-93CD-9E3D6803E82E}}
 // Application name
 AppName=SIGViewer
 // Application name and version number
-AppVerName=SIGViewer 2.3.0
+AppVerName=SIGViewer 2.3.1
 AppPublisher=National Institute of Informatics
 AppPublisherURL=http://www.sigverse.org/
 AppSupportURL=http://www.sigverse.org/
 AppUpdatesURL=http://www.sigverse.org/
-DefaultDirName={pf}\SIGViewer_2.3.0
+DefaultDirName={pf}\SIGViewer_2.3.1
 DefaultGroupName=SIGViewer
 OutputBaseFilename=setup
 OutputDir=SIGViewerSetup
@@ -52,7 +52,7 @@ Source: "../SIGViewer/Xj3D/*" ; DestDir:{app}/SIGViewer/bin/Xj3D/;  Flags: recur
 
 [Icons]
 Name: "{group}\SIGViewer"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"
-Name: "{commondesktop}\SIGViewer 2.3.0"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"; Tasks: desktopicon
+Name: "{commondesktop}\SIGViewer 2.3.1"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"; Tasks: desktopicon
 ; begin(add)(2010/2/24) install SIGWorldEditor.exe
 
 
@@ -103,12 +103,12 @@ begin
                 VC2010RuntimePage.ID,
                 'Install Library for SIGViewer',
                 'JRE (Java Runtime Environment) install',
-                'SIGViewer needs to install JRE 7.0 or later. Do you accept it?',
+                'SIGViewer needs to install JRE 8.0 or later. Do you accept it?',
                 True, False);
-        JREPage.Add('Yes. please install JRE 7.0');
-        JREPage.Add('No. I have already installed JRE 7.0 No need to install it again.');
+        JREPage.Add('Yes. please install JRE 8.0');
+        JREPage.Add('No. I have already installed JRE 8.0 No need to install it again.');
         JREPage.Values[0]:=True;
-        jvmpath := '{pf}\Java\jre7\bin\client\';
+        jvmpath := '{pf}\Java\jre1.8.0_45\bin\client\';
 end;
 
 // **************************************************************
@@ -196,7 +196,7 @@ begin
                 // ------------------------------------
                 //      get path of the installer
                 // ------------------------------------
-                JREInstellerPath := ExpandConstant('{src}\downloads\jre-7u75-windows-i586-iftw.exe');
+                JREInstellerPath := ExpandConstant('{src}\downloads\jre-8u45-windows-i586-iftw.exe');
 
                 // ------------------------------------
                 //      run installer
