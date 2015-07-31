@@ -139,6 +139,9 @@ protected:
 	//! Event handler of switching sub view
 	bool subView(const CEGUI::EventArgs &e);
 
+	//! Event handler to select Camera list.
+	bool selectCameraList(const CEGUI::EventArgs &eventArgs);
+
 	//! Event handler of over-writing function of shape file
 	bool overwriteShape(const CEGUI::EventArgs &e);
 

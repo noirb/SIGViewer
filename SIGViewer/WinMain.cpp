@@ -60,6 +60,8 @@ static const int MAX_SUBVIEW = 4;
 
 static const int MIN_SIZE = 100;
 
+static const int MAX_CAMERA_LIST = 20 + 1; // 20 Cameras and PlayerCam
+
 //-------------------------------------------------------------------------------------
 SgvMain::SgvMain(void)
 : mRenderer(0), 
@@ -134,6 +136,8 @@ void SgvMain::createScene(void)
 	CEGUI::SchemeManager::getSingleton().create("WindowsLook.scheme");
 
 	CEGUI::System::getSingleton().setDefaultMouseCursor("WindowsLook", "MouseArrow");
+
+	if (OculusMode){ mSubView = false; }
 
 	createInitWindow();
 
@@ -473,7 +477,14 @@ void SgvMain::createInitWindow()
 	// Menu item
 	CEGUI::Window *subview = wmgr.createWindow("TaharezLook/MenuItem", "subview");
 	subview->setAlwaysOnTop(true);
-	subview->setText("* Sub View");
+	if (mSubView)
+	{
+		subview->setText("* Sub View");
+	}
+	else
+	{
+		subview->setText("  Sub View");
+	}
 
 	// Menu item
 	CEGUI::Window *overwrite = wmgr.createWindow("TaharezLook/MenuItem", "overwrite");
@@ -507,6 +518,14 @@ void SgvMain::createInitWindow()
 	epm->addChildWindow(cov);
 
 	entity_pos->addChildWindow(epm);
+
+
+	// Select Camera
+	CEGUI::Window *selectCamera = wmgr.createWindow("TaharezLook/MenuItem", "SelectCamera");
+	selectCamera->setText("  Select Camera");
+	selectCamera->setEnabled(false);
+	selectCamera->setAlwaysOnTop(true);
+
 
 	//
 	//CEGUI::Window *swo = wmgr.createWindow("TaharezLook/MenuItem", "StartWithOgreSetting");
@@ -635,6 +654,8 @@ void SgvMain::createInitWindow()
 	settings_menu->addChildWindow(subview);
 	settings_menu->addChildWindow(overwrite);
 	settings_menu->addChildWindow(entity_pos);
+	settings_menu->addChildWindow(selectCamera);
+
 #ifdef _OLD_VERSION
 	settings_menu->addChildWindow(swo);
 #endif
@@ -1673,6 +1694,55 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 			return false;
 		}
 
+		/*
+		 * Clear Camera list
+		 */
+		CEGUI::Window *selectCamera = wmgr.getWindow("SelectCamera");
+		selectCamera->removeChildWindow("SelectCameraList");
+
+		/*
+		 * Add Camera list
+		 */
+		CEGUI::Window *selectCameraList = wmgr.createWindow("TaharezLook/PopupMenu", "SelectCameraList");
+		selectCameraList->setAlwaysOnTop(true);
+
+		// Add Main view port 
+		CEGUI::Window *mainViewPortCameraWindow = wmgr.createWindow("TaharezLook/MenuItem", "PlayerCam");
+		mainViewPortCameraWindow->setAlwaysOnTop(true);
+		mainViewPortCameraWindow->setText("PlayerCam");
+		mainViewPortCameraWindow->subscribeEvent(CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber(&SgvMain::selectCameraList, this));
+		selectCameraList->addChildWindow(mainViewPortCameraWindow);
+
+		bool isCameraListNumberMax = false;
+
+		// Add Avatar camera
+		for(std::map<std::string ,Sgv::SgvEntity*>::iterator itAllentities = mAllEntities.begin(); itAllentities != mAllEntities.end(); itAllentities++) 
+		{
+			std::map<int, std::string> cameras = (itAllentities->second)->getCameraName();
+
+			for (std::map<int, std::string>::iterator itCameras = cameras.begin(); itCameras != cameras.end(); itCameras ++)
+			{
+				CEGUI::Window *cameraWindow = wmgr.createWindow("TaharezLook/MenuItem", itCameras->second);
+				cameraWindow->setAlwaysOnTop(true);
+				cameraWindow->setText(itCameras->second);
+				cameraWindow->subscribeEvent(CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber(&SgvMain::selectCameraList, this));
+
+				selectCameraList->addChildWindow(cameraWindow);
+
+				if (selectCameraList->getChildCount() == MAX_CAMERA_LIST)
+				{ 
+					mLog->warning("Exceed the maximum number of camera.");
+					isCameraListNumberMax = true; 
+				}
+
+				if (isCameraListNumberMax){ break; }
+			}
+			if (isCameraListNumberMax){ break; }
+		}
+
+		selectCamera->addChildWindow(selectCameraList);
+
+
 		mHost = ipString.c_str();
 		mPort = portString.c_str();
 
@@ -1702,6 +1772,11 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 	CEGUI::Window *connect = wmgr.getWindow("Connect");
 	connect->setVisible(false);
+
+
+	CEGUI::Window *selectCameraWindow = wmgr.getWindow("SelectCamera");
+	selectCameraWindow->setEnabled(true);
+
 
 	CEGUI::Window *start_plugin = wmgr.getWindow("start_plugin");
 	start_plugin->setEnabled(true);
@@ -2330,6 +2405,7 @@ bool SgvMain::startRequest(const CEGUI::EventArgs &e)
 	return true;
 }
 
+
 bool SgvMain::agentView1(const CEGUI::EventArgs &e)
 {
 	if (OculusMode) {
@@ -2425,6 +2501,39 @@ bool SgvMain::subView(const CEGUI::EventArgs &e)
 
 	return true;
 }
+
+
+//! Event handler to select Camera list.
+bool SgvMain::selectCameraList(const CEGUI::EventArgs &eventArgs)
+{
+	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(eventArgs);
+
+	std::string cameraName = std::string(windowEventArgs.window->getName().c_str());
+
+	Ogre::Camera *cam;
+
+	if (cameraName == "PlayerCam")
+	{
+		cam = mCamera;
+	}
+	else
+	{
+		cam = mSceneMgr->getCamera(cameraName);
+	}
+
+	if (OculusMode)
+	{
+		OculusCamera = cam;
+		OculusCameraFlag = true;
+	}
+	else
+	{
+		mViewPort->setCamera(cam);
+	}
+
+	return true;
+}
+
 
 bool SgvMain::overwriteShape(const CEGUI::EventArgs &e)
 {
@@ -4533,7 +4642,7 @@ bool SgvMain::checkRequestFromService()
 
 			switch(header)
 			{
-			case SV_GET_IMAGE: 
+				case SV_GET_IMAGE: 
 				{
 					char *ename = strtok_s(p, delim, &ctx);
 
@@ -4603,7 +4712,7 @@ bool SgvMain::checkRequestFromService()
 					delete [] bitImage;
 					break;
 				}
-			case SV_GET_DISTANCE: 
+				case SV_GET_DISTANCE: 
 				{
 
 					double offset = BINARY_GET_DOUBLE_INCR(p);
@@ -4655,13 +4764,13 @@ bool SgvMain::checkRequestFromService()
 					*/
 					break;
 				}
-			case SV_DISCONNECT: 
+				case SV_DISCONNECT: 
 				{
 					delete (*it).second;
 					mServices.erase(it);
 					return false;
 				}
-			case SV_GET_DISTANCEIMAGE: 
+				case SV_GET_DISTANCEIMAGE: 
 				{
 					double offset = BINARY_GET_DOUBLE_INCR(p);
 					double range = BINARY_GET_DOUBLE_INCR(p);
@@ -4737,7 +4846,7 @@ bool SgvMain::checkRequestFromService()
 					//sprintf(tmp, "%s, %d, %d, %d", ename, dim, id, size);
 					//MessageBox( NULL, tmp, "Error", MB_OK);
 				}
-			case SV_GET_DEPTHIMAGE: 
+				case SV_GET_DEPTHIMAGE: 
 				{
 					double offset = BINARY_GET_DOUBLE_INCR(p);
 					double range = BINARY_GET_DOUBLE_INCR(p);
