@@ -1719,10 +1719,20 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 		// Add Avatar camera
 		for(std::map<std::string ,Sgv::SgvEntity*>::iterator itAllentities = mAllEntities.begin(); itAllentities != mAllEntities.end(); itAllentities++) 
 		{
+			if (isCameraListNumberMax){ break; }
+
 			std::map<int, std::string> cameras = (itAllentities->second)->getCameraName();
 
 			for (std::map<int, std::string>::iterator itCameras = cameras.begin(); itCameras != cameras.end(); itCameras ++)
 			{
+				if (selectCameraList->getChildCount() == MAX_CAMERA_LIST)
+				{ 
+					mLog->printf(Sgv::LogBase::ERR, "Exceed the maximum number of camera. Maximum number is %d.", (MAX_CAMERA_LIST-1)); //Exclude PlayerCam.
+					isCameraListNumberMax = true; 
+				}
+
+				if (isCameraListNumberMax){ break; }
+
 				CEGUI::Window *cameraWindow = wmgr.createWindow("TaharezLook/MenuItem", itCameras->second);
 				cameraWindow->setAlwaysOnTop(true);
 				cameraWindow->setText(itCameras->second);
@@ -1730,15 +1740,7 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 				selectCameraList->addChildWindow(cameraWindow);
 
-				if (selectCameraList->getChildCount() == MAX_CAMERA_LIST)
-				{ 
-					mLog->warning("Exceed the maximum number of camera.");
-					isCameraListNumberMax = true; 
-				}
-
-				if (isCameraListNumberMax){ break; }
 			}
-			if (isCameraListNumberMax){ break; }
 		}
 
 		selectCamera->addChildWindow(selectCameraList);
