@@ -457,9 +457,9 @@ void SgvMain::createInitWindow()
 	menu->setAlwaysOnTop(true);
 
 	// Menu item
-	CEGUI::Window *settings = wmgr.createWindow("TaharezLook/MenuItem", "item1");
-	settings->setText("Settings");
-	settings->setAlwaysOnTop(true);
+	CEGUI::Window *display = wmgr.createWindow("TaharezLook/MenuItem", "item1");
+	display->setText("Display");
+	display->setAlwaysOnTop(true);
 
 	// Menu item
 	CEGUI::Window *plugin = wmgr.createWindow("TaharezLook/MenuItem", "item2");
@@ -471,8 +471,8 @@ void SgvMain::createInitWindow()
 	option->setAlwaysOnTop(true);
 	//////////
 
-	CEGUI::PopupMenu *settings_menu = (CEGUI::PopupMenu*)wmgr.createWindow("TaharezLook/PopupMenu", "settings");
-	settings_menu->setAlwaysOnTop(true);
+	CEGUI::PopupMenu *display_menu = (CEGUI::PopupMenu*)wmgr.createWindow("TaharezLook/PopupMenu", "display");
+	display_menu->setAlwaysOnTop(true);
 
 	// Menu item
 	CEGUI::Window *subview = wmgr.createWindow("TaharezLook/MenuItem", "subview");
@@ -483,7 +483,7 @@ void SgvMain::createInitWindow()
 	}
 	else
 	{
-		subview->setText("  Sub View");
+		subview->setText("   Sub View");
 	}
 
 	// Menu item
@@ -497,28 +497,11 @@ void SgvMain::createInitWindow()
 	entity_pos->setText("  Entity Position");
 	entity_pos->setAlwaysOnTop(true);
 
-	// EntityPosition menu
-	CEGUI::Window *epm = wmgr.createWindow("TaharezLook/PopupMenu", "EntityPositionMenu");
-	epm->setAlwaysOnTop(true);
-	CEGUI::Window *mov = wmgr.createWindow("TaharezLook/MenuItem", "MeanOfVertex");
-	mov->setAlwaysOnTop(true);
-	CEGUI::Window *cov = wmgr.createWindow("TaharezLook/MenuItem", "CenterOfVertex");
-	cov->setAlwaysOnTop(true);
-
-	if (mAlgEntityPos == 1) {
-		mov->setText("* Average vertices (old)");
-		cov->setText("  Center of vertices (default)");
-	}
-	if (mAlgEntityPos == 2) {
-		mov->setText("  Average vertices (old)");
-		cov->setText("* Center of vertices (default)");
-	}
-
-	epm->addChildWindow(mov);
-	epm->addChildWindow(cov);
-
-	entity_pos->addChildWindow(epm);
-
+	// Menu item mejirusi 
+	CEGUI::MenuItem *dmode = (CEGUI::MenuItem*)wmgr.createWindow("TaharezLook/MenuItem", "dynamicsview");
+	dmode->setText("   Dynamics view");
+	dmode->setEnabled(false);
+	dmode->setAlwaysOnTop(true);
 
 	// Select Camera
 	CEGUI::Window *selectCamera = wmgr.createWindow("TaharezLook/MenuItem", "SelectCamera");
@@ -539,11 +522,28 @@ void SgvMain::createInitWindow()
 	CEGUI::Window *option_menu = wmgr.createWindow("TaharezLook/PopupMenu", "option");
 	option_menu->setAlwaysOnTop(true);
 
-	// Menu item mejirusi 
-	CEGUI::MenuItem *dmode = (CEGUI::MenuItem*)wmgr.createWindow("TaharezLook/MenuItem", "dynamicsview");
-	dmode->setText("   Dynamics view");
-	dmode->setEnabled(false);
-	dmode->setAlwaysOnTop(true);
+	// EntityPosition menu
+	CEGUI::Window *epm = wmgr.createWindow("TaharezLook/PopupMenu", "EntityPositionMenu");
+	epm->setAlwaysOnTop(true);
+	CEGUI::Window *mov = wmgr.createWindow("TaharezLook/MenuItem", "MeanOfVertex");
+	mov->setAlwaysOnTop(true);
+	CEGUI::Window *cov = wmgr.createWindow("TaharezLook/MenuItem", "CenterOfVertex");
+	cov->setAlwaysOnTop(true);
+
+	if (mAlgEntityPos == 1) {
+		mov->setText("* Average vertices (old)");
+		cov->setText("   Center of vertices (default)");
+	}
+	if (mAlgEntityPos == 2) {
+		mov->setText("   Average vertices (old)");
+		cov->setText("* Center of vertices (default)");
+	}
+
+	epm->addChildWindow(mov);
+	epm->addChildWindow(cov);
+
+	entity_pos->addChildWindow(epm);
+
 
 	if (!mPSrvs.empty()) mPSrvs.clear();
 	int count = 0;
@@ -646,24 +646,25 @@ void SgvMain::createInitWindow()
 	connect->addChildWindow(tusername);
 	connect->addChildWindow(tpasswd);
 
-	settings->addChildWindow(settings_menu);
+	display->addChildWindow(display_menu);
 	plugin  ->addChildWindow(plugin_menu);
 	option  ->addChildWindow(option_menu);
 	start_plugin->addChildWindow(startplugin_menu);
 
-	settings_menu->addChildWindow(subview);
-	settings_menu->addChildWindow(overwrite);
-	settings_menu->addChildWindow(entity_pos);
-	settings_menu->addChildWindow(selectCamera);
+	display_menu->addChildWindow(subview);
+	display_menu->addChildWindow(overwrite);
+	display_menu->addChildWindow(dmode);
+	display_menu->addChildWindow(selectCamera);
 
 #ifdef _OLD_VERSION
 	settings_menu->addChildWindow(swo);
 #endif
 	plugin_menu->addChildWindow(add_plugin);
 	plugin_menu->addChildWindow(start_plugin);
-	option_menu->addChildWindow(dmode);
 
-	menu->addChildWindow(settings);
+	option_menu->addChildWindow(entity_pos);
+
+	menu->addChildWindow(display);
 	menu->addChildWindow(plugin);
 	menu->addChildWindow(option);
 
@@ -2477,7 +2478,7 @@ bool SgvMain::subView(const CEGUI::EventArgs &e)
 			mSubWindows[i]->setVisible(false);
 			mSubViews  [i]->setVisible(false);
 		}
-		swin->setText("  Sub View");
+		swin->setText("   Sub View");
 
 		mSubView = false;
 	}
@@ -2614,7 +2615,7 @@ bool SgvMain::dynamicsView(const CEGUI::EventArgs &e)
 		for (int i = 0; i < odesize; i++) {
 			m_ODENodes[i]->setVisible(false);
 		}
-		dview->setText("   Dynamics view");
+		dview->setText("   Dynamics View");
 		m_dynamicsView = 0;
 
 		std::map<std::string, Sgv::SgvEntity*>::iterator it = mAllEntities.begin();
@@ -4552,7 +4553,7 @@ bool SgvMain::setMOV(const CEGUI::EventArgs &e)
 	CEGUI::Window *mov = wmgr.getWindow("MeanOfVertex");
 	CEGUI::Window *cov = wmgr.getWindow("CenterOfVertex");
 	mov->setText("* Average vertices (old)");
-	cov->setText("  Center of vertices (default)");
+	cov->setText("   Center of vertices (default)");
 	mAlgEntityPos = 1;
 	WritePrivateProfileSection("ALGORITHM", "EntityPosition=1", mSettingPath);
 	return true;
@@ -4564,7 +4565,7 @@ bool SgvMain::setCOV(const CEGUI::EventArgs &e)
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window *mov = wmgr.getWindow("MeanOfVertex");
 	CEGUI::Window *cov = wmgr.getWindow("CenterOfVertex");
-	mov->setText("  Average vertices (old)");
+	mov->setText("   Average vertices (old)");
 	cov->setText("* Center of vertices (default)");
 	mAlgEntityPos = 2;
 	WritePrivateProfileSection("ALGORITHM", "EntityPosition=2", mSettingPath);
