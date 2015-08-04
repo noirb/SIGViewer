@@ -109,10 +109,7 @@ protected:
 	bool startRequest(const CEGUI::EventArgs &e);
 
 	//! Use agent's view as main view
-	bool agentView1(const CEGUI::EventArgs &e);
-	bool agentView2(const CEGUI::EventArgs &e);
-	bool agentView3(const CEGUI::EventArgs &e);
-	bool agentView4(const CEGUI::EventArgs &e);
+	bool agentView(const CEGUI::EventArgs &eventArgs);
 
 	//! Create event handler for each service provider
 	//TODO: Are there any smarter method?
@@ -124,13 +121,7 @@ protected:
 
 	int cameraView_Select(const CEGUI::EventArgs &e, int *result);
 
-	bool startService1(const CEGUI::EventArgs &e);
-	bool startService2(const CEGUI::EventArgs &e);
-	bool startService3(const CEGUI::EventArgs &e);
-	bool startService4(const CEGUI::EventArgs &e);
-	bool startService5(const CEGUI::EventArgs &e);
-	bool startService6(const CEGUI::EventArgs &e);
-
+	bool startService(const CEGUI::EventArgs &eventArgs);
 	bool startService(std::string fullpath);
 
 	//! Toggle the flag of ssh connection

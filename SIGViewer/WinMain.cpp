@@ -58,9 +58,12 @@ static const double R_DD = 10.0;
 
 static const int MAX_SUBVIEW = 4;
 
-static const int MIN_SIZE = 100;
+static const int MAX_SERVICE_SIZE = 9;
 
 static const int MAX_CAMERA_LIST = 20 + 1; // 20 Cameras and PlayerCam
+
+static const int PRIVATE_PROFILE_STRING_SIZE = 1024;
+static const int PRIVATE_PROFILE_SECTION_LEN = 1024;
 
 //-------------------------------------------------------------------------------------
 SgvMain::SgvMain(void)
@@ -116,10 +119,10 @@ void SgvMain::createScene(void)
 
 	TCHAR pathText[MAX_STRING_NUM];
 
-	GetPrivateProfileString("SHAPEFILE","OVERWRITE",'\0', pathText, 1024, mSettingPath);
+	GetPrivateProfileString("SHAPEFILE","OVERWRITE",'\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (strcmp(pathText,"true") == 0)  mOverWrite = true;
 
-	GetPrivateProfileString("ALGORITHM","EntityPosition",'\0', pathText, 1024, mSettingPath);
+	GetPrivateProfileString("ALGORITHM","EntityPosition",'\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if      (strcmp(pathText,"1") == 0)  mAlgEntityPos = 1;
 	else if (strcmp(pathText,"2") == 0)  mAlgEntityPos = 2;
 
@@ -150,7 +153,7 @@ void SgvMain::createScene(void)
 		*plane,
 		3000, 3000, 50, 50, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
 
-	GetPrivateProfileString("PLANE", "PLANE", '\0', pathText, 1024, mSettingPath);
+	GetPrivateProfileString("PLANE", "PLANE", '\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (0 < strlen(pathText)) {
 		Ogre::Entity* entGround = mSceneMgr->createEntity("GroundEntity", "MyPlane");
 		mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(entGround);
@@ -221,15 +224,15 @@ void SgvMain::createScene(void)
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 
 	Ogre::Light *l = mSceneMgr->createLight("MainLight");
-	l->setType( Light::LightTypes::LT_DIRECTIONAL );
+	l->setType( Ogre::Light::LightTypes::LT_DIRECTIONAL );
 	l->setPosition(1000.0f, 1000.0f, -1000.0f);
 	l->setDirection(Ogre::Vector3(0, -1, 0));
 	l->setDiffuseColour(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 	l->setSpecularColour(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 
-   	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
+	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_NONE);
 
-	GetPrivateProfileString("SKYPLANE", "SKYPLANE", '\0', pathText, 1024, mSettingPath);
+	GetPrivateProfileString("SKYPLANE", "SKYPLANE", '\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (0 < strlen(pathText)) {
 		Ogre::Plane sky_plane;
 		sky_plane.d = 3000;
@@ -319,7 +322,7 @@ void SgvMain::createInitWindow()
 	sname->setPosition(CEGUI::UVector2(CEGUI::UDim(0.55f, 0.0f), CEGUI::UDim(0.00f, 0.0f)));
 
 	TCHAR strText[MAX_STRING_NUM];
-	GetPrivateProfileString("LOGIN","SERVICE_NAME", '\0',strText, 1024, mSettingPath);
+	GetPrivateProfileString("LOGIN","SERVICE_NAME", '\0',strText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 
 	if (strText[0] == '\0') sname->setText("SIGViewer");
 	else sname->setText(strText);
@@ -328,7 +331,7 @@ void SgvMain::createInitWindow()
 	serverip->setSize(CEGUI::UVector2(CEGUI::UDim(0.4f, 0.0f), CEGUI::UDim(0.11f, 0.0f)));
 	serverip->setPosition(CEGUI::UVector2(CEGUI::UDim(0.55f, 0.0f), CEGUI::UDim(0.15f, 0.0f)));
 
-	GetPrivateProfileString("LOGIN","SERVER_IP",'\0',strText, 1024, mSettingPath);
+	GetPrivateProfileString("LOGIN","SERVER_IP",'\0',strText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 
 	if (strText[0] == '\0') serverip->setText("localhost");
 	else serverip->setText(strText);
@@ -337,7 +340,7 @@ void SgvMain::createInitWindow()
 	port->setSize(CEGUI::UVector2(CEGUI::UDim(0.4f, 0.0f), CEGUI::UDim(0.11f, 0.0f)));
 	port->setPosition(CEGUI::UVector2(CEGUI::UDim(0.55f, 0.0f), CEGUI::UDim(0.3f, 0.0f)));
 
-	GetPrivateProfileString("LOGIN","SERVER_PORT", '\0',strText, 1024, mSettingPath);
+	GetPrivateProfileString("LOGIN","SERVER_PORT", '\0',strText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (strText[0] == '\0') port->setText("9000");
 	else port->setText(strText);
 
@@ -345,7 +348,7 @@ void SgvMain::createInitWindow()
 	ssh_checkbox->setSize(CEGUI::UVector2(CEGUI::UDim(0.5f, 0.0f), CEGUI::UDim(0.11f, 0.0f)));
 	ssh_checkbox->setPosition(CEGUI::UVector2(CEGUI::UDim(0.45f, 0.0f), CEGUI::UDim(0.45f, 0.0f)));
 
-	GetPrivateProfileString("LOGIN","SSH_CHECK", '\0',strText, 1024, mSettingPath);
+	GetPrivateProfileString("LOGIN","SSH_CHECK", '\0',strText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (strcmp(strText, "true") == 0) ssh_checkbox->setSelected(true);
 
 	CEGUI::Window *username = wmgr.createWindow("OgreTray/Editbox", "UserName");
@@ -356,7 +359,7 @@ void SgvMain::createInitWindow()
 		username->setAlpha(0.4f);
 	}
 
-	GetPrivateProfileString("LOGIN","SSH_USERNAME", '\0',strText, 1024, mSettingPath);
+	GetPrivateProfileString("LOGIN","SSH_USERNAME", '\0',strText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (strText[0] != '\0') username->setText(strText);
 
 	CEGUI::Window *passwd = wmgr.createWindow("OgreTray/Editbox", "Password");
@@ -438,8 +441,7 @@ void SgvMain::createInitWindow()
 	rtray->setPosition(CEGUI::UVector2(CEGUI::UDim(0.24f, 0.0f), CEGUI::UDim(0.79f, 0.0f)));
 	rtray->setCloseButtonEnabled(true);
 	CEGUI::PushButton* closebutton = rtray->getCloseButton();
-	closebutton->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::closeRecvMessageTray, this));
+	closebutton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::closeRecvMessageTray, this));
 	rtray->setAlpha(0.5f);
 
 	mTelop = wmgr.createWindow("Vanilla/Listbox", "Telop");
@@ -555,42 +557,32 @@ void SgvMain::createInitWindow()
 		std::string pathnum = std::string(tmp);
 		std::string key = "PATH" + pathnum;
 
-		GetPrivateProfileString("PLUGIN",key.c_str(),'\0', pathText, 1024, mSettingPath);
+		GetPrivateProfileString("PLUGIN",key.c_str(),'\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 
 		if (pathText[0] == '\0') break;
 
-		if (count > 10) break;
+		if (count >= MAX_SERVICE_SIZE)
+		{
+			char msg[MAX_STRING_NUM];
+			sprintf_s(msg, MAX_STRING_NUM, "Exceed the maximum number of Service. Maximum number is %d.", MAX_SERVICE_SIZE);
+			MessageBox( NULL, msg, _T("Error"), MB_OK);
+			break;
+		}
 
 		mPSrvs.push_back(pathText);
 
 		char * filename = getFileName((char*)pathText);
-		CEGUI::Window *tmp1 = wmgr.createWindow("TaharezLook/MenuItem", filename);
-		tmp1->setAlwaysOnTop(true);
-		tmp1->setText(filename);
-		startplugin_menu->addChildWindow(tmp1);
-		//if (count == 0)
+		CEGUI::Window *serviceItemWindow = wmgr.createWindow("TaharezLook/MenuItem", filename);
+		serviceItemWindow->setAlwaysOnTop(true);
+		serviceItemWindow->setText(filename);
+		serviceItemWindow->setUserString("FullPath", pathText);
+		startplugin_menu->addChildWindow(serviceItemWindow);
 
-		if (count == 0)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService1, this));
-		else if (count == 1)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService2, this));
-		else if (count == 2)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService3, this));
-		else if (count == 3)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService4, this));
-		else if (count == 4)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService5, this));
-		else if (count == 5)
-			tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, 
-			                     CEGUI::Event::Subscriber(&SgvMain::startService6, this));
+		serviceItemWindow->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService, this));
 
 		count++;
 	}
+
 
 #ifdef _OLD_VERSION
 	// Menu item
@@ -608,26 +600,13 @@ void SgvMain::createInitWindow()
 	start_plugin->setText("  Start");
 	start_plugin->setAlwaysOnTop(true);
 
-	subview->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::subView, this));
-
-	overwrite->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::overwriteShape, this));
-
-	ssh_checkbox->subscribeEvent(CEGUI::Checkbox::EventMouseClick,
-		CEGUI::Event::Subscriber(&SgvMain::sshCheckONOFF, this));
-
-	dmode->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::dynamicsView, this));
-
-	mov->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::setMOV, this));
-
-	cov->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::setCOV, this));
-
-	add_plugin->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::editService, this));
+	subview     ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::subView,        this));
+	overwrite   ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::overwriteShape, this));
+	ssh_checkbox->subscribeEvent(CEGUI::Checkbox::EventMouseClick, CEGUI::Event::Subscriber(&SgvMain::sshCheckONOFF,  this));
+	dmode       ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::dynamicsView,   this));
+	mov         ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::setMOV,         this));
+	cov         ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::setCOV,         this));
+	add_plugin  ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::editService,    this));
 
 	// editbox
 	connect->addChildWindow(sname);
@@ -674,8 +653,7 @@ void SgvMain::createInitWindow()
 
 	CEGUI::System::getSingleton().setGUISheet(sheet);
 
-	cb->subscribeEvent(CEGUI::PushButton::EventClicked,
-		CEGUI::Event::Subscriber(&SgvMain::connect, this));
+	cb->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::connect, this));
 
 	Ogre::Camera *tmp_cam = mSceneMgr->createCamera("RTTCam1");
 
@@ -684,9 +662,10 @@ void SgvMain::createInitWindow()
 	mTidx = -1;
 	char tmp_name1[MAX_STRING_NUM], tmp_name2[MAX_STRING_NUM], tmp_name3[MAX_STRING_NUM];
 
-	for (int i = 0; i < MAX_SUBVIEW; i++) {
+	for (int i = 0; i < MAX_SUBVIEW; i++) 
+	{
 		sprintf(tmp_name1, "RTT_%d",i);
-		sprintf(tmp_name2, "cam%d",i + 1);
+		sprintf(tmp_name2, "cam%d", i + 1);
 		sprintf(tmp_name3, "FW_%d", i);
 
 		Ogre::TexturePtr tex = mRoot->getTextureManager()->createManual(
@@ -708,8 +687,7 @@ void SgvMain::createInitWindow()
 		mViews.push_back(view);
 		CEGUI::Texture &guiTex = mRenderer->createTexture(tex);
 
-		CEGUI::Imageset &imageSet =
-			CEGUI::ImagesetManager::getSingleton().create(tmp_name1, guiTex);
+		CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create(tmp_name1, guiTex);
 
 		if (imageSet.isImageDefined("RTTImage")) {
 			imageSet.getImage("RTTImage");
@@ -734,6 +712,7 @@ void SgvMain::createInitWindow()
 		fb->setSize(CEGUI::UVector2(CEGUI::UDim(0.15f, 0.0f), CEGUI::UDim(0.15f, 0.0f)));
 		fb->setPosition(CEGUI::UVector2(CEGUI::UDim(0.85f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
 		fb->setAlpha(0.50f);
+		fb->setUserString("SubViewIndex", std::to_string((long long)i));
 		tmp_subwin.push_back(fb);
 
 		si->setProperty("Image", CEGUI::PropertyHelper::imageToString(&imageSet.getImage("RTTImage")));
@@ -762,14 +741,9 @@ void SgvMain::createInitWindow()
 	this->mBm[0] = 0.0;
 	this->mBm[1] = 0.0;
 
-	bool (SgvMain::*cfunc[])(const CEGUI::EventArgs &e) = {&SgvMain::agentView1,
-	                                                       &SgvMain::agentView2,
-	                                                       &SgvMain::agentView3,
-	                                                       &SgvMain::agentView4};
-
-	for (int i = 0; i < MAX_SUBVIEW; i++) {
-		tmp_subwin[i]->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(cfunc[i], this));
-
+	for (int i = 0; i < MAX_SUBVIEW; i++) 
+	{
+		tmp_subwin[i]->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::agentView, this));
 	}
 
 	const CEGUI::String mevents[] = {CEGUI::Window::EventMouseButtonDown,
@@ -787,12 +761,12 @@ void SgvMain::createInitWindow()
 			mSubViews[i]->subscribeEvent(mevents[j], CEGUI::Event::Subscriber(mfunc[j], this));
 		}
 		mSubWindows[i]->subscribeEvent(CEGUI::FrameWindow::EventMouseButtonDown, CEGUI::Event::Subscriber(&SgvMain::cameraView_Sizing, this));
-		mSubWindows[i]->subscribeEvent(CEGUI::FrameWindow::EventSized, CEGUI::Event::Subscriber(&SgvMain::cameraView_Sized, this));
+		mSubWindows[i]->subscribeEvent(CEGUI::FrameWindow::EventSized,           CEGUI::Event::Subscriber(&SgvMain::cameraView_Sized,  this));
 	}
 }
 
-int SgvMain::cameraView_Select(const CEGUI::EventArgs &e, int *result) {
-
+int SgvMain::cameraView_Select(const CEGUI::EventArgs &e, int *result) 
+{
 	for (int i = 0; i < MAX_SUBVIEW; i++) {
 
 		double tmx = mSubWindows[i]->getPixelSize().d_width;
@@ -817,15 +791,18 @@ int SgvMain::cameraView_Select(const CEGUI::EventArgs &e, int *result) {
 	return 0;
 }
 
-bool SgvMain::cameraView_Sizing(const CEGUI::EventArgs &e) {
+bool SgvMain::cameraView_Sizing(const CEGUI::EventArgs &e) 
+{
 	cameraView_Select(e, &mTidx);
+
 	if (mTidx < 0) {
-		return true;
+		return false;
 	}
 	return true;
 }
 
-bool SgvMain::cameraView_Sized(const CEGUI::EventArgs &e) {
+bool SgvMain::cameraView_Sized(const CEGUI::EventArgs &e) 
+{
 	if (mTidx < 0) return true;
 
 	double tmx = mSubWindows[mTidx]->getPixelSize().d_width;
@@ -834,16 +811,6 @@ bool SgvMain::cameraView_Sized(const CEGUI::EventArgs &e) {
 	if (tmx - 0.0f <= DBL_EPSILON && tmy - 0.0f <= DBL_EPSILON) {
 		return true;
 	}
-
-	/*
-	if (tmx < MIN_SIZE || tmy < MIN_SIZE) {
-		tmx = (tmx < MIN_SIZE ? MIN_SIZE : tmx);
-		tmy = (tmy < MIN_SIZE ? MIN_SIZE : tmy);
-		
-		mSubWindows[mTidx]->setSize(CEGUI::UVector2(CEGUI::UDim(0.0f, tmx),
-			                                        CEGUI::UDim(0.0f, tmy)));
-	}
-	*/
 
 	CEGUI::UDim hmx = mSubWindows[mTidx]->getXPosition();
 	CEGUI::UDim hmy = mSubWindows[mTidx]->getYPosition();
@@ -862,7 +829,17 @@ bool SgvMain::cameraView_Sized(const CEGUI::EventArgs &e) {
 	return true;
 }
 
-bool SgvMain::cameraView_Down(const CEGUI::EventArgs &e) {
+bool SgvMain::cameraView_Down(const CEGUI::EventArgs &e) 
+{
+//	MessageBox( NULL, "Clicked", "Error", MB_OK);
+	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(e);
+
+	if (windowEventArgs.window->isActive())
+	{
+		MessageBox( NULL, "cameraView_Down is active", "Error", MB_OK);
+	}
+	//std::string cameraName = windowEventArgs.window->getUserString("CameraName").c_str();
+
 
 	cameraView_Select(e, &mTidx);
 	if (mTidx < 0) {
@@ -1085,17 +1062,22 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 		int requestType = mService->getRequestType();
 
-		if (requestType != NULL) {
-			switch(requestType) {
-			case VIEWER_REQUEST_TYPE_CAPTUREVIEW: {
+		if (requestType != NULL) 
+		{
+			switch(requestType) 
+			{
+				case VIEWER_REQUEST_TYPE_CAPTUREVIEW: 
+				{
 					captureView();
 					break;
 				}
-			case VIEWER_REQUEST_TYPE_DISTANCE_SENSOR: {
+				case VIEWER_REQUEST_TYPE_DISTANCE_SENSOR: 
+				{
 					distanceSensor();
 					break;
 				}
-			case VIEWER_REQUEST_TYPE_DETECT_ENTITIES: {
+				case VIEWER_REQUEST_TYPE_DETECT_ENTITIES: 
+				{
 					detectEntities();
 					break;
 				}
@@ -1183,6 +1165,7 @@ CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
 		break;
 	}
 }
+
 bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
 {
 	CEGUI::System::getSingleton().injectMousePosition(arg.state.X.abs, arg.state.Y.abs);
@@ -1655,14 +1638,20 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 	}
 	std::string scheck = "";
 	if (sshCheck) scheck = "true";
-	else         scheck = "false";
-	std::string val_test = 
+	else          scheck = "false";
+
+	std::string tmpStr = 
 		"SERVICE_NAME=" + std::string(snameString.c_str()) + "\n" +
 		"SERVER_IP="    + std::string(ipString.c_str())    + "\n" +
 		"SERVER_PORT="  + std::string(portString.c_str())  + "\n" +
-		"SSH_CHECK="    +                          scheck  + "\n" +
-		"SSH_USERNAME=" + std::string(uname.c_str())       + '\0';
-	WritePrivateProfileSection("LOGIN", val_test.c_str(), mSettingPath);
+		"SSH_CHECK="    + scheck                           + "\n" +
+		"SSH_USERNAME=" + std::string(uname.c_str());
+
+	const int connectInfoNum = 5;
+	char val[PRIVATE_PROFILE_SECTION_LEN * connectInfoNum] = { 0 };
+
+	sprintf(val, tmpStr.c_str());
+	WritePrivateProfileSection("LOGIN", val, mSettingPath);
 
 	if (sshCheck) ipString = "localhost";
 
@@ -1712,6 +1701,7 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 		mainViewPortCameraWindow->setAlwaysOnTop(true);
 		mainViewPortCameraWindow->setText("PlayerCam");
 		mainViewPortCameraWindow->subscribeEvent(CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber(&SgvMain::selectCameraList, this));
+		mainViewPortCameraWindow->setUserString("CameraName", "PlayerCam");
 		selectCameraList->addChildWindow(mainViewPortCameraWindow);
 
 		bool isCameraListNumberMax = false;
@@ -1735,9 +1725,9 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 				CEGUI::Window *cameraWindow = wmgr.createWindow("TaharezLook/MenuItem", itCameras->second);
 				cameraWindow->setAlwaysOnTop(true);
-				cameraWindow->setText(itCameras->second);
+				cameraWindow->setText(itCameras->second.c_str());
 				cameraWindow->subscribeEvent(CEGUI::Window::EventMouseClick, CEGUI::Event::Subscriber(&SgvMain::selectCameraList, this));
-
+				cameraWindow->setUserString("CameraName", itCameras->second.c_str());
 				selectCameraList->addChildWindow(cameraWindow);
 
 			}
@@ -1844,23 +1834,12 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 		main->addChildWindow(worktray);
 
-		start->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::startRequest, this));
-
-		disconnect->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::disconnect, this));
-
-		quit->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::quit, this));
-
-		msg->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::messageTray, this));
-
-		timeu->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::changeTimeUnit, this));
-
-		ent_data->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::displayEntityData, this));
+		start     ->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startRequest     , this));
+		disconnect->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::disconnect       , this));
+		quit      ->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::quit             , this));
+		msg       ->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::messageTray      , this));
+		timeu     ->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::changeTimeUnit   , this));
+		ent_data  ->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::displayEntityData, this));
 	}
 	else {
 		CEGUI::Window *connect = wmgr.getWindow("WorkTray");
@@ -1881,7 +1860,7 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 
 	TCHAR archeck[8];
-	GetPrivateProfileString("PLUGIN_OPTION","AUTO_RUN",'\0', archeck, 1024, mSettingPath);
+	GetPrivateProfileString("PLUGIN_OPTION","AUTO_RUN",'\0', archeck, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 	if (strcmp(archeck, "true") == 0) {
 		int srvsize = (int)mPSrvs.size();
 		for (int i = 0; i < srvsize; i++) {
@@ -2409,65 +2388,26 @@ bool SgvMain::startRequest(const CEGUI::EventArgs &e)
 }
 
 
-bool SgvMain::agentView1(const CEGUI::EventArgs &e)
+bool SgvMain::agentView(const CEGUI::EventArgs &eventArgs)
 {
+	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(eventArgs);
+
+	int subViewIndex = std::atoi(windowEventArgs.window->getUserString("SubViewIndex").c_str());
+
 	if (OculusMode) {
-		OculusCamera = mViews[0]->getCamera();
+		OculusCamera = mViews[subViewIndex]->getCamera();
 		OculusCameraFlag = true;
 	}
 	else{
-		Ogre::Camera *cam1 = mViews[0]->getCamera();
+		Ogre::Camera *cam1 = mViews[subViewIndex]->getCamera();
 		Ogre::Camera *cam2 = mViewPort->getCamera();
 		mViewPort->setCamera(cam1);
-		mViews[0]->setCamera(cam2);
+		mViews[subViewIndex]->setCamera(cam2);
 	}
 	return true;
 }
 
-bool SgvMain::agentView2(const CEGUI::EventArgs &e)
-{
-	if (OculusMode) {
-		OculusCamera = mViews[1]->getCamera();
-		OculusCameraFlag = true;
-	}
-	else{
-		Ogre::Camera *cam1 = mViews[1]->getCamera();
-		Ogre::Camera *cam2 = mViewPort->getCamera();
-		mViewPort->setCamera(cam1);
-		mViews[1]->setCamera(cam2);
-	}
-	return true;
-}
 
-bool SgvMain::agentView3(const CEGUI::EventArgs &e)
-{
-	if (OculusMode) {
-		OculusCamera = mViews[2]->getCamera();
-		OculusCameraFlag = true;
-	}
-	else{
-		Ogre::Camera *cam1 = mViews[2]->getCamera();
-		Ogre::Camera *cam2 = mViewPort->getCamera();
-		mViewPort->setCamera(cam1);
-		mViews[2]->setCamera(cam2);
-	}
-	return true;
-}
-
-bool SgvMain::agentView4(const CEGUI::EventArgs &e)
-{
-	if (OculusMode) {
-		OculusCamera = mViews[3]->getCamera();
-		OculusCameraFlag = true;
-	}
-	else{
-		Ogre::Camera *cam1 = mViews[3]->getCamera();
-		Ogre::Camera *cam2 = mViewPort->getCamera();
-		mViewPort->setCamera(cam1);
-		mViews[3]->setCamera(cam2);
-	}
-	return true;
-}
 
 bool SgvMain::subView(const CEGUI::EventArgs &e)
 {
@@ -2476,7 +2416,7 @@ bool SgvMain::subView(const CEGUI::EventArgs &e)
 	CEGUI::Window *swin = wmgr.getWindow("subview");
 
 	if (mSubView) {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < MAX_SUBVIEW; i++) {
 			mSubWindows[i]->setVisible(false);
 			mSubViews  [i]->setVisible(false);
 		}
@@ -2485,7 +2425,7 @@ bool SgvMain::subView(const CEGUI::EventArgs &e)
 		mSubView = false;
 	}
 	else {
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < MAX_SUBVIEW; i++) {
 			if (!mSubWindows[i]->isVisible()) {
 				Ogre::Vector3 pos  = mViews[i]->getCamera()->getPosition();
 				Ogre::Vector3 mpos = mCamera->getPosition(); 
@@ -2511,7 +2451,7 @@ bool SgvMain::selectCameraList(const CEGUI::EventArgs &eventArgs)
 {
 	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(eventArgs);
 
-	std::string cameraName = std::string(windowEventArgs.window->getName().c_str());
+	std::string cameraName = windowEventArgs.window->getUserString("CameraName").c_str();
 
 	Ogre::Camera *cam;
 
@@ -2542,19 +2482,21 @@ bool SgvMain::overwriteShape(const CEGUI::EventArgs &e)
 {
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window *overwrite = wmgr.getWindow("overwrite");
-	std::string over_set;
+
+	char over_set[PRIVATE_PROFILE_SECTION_LEN] = { 0 };
+
 	if (!mOverWrite) {
 		overwrite->setText("* Overwrite shape file");
 		mOverWrite  = true;
-		over_set = "OVERWRITE=true" + '\0';
+		sprintf(over_set, "OVERWRITE=true");
 	}
 	else{
 		overwrite->setText("   Overwrite shape file");
 		mOverWrite  = false;
-		over_set = "OVERWRITE=false" + '\0';// + '\0';
+		sprintf(over_set, "OVERWRITE=false");
 	}
 
-	WritePrivateProfileSection("SHAPEFILE", over_set.c_str(), mSettingPath);
+	WritePrivateProfileSection("SHAPEFILE", over_set, mSettingPath);
 	return true;
 }
 
@@ -2669,8 +2611,7 @@ bool SgvMain::messageTray(const CEGUI::EventArgs &e)
 		msg->setPosition(CEGUI::UVector2(CEGUI::UDim(0.74f, 0.0f), CEGUI::UDim(0.01f, 0.0f)));
 		msg->setCloseButtonEnabled(true);
 		CEGUI::PushButton *cbutton = msg->getCloseButton();
-		cbutton->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::closeSendMessageTray, this));
+		cbutton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::closeSendMessageTray, this));
 		msg->setAlpha(0.5f);
 
 		// text
@@ -2735,8 +2676,7 @@ bool SgvMain::messageTray(const CEGUI::EventArgs &e)
 		msg->addChildWindow(sendButton);
 		main->addChildWindow(msg);
 
-		sendButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::sendMessage, this));
+		sendButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::sendMessage, this));
 
 	}
 	else {
@@ -3932,7 +3872,7 @@ void SgvMain::sshPortForwarding(unsigned int localport, unsigned int remoteport,
 	struct sockaddr_in sin;
 	//struct sockaddr_in sin1;
 	socklen_t sinlen;
-	LIBSSH2_CHANNEL *channel = NULL;
+	LIBSSH2_CHANNEL *channel  = NULL;
 	LIBSSH2_CHANNEL *channel1 = NULL;
 	LIBSSH2_CHANNEL *channel2 = NULL;
 	LIBSSH2_CHANNEL *channel3 = NULL;
@@ -4125,6 +4065,7 @@ void SgvMain::closeChAndSock(LIBSSH2_CHANNEL *channel, SOCKET sock)
 	libssh2_channel_free(channel);
 	closesocket(sock);
 }
+
 bool SgvMain::sshCheckONOFF(const CEGUI::EventArgs &e)
 {
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
@@ -4137,7 +4078,8 @@ bool SgvMain::sshCheckONOFF(const CEGUI::EventArgs &e)
 	CEGUI::Checkbox *sshcheck = static_cast<CEGUI::Checkbox*>(wmgr.getWindow("ssh_check"));
 
 	// check ON
-	if (sshcheck->isSelected()) {
+	if (sshcheck->isSelected()) 
+	{
 		uname->setAlpha(1.0f);
 		passwd->setAlpha(1.0f);
 		tuname->setAlpha(1.0f);
@@ -4149,7 +4091,8 @@ bool SgvMain::sshCheckONOFF(const CEGUI::EventArgs &e)
 		tpasswd->enable();
 	}
 	// check OFF
-	else{
+	else
+	{
 		uname->setAlpha(0.4f);
 		passwd->setAlpha(0.4f);
 		tuname->setAlpha(0.4f);
@@ -4165,6 +4108,14 @@ bool SgvMain::sshCheckONOFF(const CEGUI::EventArgs &e)
 
 bool SgvMain::addService(const CEGUI::EventArgs &e)
 {
+	if (mPSrvs.size() >= MAX_SERVICE_SIZE)
+	{
+		char msg[MAX_STRING_NUM];
+		sprintf_s(msg, MAX_STRING_NUM, "Exceed the maximum number of Service. Maximum number is %d.", MAX_SERVICE_SIZE);
+		MessageBox( NULL, msg, _T("Error"), MB_OK);
+		return false;
+	}
+
 	char curr[MAX_STRING_NUM];
 	GetCurrentDirectory(MAX_STRING_NUM, curr);
 
@@ -4205,9 +4156,10 @@ bool SgvMain::addService(const CEGUI::EventArgs &e)
 
 	if (wmgr.isWindowPresent(filename))
 		wmgr.destroyWindow(wmgr.getWindow(filename));
-	CEGUI::Window *tmp1 = wmgr.createWindow("TaharezLook/MenuItem", filename);
-	tmp1->setText(filename);
-	startplugin_menu->addChildWindow(tmp1);
+	CEGUI::Window *newWindow = wmgr.createWindow("TaharezLook/MenuItem", filename);
+	newWindow->setText(filename);
+	newWindow->setUserString("FullPath", filename_full);
+	startplugin_menu->addChildWindow(newWindow);
 
 	CEGUI::Listbox *slist = static_cast<CEGUI::Listbox *>(wmgr.getWindow("Service_ServiceList"));
 	CEGUI::ListboxTextItem *item1 = new CEGUI::ListboxTextItem(filename);
@@ -4219,72 +4171,34 @@ bool SgvMain::addService(const CEGUI::EventArgs &e)
 	mPSrvs.push_back(filename_full);
 	int ssize = mPSrvs.size();
 
-	std::string val = "";
+	std::string tmpStr = "";
 
 	for (int i = 0; i < ssize; i++) {
 		char tmp[2];
 		sprintf_s(tmp, 2, "%d", i);
 		std::string pathnum = std::string(tmp);
-		val += "PATH" + pathnum + "=" + mPSrvs[i] + "\n";
+		tmpStr += "PATH" + pathnum + "=" + mPSrvs[i];
+		if (i != ssize - 1){ tmpStr += "\n";  }
 	}
-	val += '\0';
-	WritePrivateProfileSection("PLUGIN", val.c_str(), mSettingPath);
+	
+	char val[PRIVATE_PROFILE_SECTION_LEN * MAX_SERVICE_SIZE] = { 0 };
+	sprintf(val, tmpStr.c_str());
+	WritePrivateProfileSection("PLUGIN", val, mSettingPath);
 
-	if (ssize == 1)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService1, this));
-	else if (ssize == 2)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService2, this));
-	else if (ssize == 3)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService3, this));
-	else if (ssize == 4)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService4, this));
-	else if (ssize == 5)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService5, this));
-	else if (ssize == 6)
-		tmp1->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService6, this));
+	newWindow->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService, this));
 
 	SetCurrentDirectory(curr);
 	return true;
 }
 
-bool SgvMain::startService1(const CEGUI::EventArgs &e)
+bool SgvMain::startService(const CEGUI::EventArgs &eventArgs)
 {
-	if (!startService(mPSrvs[0]))
-		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
-	return true;
-}
+	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(eventArgs);
 
-bool SgvMain::startService2(const CEGUI::EventArgs &e)
-{
-	if (!startService(mPSrvs[1]))
-		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
-	return true;
-}
+	std::string fullPath = windowEventArgs.window->getUserString("FullPath").c_str();
 
-bool SgvMain::startService3(const CEGUI::EventArgs &e)
-{
-	if (!startService(mPSrvs[2]))
-		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
-	return true;
-}
 
-bool SgvMain::startService4(const CEGUI::EventArgs &e)
-{
-	if (!startService(mPSrvs[3]))
-		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
-	return true;
-}
-
-bool SgvMain::startService5(const CEGUI::EventArgs &e)
-{
-	if (!startService(mPSrvs[4]))
-		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
-	return true;
-}
-
-bool SgvMain::startService6(const CEGUI::EventArgs &e)
-{
-	if (!startService(mPSrvs[5]))
+	if (!startService(fullPath))
 		MessageBox(NULL, _T("Cannot start service."), _T("Error"), MB_OKCANCEL); 
 	return true;
 }
@@ -4300,7 +4214,7 @@ bool SgvMain::startService(std::string fullpath)
 
 	int ret = SetCurrentDirectory(fpath);
 	if (ret == 0) {
-		mLog->printf(Sgv::LogBase::ERR, "startService: cannot chang directory. [%s]", fpath);
+		mLog->printf(Sgv::LogBase::ERR, "startService: cannot change directory. [%s]", fpath);
 		return false;
 	}
 
@@ -4363,11 +4277,14 @@ bool SgvMain::editService(const CEGUI::EventArgs &e)
 			std::string pathnum = std::string(tmp);
 			std::string key = "PATH" + pathnum;
 
-			GetPrivateProfileString("PLUGIN",key.c_str(),'\0', pathText, 1024, mSettingPath);
+			GetPrivateProfileString("PLUGIN",key.c_str(),'\0', pathText, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 
 			if (pathText[0] == '\0') break;
 
-			if (count > 10) break;
+			if (count >= MAX_SERVICE_SIZE)
+			{
+				break;
+			}
 
 			Ogre::String ServiceName = getFileName(pathText);
 
@@ -4381,7 +4298,7 @@ bool SgvMain::editService(const CEGUI::EventArgs &e)
 
 		TCHAR archeck[8];
 
-		GetPrivateProfileString("PLUGIN_OPTION","AUTO_RUN",'\0', archeck, 1024, mSettingPath);
+		GetPrivateProfileString("PLUGIN_OPTION","AUTO_RUN",'\0', archeck, PRIVATE_PROFILE_STRING_SIZE, mSettingPath);
 		if (strcmp(archeck, "true") == 0) {
 			autorun_checkbox->setSelected(true);
 		}
@@ -4390,23 +4307,20 @@ bool SgvMain::editService(const CEGUI::EventArgs &e)
 		addButton->setText("  Add");
 		addButton->setSize(CEGUI::UVector2(CEGUI::UDim(0.2f, 0.0f), CEGUI::UDim(0.1f, 0.0f)));
 		addButton->setPosition(CEGUI::UVector2(CEGUI::UDim(0.1f, 0.0f), CEGUI::UDim(0.85f, 0.0f)));
-		addButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::addService, this));
+		addButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::addService, this));
 
 		CEGUI::Window *removeButton = wmgr.createWindow("OgreTray/Button", "Service_RemoveButton");
 		removeButton->setText("Remove");
 		removeButton->setSize(CEGUI::UVector2(CEGUI::UDim(0.2f, 0.0f), CEGUI::UDim(0.1f, 0.0f)));
 		removeButton->setPosition(CEGUI::UVector2(CEGUI::UDim(0.4f, 0.0f), CEGUI::UDim(0.85f, 0.0f)));
-		removeButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::removeService, this));
+		removeButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::removeService, this));
 
 		CEGUI::Window *okButton = wmgr.createWindow("OgreTray/Button", "Service_OKButton");
 		okButton->setText("OK");
 		okButton->setSize(CEGUI::UVector2(CEGUI::UDim(0.2f, 0.0f), CEGUI::UDim(0.1f, 0.0f)));
 		okButton->setPosition(CEGUI::UVector2(CEGUI::UDim(0.7f, 0.0f), CEGUI::UDim(0.85f, 0.0f)));
 
-		okButton->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&SgvMain::okService, this));
+		okButton->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::okService, this));
 
 		list->addChildWindow(slist);
 		list->addChildWindow(autorun_checkbox);
@@ -4455,15 +4369,19 @@ bool SgvMain::removeService(const CEGUI::EventArgs &e)
 	}
 
 	int ssize = mPSrvs.size();
-	std::string val = "";
+
+	std::string tmpStr = "";
 	for (int i = 0; i < ssize; i++) {
 		char tmp[2];
 		sprintf_s(tmp, 2, "%d", i);
 		std::string pathnum = std::string(tmp);
-		val += "PATH" + pathnum + "=" + mPSrvs[i] + "\n";
+		tmpStr += "PATH" + pathnum + "=" + mPSrvs[i];
+		if (i != ssize - 1){ tmpStr += "\n";  }
 	}
-	val += '\0';
-	WritePrivateProfileSection("PLUGIN", val.c_str(), mSettingPath);
+
+	char val[PRIVATE_PROFILE_SECTION_LEN * MAX_SERVICE_SIZE] = { 0 };
+	sprintf(val, tmpStr.c_str());
+	WritePrivateProfileSection("PLUGIN", val, mSettingPath);
 
 	return true;
 }
@@ -4473,15 +4391,19 @@ bool SgvMain::okService(const CEGUI::EventArgs &e)
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window *slist = wmgr.getWindow("Service_List");
 
-	std::string tmp;
+	std::string tmpStr;
 	CEGUI::Checkbox *autorun_check = static_cast<CEGUI::Checkbox*>(wmgr.getWindow("autorun_check"));
-	if (autorun_check->isSelected())
-		tmp = "AUTO_RUN=true" + '\0';
-	else
-		tmp = "AUTO_RUN=false" + '\0';
+	if (autorun_check->isSelected()){
+		tmpStr = "AUTO_RUN=true";
+	}
+	else{
+		tmpStr = "AUTO_RUN=false";
+	}
 
-	tmp[tmp.size()] = '\0';
-	WritePrivateProfileSection("PLUGIN_OPTION", tmp.c_str(), mSettingPath);
+	char val[PRIVATE_PROFILE_SECTION_LEN] = { 0 };
+	sprintf(val, tmpStr.c_str());
+
+	WritePrivateProfileSection("PLUGIN_OPTION", val, mSettingPath);
 
 	slist->setVisible(false);
 	return true;
@@ -4559,7 +4481,6 @@ bool SgvMain::setMOV(const CEGUI::EventArgs &e)
 	mAlgEntityPos = 1;
 	WritePrivateProfileSection("ALGORITHM", "EntityPosition=1", mSettingPath);
 	return true;
-
 }
 
 bool SgvMain::setCOV(const CEGUI::EventArgs &e)
