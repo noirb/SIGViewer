@@ -31,6 +31,9 @@ This source file is part of the
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
+#include <CEGUI.h>
+#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
+
 #include <SdkTrays.h>
 #include <SdkCameraMan.h>
 
@@ -63,6 +66,8 @@ protected:
 	// OIS::KeyListener
 	virtual bool keyPressed( const OIS::KeyEvent &arg );
 	virtual bool keyReleased( const OIS::KeyEvent &arg );
+	CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
+
 	// OIS::MouseListener
 	virtual bool mouseMoved( const OIS::MouseEvent &arg );
 	virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
@@ -84,17 +89,16 @@ protected:
 
 	Ogre::ColourValue mBackGroundColor;
 
-	//// OgreBites
-	//OgreBites::SdkTrayManager* mTrayMgr;
-	//OgreBites::SdkCameraMan* mCameraMan;	   // basic camera controller
-	//OgreBites::ParamsPanel* mDetailsPanel;   // sample details panel
-	//bool mCursorWasVisible;                  // was cursor visible before dialog appeared
-	//bool mShutDown;
-
 	//OIS Input devices
 	OIS::InputManager* mInputManager;
 	OIS::Mouse*    mMouse;
 	OIS::Keyboard* mKeyboard;
+
+	bool mShift;      // True if shift is pressed
+	bool mCtrl;       // True if Ctrl is pressed
+	bool mLMouseDown; // True if it clicked
+	bool mRMouseDown; // True if it clicked
+
 
 	//mode flag
 	bool OculusMode;     //treate as oculus rift viewing

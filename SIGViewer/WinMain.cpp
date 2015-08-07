@@ -101,7 +101,7 @@ SgvMain::~SgvMain(void)
 
 void SgvMain::destroyScene()
 {
-
+	BaseApplication::destroyScene();
 }
  
 //-------------------------------------------------------------------------------------
@@ -892,67 +892,31 @@ bool SgvMain::cameraView_Up(const CEGUI::EventArgs &e) {
 
 void SgvMain::chooseSceneManager(void)
 {
-//	MessageBox( NULL, "start chooseSceneManager", "Error", MB_OK);
-//
-	//create a scene manager that is meant for handling outdoor scenes
-	mSceneMgr = mRoot->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+	BaseApplication::chooseSceneManager();
 }
 
 void SgvMain::createFrameListener(void)
 {
-//	MessageBox( NULL, "start createFrameListener", "Error", MB_OK);
-//
+	//	MessageBox( NULL, "start createFrameListener", "Error", MB_OK);
+	//
+	BaseApplication::createFrameListener();
+
 	mCount = 0;
 	mCurrentObject = NULL;
-	mLMouseDown = false;
-	mRMouseDown = false;
-	mShift      = false;
-	mCtrl       = false;
 
 	mRotateSpeed =.1f;
-
 	mMoveXYSpeed =.3f;
-
 	mMoveZSpeed =.3f;
 
 	// Create RaySceneQuery
 	mRaySceneQuery = mSceneMgr->createRayQuery(Ogre::Ray());
-
-	Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
-	OIS::ParamList pl;
-	size_t windowHnd = 0;
-	std::ostringstream windowHndStr;
- 
-	mWindow->getCustomAttribute("WINDOW", &windowHnd);
-	windowHndStr << windowHnd;
-
-	pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" )));
-	pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_NONEXCLUSIVE")));
-	pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_FOREGROUND")));
-	pl.insert(std::make_pair(std::string("w32_keyboard"), std::string("DISCL_NONEXCLUSIVE")));
-	pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
-
-	mInputManager = OIS::InputManager::createInputSystem( pl );
- 
-	mKeyboard = static_cast<OIS::Keyboard*>(mInputManager->createInputObject( OIS::OISKeyboard, true ));
-	mMouse = static_cast<OIS::Mouse*>(mInputManager->createInputObject( OIS::OISMouse, true ));
-
-	mMouse->setEventCallback(this);
-	mKeyboard->setEventCallback(this);
-
-	CEGUI::MouseCursor::getSingleton().setVisible(false);
- 
-	//Set initial mouse clipping size
-	windowResized(mWindow);
- 
-	//Register as a Window listener
-	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
-
-	mRoot->addFrameListener(this);
 }
+
 
 bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
+	BaseApplication::frameRenderingQueued(evt);
+
 	if (OculusMode && OculusCameraFlag) {
 		oculus.m_cameras[0]->setPosition(0.0f,0.0f,0.0f);
 		oculus.m_cameras[1]->setPosition(0.0f,0.0f,0.0f);
@@ -960,16 +924,6 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		oculus.m_cameras[0]->setOrientation(OculusCamera->getRealOrientation());
 		oculus.m_cameras[1]->setOrientation(OculusCamera->getRealOrientation());
 	}
-
-	//static bool sended;
-
-	if (mWindow->isClosed()) {
-		return false;
-	}
-
-	//Need to capture/update each device
-	mKeyboard->capture();
-	mMouse->capture();
 
 	if (mSended && mConnectServer) {
 		if (!recvMoveEntities()) {
@@ -1080,81 +1034,26 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
  
 bool SgvMain::keyPressed( const OIS::KeyEvent &arg )
 {
-	CEGUI::System &sys = CEGUI::System::getSingleton();
-
-	sys.injectKeyDown(arg.key);
-	sys.injectChar(arg.text);
- 
-	if (arg.key == OIS::KC_LSHIFT || arg.key == OIS::KC_RSHIFT)
-	{
-		mShift = true;
-	}
-	else if (arg.key == OIS::KC_LCONTROL ||
-	         arg.key == OIS::KC_RCONTROL ||
-	         arg.key == OIS::KC_CAPITAL)
-	{
-		mCtrl = true;
-	}
- 
-//	mCameraMan->injectKeyDown(arg);
-	return true;
+	return BaseApplication::keyPressed(arg);
 }
 
 bool SgvMain::keyReleased( const OIS::KeyEvent &arg )
 {
-	CEGUI::System::getSingleton().injectKeyUp(arg.key);
-
-	if (arg.key == OIS::KC_LSHIFT || arg.key == OIS::KC_RSHIFT)
-	{
-		mShift = false;
-	}
-	else if (arg.key == OIS::KC_LCONTROL ||
-	         arg.key == OIS::KC_RCONTROL ||
-	         arg.key == OIS::KC_CAPITAL)
-	{
-		mCtrl = false;
-	}
-
-	return true;
+	return BaseApplication::keyReleased(arg);
 }
 
-
-CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
-{
-	switch (buttonID)
-	{
-		case OIS::MB_Left:
-		{
-			return CEGUI::LeftButton;
-			break;
-		}
-		case OIS::MB_Right:
-		{
-			return CEGUI::RightButton;
-			break;
-		}
-		case OIS::MB_Middle:
-		{
-			return CEGUI::MiddleButton;
-			break;
-		}
-		default:
-		{
-			return CEGUI::LeftButton;
-			break;
-		}
-	}
-}
 
 bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
 {
-	CEGUI::System::getSingleton().injectMousePosition(arg.state.X.abs, arg.state.Y.abs);
+	BaseApplication::mouseMoved(arg);
+
+//		mLog->err("mouseMoved1");
 
 	// If we are dragging the left mouse button.
 	if (mLMouseDown)
 	{
 		printf("");
-	} // if
+	}
  
 	else if (mRMouseDown)
 	{
@@ -1176,6 +1075,8 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
 		}
 		else if (mCtrl)
 		{
+//			mLog->err("mouseMoved22");
+
 			if (OculusMode) {
 				Ogre::Vector3 pos = oculus.m_cameras[0]->getPosition();
 				Ogre::Vector3 dir = oculus.m_cameras[0]->getDirection();
@@ -1199,21 +1100,22 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
 			mCamera->yaw(Ogre::Degree(-arg.state.X.rel * mRotateSpeed));
 			mCamera->pitch(Ogre::Degree(arg.state.Y.rel * mRotateSpeed));
 		}
-	} // else if
+	}
 
 	return true;
 }
  
 bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+	BaseApplication::mousePressed(arg, id);
+
 	if (mCurrentObject)
 	{
 		mCurrentObject->showBoundingBox(false);
 	}
+
 	if (id == OIS::MB_Left)
 	{
-		mLMouseDown = true;
-
 		//Ogre::Vector3 chpos1 = mViewPort->getCamera()->getPosition();
 		//Ogre::Vector3 chpos2 = mCamera->getPosition();
 		//if (chpos1 == chpos2) {
@@ -1503,20 +1405,6 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 			}
 			iter++;
 		} //  while (iter != result.end())
-		//} //   if (chpos1 == chpos2) {
-	} // if (id == OIS::MB_Left)
-
-	else if (id == OIS::MB_Right)
-	{
-		//CEGUI::MouseCursor::getSingleton().hide();
-		mRMouseDown = true;
-	} // else if
-
-
-	
-	if (CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id)))
-	{
-		return true;
 	}
 
 	if (mCurrentObject)
@@ -1529,38 +1417,20 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 
 bool SgvMain::mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
-	// Left mouse button up
-	if (id == OIS::MB_Left)
-	{
-		mLMouseDown = false;
-	} // if
- 
-	// Right mouse button up
-	else if (id == OIS::MB_Right)
-	{
-		//CEGUI::MouseCursor::getSingleton().show();
-		mRMouseDown = false;
-	} // else if
-
-	if (CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id))) return true;
-	//mCameraMan->injectMouseUp(arg, id);
-	return true;
+	return BaseApplication::mouseReleased(arg, id);
 }
 
 
 void SgvMain::windowResized(Ogre::RenderWindow* rw)
 {
-	unsigned int width, height, depth;
-	int left, top;
-	rw->getMetrics(width, height, depth, left, top);
-
-	const OIS::MouseState &ms = mMouse->getMouseState();
-	ms.width = width;
-	ms.height = height;
-	CEGUI::Size size(width, height);
-	CEGUI::System::getSingleton().notifyDisplaySizeChanged(size);
-
+	BaseApplication::windowResized(rw);
 }
+
+void SgvMain::windowClosed(Ogre::RenderWindow* rw)
+{
+	BaseApplication::windowClosed(rw);
+}
+
 
 bool SgvMain::quit(const CEGUI::EventArgs &e)
 {

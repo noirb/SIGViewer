@@ -10,8 +10,6 @@
 
 #include <stdio.h> 
 #include <map>
-#include <CEGUI.h>
-#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
 #include <libssh2.h>
 
 class SgvMain : public BaseApplication
@@ -74,6 +72,7 @@ protected:
 	virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
 	virtual void windowResized(Ogre::RenderWindow* rw);
+	virtual void windowClosed(Ogre::RenderWindow* rw);
 
 	bool quit(const CEGUI::EventArgs &e);
 
@@ -207,8 +206,7 @@ private:
 	// @param pass   Password
 	// @param host   Hostname
 	//------------------------------------------------------
-	LIBSSH2_SESSION *sshLogin(const char *uname, const char *key1, const char *key2, const char *p\
-ass, const char *host);
+	LIBSSH2_SESSION *sshLogin(const char *uname, const char *key1, const char *key2, const char *pass, const char *host);
 
 	//------------------------------------------------------
 	// @brief  data transfer via ssh port forwarding
@@ -231,9 +229,6 @@ ass, const char *host);
 
 protected:
 	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
-	bool mLMouseDown, mRMouseDown;      // True if it clicked
-	bool mShift;                        // True if shift is pressed
-	bool mCtrl;                         // True if Ctrl is pressed
 	int  mCount;                        // The number of robots on the screen
 	Ogre::SceneNode *mCurrentObject;    // pointer to our currently selected object
 	Ogre::SceneNode *mHeadNode;
