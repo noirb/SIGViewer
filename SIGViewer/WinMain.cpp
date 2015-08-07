@@ -107,6 +107,8 @@ void SgvMain::destroyScene()
 //-------------------------------------------------------------------------------------
 void SgvMain::createScene(void)
 {
+//	MessageBox( NULL, "start createScene", "Error", MB_OK);
+//
 	char dir[MAX_STRING_NUM];
 	GetCurrentDirectory(MAX_STRING_NUM, dir);
 	std::string inipath = std::string(dir) + "/SIGVerse.ini";
@@ -309,6 +311,8 @@ void SgvMain::createScene(void)
  */
 void SgvMain::createInitWindow()
 {
+//	MessageBox( NULL, "start createInitWindow", "Error", MB_OK);
+//
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	CEGUI::Window *sheet = wmgr.createWindow("DefaultWindow", "MainSheet");
 
@@ -909,12 +913,16 @@ bool SgvMain::cameraView_Up(const CEGUI::EventArgs &e) {
 
 void SgvMain::chooseSceneManager(void)
 {
+//	MessageBox( NULL, "start chooseSceneManager", "Error", MB_OK);
+//
 	//create a scene manager that is meant for handling outdoor scenes
 	mSceneMgr = mRoot->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
 }
 
 void SgvMain::createFrameListener(void)
 {
+//	MessageBox( NULL, "start createFrameListener", "Error", MB_OK);
+//
 	mCount = 0;
 	mCurrentObject = NULL;
 	mLMouseDown = false;
@@ -977,9 +985,6 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	//static bool sended;
 
 	if (mWindow->isClosed()) {
-		return false;
-	}
-	if (mShutDown) {
 		return false;
 	}
 
@@ -1103,16 +1108,10 @@ bool SgvMain::keyPressed( const OIS::KeyEvent &arg )
 	sys.injectKeyDown(arg.key);
 	sys.injectChar(arg.text);
  
-	if (arg.key == OIS::KC_ESCAPE)
-	{
-		mShutDown = true;
-	}
-
-	else if (arg.key == OIS::KC_LSHIFT || arg.key == OIS::KC_RSHIFT)
+	if (arg.key == OIS::KC_LSHIFT || arg.key == OIS::KC_RSHIFT)
 	{
 		mShift = true;
 	}
-
 	else if (arg.key == OIS::KC_LCONTROL ||
 	         arg.key == OIS::KC_RCONTROL ||
 	         arg.key == OIS::KC_CAPITAL)
@@ -1132,7 +1131,6 @@ bool SgvMain::keyReleased( const OIS::KeyEvent &arg )
 	{
 		mShift = false;
 	}
-
 	else if (arg.key == OIS::KC_LCONTROL ||
 	         arg.key == OIS::KC_RCONTROL ||
 	         arg.key == OIS::KC_CAPITAL)
@@ -1148,21 +1146,26 @@ CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
 {
 	switch (buttonID)
 	{
-	case OIS::MB_Left:
-		return CEGUI::LeftButton;
-		break;
-
-	case OIS::MB_Right:
-		return CEGUI::RightButton;
-		break;
-
-	case OIS::MB_Middle:
-		return CEGUI::MiddleButton;
-		break;
-
-	default:
-		return CEGUI::LeftButton;
-		break;
+		case OIS::MB_Left:
+		{
+			return CEGUI::LeftButton;
+			break;
+		}
+		case OIS::MB_Right:
+		{
+			return CEGUI::RightButton;
+			break;
+		}
+		case OIS::MB_Middle:
+		{
+			return CEGUI::MiddleButton;
+			break;
+		}
+		default:
+		{
+			return CEGUI::LeftButton;
+			break;
+		}
 	}
 }
 
@@ -1232,298 +1235,313 @@ bool SgvMain::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 	}
 	if (id == OIS::MB_Left)
 	{
-
 		mLMouseDown = true;
 
 		//Ogre::Vector3 chpos1 = mViewPort->getCamera()->getPosition();
 		//Ogre::Vector3 chpos2 = mCamera->getPosition();
 		//if (chpos1 == chpos2) {
 
-			// Set up the ray scene query
-			CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
-			Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x/float(arg.state.width), mousePos.d_y/float(arg.state.height));
-			mRaySceneQuery->setRay(mouseRay);
-			mRaySceneQuery->setSortByDistance(true);
- 
-			// Execute query
-			RaySceneQueryResult &result = mRaySceneQuery->execute();
-			RaySceneQueryResult::iterator iter = result.begin();
+		// Set up the ray scene query
+		CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
+		Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x / float(arg.state.width), mousePos.d_y / float(arg.state.height));
+		mRaySceneQuery->setRay(mouseRay);
+		mRaySceneQuery->setSortByDistance(true);
 
-			bool display = false;
- 
-			while (iter != result.end()) {
-				if (iter->movable) {
-					Ogre::String str = iter->movable->getName();
-					if (!str.empty() && str != "GroundPlane" && str != "plane") {
-						if (strstr(str.c_str(),"camera") != NULL) {
-							iter++;
-							continue;
-						}
+		// Execute query
+		RaySceneQueryResult &result = mRaySceneQuery->execute();
+		RaySceneQueryResult::iterator iter = result.begin();
 
-						if (strstr(str.c_str(),"ODEShape") != NULL) {
-							iter++;
-							continue;
-						}
 
-						// 
-						int strPos1 = 0;
-						int strPos2;
-						std::string namess;
-						std::string tmpss;
+		bool display = false;
 
-						strPos2 = str.find("/",strPos1);
-						namess.assign(str, strPos1, strPos2-strPos1);
+		while (iter != result.end())
+		{
+			if (iter->movable)
+			{
+				Ogre::String str = iter->movable->getName();
 
-						std::map<std::string, Sgv::SgvEntity*>::iterator it = mAllEntities.find(namess);
-						if (it == mAllEntities.end()) {
-							iter++;
-							continue;
-						}
-						CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+//				mLog->warn(("mousePressed name=" + str).c_str());
 
-						// entity data window 
-						if (wmgr.isWindowPresent("EntityDataWindow") && !display) {
-							CEGUI::Window *main = wmgr.getWindow("EntityDataWindow");
-							if (main->isVisible()) {
+				if (!str.empty() && str != "GroundPlane" && str != "plane")
+				{
+					if (strstr(str.c_str(), "camera") != NULL) {
+						iter++;
+						continue;
+					}
 
-								if (mEntityData != NULL) {
+					if (strstr(str.c_str(), "ODEShape") != NULL) {
+						iter++;
+						continue;
+					}
 
-									//if (mEntityData->getName() != (*it).second->getName()) {
-									mEntityData->resetTransparency();
+					// 
+					int strPos1 = 0;
+					int strPos2;
+					std::string namess;
+					std::string tmpss;
 
-									mEntityData->setPositionMarkVisible(false);
+					strPos2 = str.find("/", strPos1);
+					namess.assign(str, strPos1, strPos2 - strPos1);
 
-									if (mEntityData->isRobot()) {
-										mEntityData->setJointPositionVisible(false);
-										mEntityData->setSegmentPositionVisible(false);
-										mEntityData->setCameraArrowVisible(false);
-										mEntityData->setCameraPositionVisible(false);
+					std::map<std::string, Sgv::SgvEntity*>::iterator it = mAllEntities.find(namess);
+					if (it == mAllEntities.end()) {
+						iter++;
+						continue;
+					}
+					CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 
-										if (!mCurrentEntityName.empty()) {
-											Ogre::Entity *ent = mSceneMgr->getEntity(mCurrentEntityName);
-											if (ent != NULL)
-												ent->getParentSceneNode()->showBoundingBox(false);
-										}
+					// entity data window 
+					if (wmgr.isWindowPresent("EntityDataWindow") && !display) 
+					{
+						CEGUI::Window *main = wmgr.getWindow("EntityDataWindow");
+
+						if (main->isVisible()) {
+
+							if (mEntityData != NULL) {
+
+								//if (mEntityData->getName() != (*it).second->getName()) {
+								mEntityData->resetTransparency();
+
+								mEntityData->setPositionMarkVisible(false);
+
+								if (mEntityData->isRobot()) {
+									mEntityData->setJointPositionVisible(false);
+									mEntityData->setSegmentPositionVisible(false);
+									mEntityData->setCameraArrowVisible(false);
+									mEntityData->setCameraPositionVisible(false);
+
+									if (!mCurrentEntityName.empty()) {
+										Ogre::Entity *ent = mSceneMgr->getEntity(mCurrentEntityName);
+										if (ent != NULL)
+											ent->getParentSceneNode()->showBoundingBox(false);
 									}
-									else{
-										mEntityData->setBoundingBoxVisible(false);
-									}
-									//}
-
 								}
-
-								(*it).second->setTransparency(0.6f);
-
-								CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(wmgr.getWindow("EntityDataList"));
-
-								int dataSize = mEntityDataList.size();
-								for (int i = 0; i < dataSize; i++) {
-									eDataList->removeItem(mEntityDataList[i]);
-								}
-								mEntityDataList.clear();
-
-								CEGUI::String entName = "Name : " + namess;
-								CEGUI::ListboxTextItem *entname = new CEGUI::ListboxTextItem(entName);
-								//entname->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.0f, 1.0f)));
-
-								Ogre::Vector3 pos = (*it).second->getHeadNode()->getPosition();
-								char pos_tmp[MAX_STRING_NUM];
-								sprintf_s(pos_tmp, MAX_STRING_NUM, "Position : (%.3g, %.3g, %.3g)", pos.x, pos.y, pos.z);
-								CEGUI::ListboxTextItem *entpos = new CEGUI::ListboxTextItem(pos_tmp);
-								entpos->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.0f, 0.0f)));
-
-								Ogre::Quaternion qua = (*it).second->getHeadNode()->getOrientation();
-
-								char qua_tmp[MAX_STRING_NUM];
-								sprintf_s(qua_tmp, MAX_STRING_NUM, "Quaternion : (%.3g, %.3g, %.3g, %.3g)", qua.w, qua.x, qua.y, qua.z);
-								CEGUI::ListboxTextItem *qua_item = new CEGUI::ListboxTextItem(qua_tmp);
-
-								eDataList->addItem(entname);
-								eDataList->addItem(entpos);
-								eDataList->addItem(qua_item);
-								mEntityDataList.push_back(entname);
-								mEntityDataList.push_back(entpos);
-								mEntityDataList.push_back(qua_item);
-
-								if (!(*it).second->isRobot()) {
-									Ogre::Vector3 bsize = (*it).second->getBBoxSize();
-									Ogre::Vector3 scale = (*it).second->getScale();
-									char bbox_tmp[MAX_STRING_NUM];
-									sprintf_s(bbox_tmp, MAX_STRING_NUM, "BBoxSize : (%.3g, %.3g, %.3g)", bsize.x*scale.x, bsize.y*scale.y, bsize.z*scale.z);
-									CEGUI::ListboxTextItem *bbox = new CEGUI::ListboxTextItem(bbox_tmp);
-									eDataList->addItem(bbox);
-									mEntityDataList.push_back(bbox);
-									(*it).second->setBoundingBoxVisible(true);
-								}
-
 								else{
-									(*it).second->setSegmentPositionVisible(true);
-
-									(*it).second->setJointPositionVisible(true);
-
-									(*it).second->setCameraPositionVisible(true);
-
-									(*it).second->setCameraArrowVisible(true);
-
-									Ogre::SceneNode *partsnode  = mSceneMgr->getEntity(str)->getParentSceneNode()->getParentSceneNode();
-
-									//partsnode->showBoundingBox(true);
-									Ogre::String ptmp = partsnode->getName();
-
-									mSceneMgr->getEntity(str)->getParentSceneNode()->showBoundingBox(true);
-
-									//Ogre::Vector3 lpos = partsnode->getPosition();
-									Ogre::Vector3 lpos = mSceneMgr->getEntity(str)->getParentSceneNode()->getPosition();
-									Ogre::Vector3 ppos = partsnode->convertLocalToWorldPosition(lpos);
-
-
-									Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(str);	
-									Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
-									Ogre::ColourValue color = p->getDiffuse();
-									p->setDiffuse(color.r, color.g, color.b, 0.7f);
-
-									Ogre::String partsname;
-									strPos1 = ptmp.find("/",0);
-									partsname.assign(ptmp, strPos1+1, ptmp.size() - strPos1 -1);
-
-									//Ogre::String jointname;
-									//strPos1 = jtmp.find("/",0);
-									//jointname.assign(jtmp, strPos1+1, jtmp.size() - strPos1 -1);
-
-									CEGUI::ListboxTextItem *separate1 = new CEGUI::ListboxTextItem("-----------------------------------");
-									CEGUI::ListboxTextItem *separate2 = new CEGUI::ListboxTextItem("-----------------------------------");
-
-									char parts_name[MAX_STRING_NUM];
-									sprintf_s(parts_name, MAX_STRING_NUM, "Parts name : %s", partsname.c_str());
-									CEGUI::ListboxTextItem *parts_name_item = new CEGUI::ListboxTextItem(parts_name);
-
-									char parts_pos[MAX_STRING_NUM];
-									sprintf_s(parts_pos, MAX_STRING_NUM, "Parts pos : (%.1f, %.1f, %.1f)", ppos.x, ppos.y, ppos.z);
-									CEGUI::ListboxTextItem *parts_pos_item = new CEGUI::ListboxTextItem(parts_pos);
-
-									//char joint_name[128];
-									//sprintf_s(joint_name, 128, "Joint name : %s", jointname.c_str());
-									//CEGUI::ListboxTextItem *joint_name_item = new CEGUI::ListboxTextItem(joint_name);
-
-									parts_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.5f, 0.0f)));
-									parts_pos_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.5f, 0.0f)));
-									//joint_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.0f, 0.5f)));
-
-									eDataList->addItem(separate1);
-									eDataList->addItem(parts_name_item);
-									eDataList->addItem(parts_pos_item);
-									eDataList->addItem(separate2);
-									//eDataList->addItem(joint_name_item);
-
-									mEntityDataList.push_back(separate1);
-									mEntityDataList.push_back(parts_name_item);
-									mEntityDataList.push_back(parts_pos_item);
-									mEntityDataList.push_back(separate2);
-									//mEntityDataList.push_back(joint_name_item);
-
-									Ogre::Node::ChildNodeIterator it = partsnode->getChildIterator();
-									while (it.current() != it.end()) {
-										SceneNode *node = static_cast<Ogre::SceneNode*>(it.current()->second);
-										Ogre::String tmp_name = node->getName();
-										if (strstr(tmp_name.c_str(), "/camera") != NULL) {
-
-											if (mSceneMgr->hasCamera(tmp_name)) {
-
-												Ogre::Camera *cam = mSceneMgr->getCamera(tmp_name);
-
-												Ogre::String camname;
-												strPos1 = tmp_name.find("/camera",0);
-												camname.assign(tmp_name, strPos1+1, tmp_name.size()-strPos1-1);
-
-												Ogre::Vector3 cam_pos = cam->getRealPosition();
-
-												char camera_name[MAX_STRING_NUM];
-												sprintf_s(camera_name, MAX_STRING_NUM, "%s pos : (%.1f, %.1f, %.1f)", camname.c_str(), cam_pos.x, cam_pos.y, cam_pos.z);
-												CEGUI::ListboxTextItem *camera_name_item = new CEGUI::ListboxTextItem(camera_name);
-												camera_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.4f, 0.0f)));
-
-												eDataList->addItem(camera_name_item);
-												mEntityDataList.push_back(camera_name_item);
-											}
-										}
-										it.moveNext();
-									}
-
-
+									mEntityData->setBoundingBoxVisible(false);
 								}
-								(*it).second->setPositionMarkVisible(true);
+								//}
 
-								mEntityData = (*it).second;
-								display = true;
-								mCurrentEntityName = str;
+							}
+
+							(*it).second->setTransparency(0.6f);
+
+							CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(wmgr.getWindow("EntityDataList"));
+
+							int dataSize = mEntityDataList.size();
+							for (int i = 0; i < dataSize; i++) {
+								eDataList->removeItem(mEntityDataList[i]);
+							}
+							mEntityDataList.clear();
+
+							CEGUI::String entName = "Name : " + namess;
+							CEGUI::ListboxTextItem *entname = new CEGUI::ListboxTextItem(entName);
+							//entname->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.0f, 1.0f)));
+
+							Ogre::Vector3 pos = (*it).second->getHeadNode()->getPosition();
+							char pos_tmp[MAX_STRING_NUM];
+							sprintf_s(pos_tmp, MAX_STRING_NUM, "Position : (%.3g, %.3g, %.3g)", pos.x, pos.y, pos.z);
+							CEGUI::ListboxTextItem *entpos = new CEGUI::ListboxTextItem(pos_tmp);
+							entpos->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.0f, 0.0f)));
+
+							Ogre::Quaternion qua = (*it).second->getHeadNode()->getOrientation();
+
+							char qua_tmp[MAX_STRING_NUM];
+							sprintf_s(qua_tmp, MAX_STRING_NUM, "Quaternion : (%.3g, %.3g, %.3g, %.3g)", qua.w, qua.x, qua.y, qua.z);
+							CEGUI::ListboxTextItem *qua_item = new CEGUI::ListboxTextItem(qua_tmp);
+
+							eDataList->addItem(entname);
+							eDataList->addItem(entpos);
+							eDataList->addItem(qua_item);
+							mEntityDataList.push_back(entname);
+							mEntityDataList.push_back(entpos);
+							mEntityDataList.push_back(qua_item);
+
+							if (!(*it).second->isRobot()) {
+								Ogre::Vector3 bsize = (*it).second->getBBoxSize();
+								Ogre::Vector3 scale = (*it).second->getScale();
+								char bbox_tmp[MAX_STRING_NUM];
+								sprintf_s(bbox_tmp, MAX_STRING_NUM, "BBoxSize : (%.3g, %.3g, %.3g)", bsize.x*scale.x, bsize.y*scale.y, bsize.z*scale.z);
+								CEGUI::ListboxTextItem *bbox = new CEGUI::ListboxTextItem(bbox_tmp);
+								eDataList->addItem(bbox);
+								mEntityDataList.push_back(bbox);
+								(*it).second->setBoundingBoxVisible(true);
+							}
+
+							else{
+								(*it).second->setSegmentPositionVisible(true);
+
+								(*it).second->setJointPositionVisible(true);
+
+								(*it).second->setCameraPositionVisible(true);
+
+								(*it).second->setCameraArrowVisible(true);
+
+								Ogre::SceneNode *partsnode = mSceneMgr->getEntity(str)->getParentSceneNode()->getParentSceneNode();
+
+								//partsnode->showBoundingBox(true);
+								Ogre::String ptmp = partsnode->getName();
+
+								mSceneMgr->getEntity(str)->getParentSceneNode()->showBoundingBox(true);
+
+								//Ogre::Vector3 lpos = partsnode->getPosition();
+								Ogre::Vector3 lpos = mSceneMgr->getEntity(str)->getParentSceneNode()->getPosition();
+								Ogre::Vector3 ppos = partsnode->convertLocalToWorldPosition(lpos);
+
+
+								Ogre::MaterialPtr mat = Ogre::MaterialManager::getSingleton().getByName(str);
+								Ogre::Pass *p = mat->getTechnique(0)->getPass(0);
+								Ogre::ColourValue color = p->getDiffuse();
+								p->setDiffuse(color.r, color.g, color.b, 0.7f);
+
+								Ogre::String partsname;
+								strPos1 = ptmp.find("/", 0);
+								partsname.assign(ptmp, strPos1 + 1, ptmp.size() - strPos1 - 1);
+
+								//Ogre::String jointname;
+								//strPos1 = jtmp.find("/",0);
+								//jointname.assign(jtmp, strPos1+1, jtmp.size() - strPos1 -1);
+
+								CEGUI::ListboxTextItem *separate1 = new CEGUI::ListboxTextItem("-----------------------------------");
+								CEGUI::ListboxTextItem *separate2 = new CEGUI::ListboxTextItem("-----------------------------------");
+
+								char parts_name[MAX_STRING_NUM];
+								sprintf_s(parts_name, MAX_STRING_NUM, "Parts name : %s", partsname.c_str());
+								CEGUI::ListboxTextItem *parts_name_item = new CEGUI::ListboxTextItem(parts_name);
+
+								char parts_pos[MAX_STRING_NUM];
+								sprintf_s(parts_pos, MAX_STRING_NUM, "Parts pos : (%.1f, %.1f, %.1f)", ppos.x, ppos.y, ppos.z);
+								CEGUI::ListboxTextItem *parts_pos_item = new CEGUI::ListboxTextItem(parts_pos);
+
+								//char joint_name[128];
+								//sprintf_s(joint_name, 128, "Joint name : %s", jointname.c_str());
+								//CEGUI::ListboxTextItem *joint_name_item = new CEGUI::ListboxTextItem(joint_name);
+
+								parts_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.5f, 0.0f)));
+								parts_pos_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.5f, 0.0f)));
+								//joint_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(0.0f, 0.0f, 0.5f)));
+
+								eDataList->addItem(separate1);
+								eDataList->addItem(parts_name_item);
+								eDataList->addItem(parts_pos_item);
+								eDataList->addItem(separate2);
+								//eDataList->addItem(joint_name_item);
+
+								mEntityDataList.push_back(separate1);
+								mEntityDataList.push_back(parts_name_item);
+								mEntityDataList.push_back(parts_pos_item);
+								mEntityDataList.push_back(separate2);
+								//mEntityDataList.push_back(joint_name_item);
+
+								Ogre::Node::ChildNodeIterator it = partsnode->getChildIterator();
+								while (it.current() != it.end()) {
+									SceneNode *node = static_cast<Ogre::SceneNode*>(it.current()->second);
+									Ogre::String tmp_name = node->getName();
+									if (strstr(tmp_name.c_str(), "/camera") != NULL) {
+
+										if (mSceneMgr->hasCamera(tmp_name)) {
+
+											Ogre::Camera *cam = mSceneMgr->getCamera(tmp_name);
+
+											Ogre::String camname;
+											strPos1 = tmp_name.find("/camera", 0);
+											camname.assign(tmp_name, strPos1 + 1, tmp_name.size() - strPos1 - 1);
+
+											Ogre::Vector3 cam_pos = cam->getRealPosition();
+
+											char camera_name[MAX_STRING_NUM];
+											sprintf_s(camera_name, MAX_STRING_NUM, "%s pos : (%.1f, %.1f, %.1f)", camname.c_str(), cam_pos.x, cam_pos.y, cam_pos.z);
+											CEGUI::ListboxTextItem *camera_name_item = new CEGUI::ListboxTextItem(camera_name);
+											camera_name_item->setTextColours(CEGUI::ColourRect(CEGUI::colour(1.0f, 0.4f, 0.0f)));
+
+											eDataList->addItem(camera_name_item);
+											mEntityDataList.push_back(camera_name_item);
+										}
+									}
+									it.moveNext();
+								}
+
+
+							}
+							(*it).second->setPositionMarkVisible(true);
+
+							mEntityData = (*it).second;
+							display = true;
+							mCurrentEntityName = str;
+						}
+					}
+
+					//char tmp[64];
+					//sprintf(tmp, "name = %s", namess.c_str());
+					//MessageBox( NULL, tmp, "Error", MB_OK);
+
+					int camNum = (*it).second->getCameraNum();
+
+					if (camNum > 0 && mSubView)  {
+						for (int i = 0; i < 4; i++) {
+							std::string cam_name = (*it).second->getCameraName(i + 1);
+
+							if (cam_name.length() > 0) {
+								Ogre::Camera *ocam = mSceneMgr->getCamera(cam_name);
+								mViews[i]->setCamera(ocam);
+
+								mSubWindows[i]->setVisible(true);
+								//mSubWindows[i]->setAlwaysOnTop(true);
+								mSubViews[i]->setVisible(true);
+								mSubViews[i]->setAlwaysOnTop(true);
+								this->mTidx = i;
+
+							}
+							else{
+								if (mSubWindows[i]->isVisible()) {
+									mSubWindows[i]->setVisible(false);
+								}
+								if (mSubViews[i]->isVisible()) {
+									mSubViews[i]->setVisible(false);
+								}
 							}
 						}
+						// break;
+					} // if (camNum > 0 && !cameraFind)  {
 
-						//char tmp[64];
-						//sprintf(tmp, "name = %s", namess.c_str());
-						//MessageBox( NULL, tmp, "Error", MB_OK);
+					if (wmgr.isWindowPresent("EntityList")) {
 
-						int camNum = (*it).second->getCameraNum();
+						std::map<CEGUI::String, CEGUI::ListboxTextItem*>::iterator it;
+						it = mMsgList.find(namess);
+						if (it != mMsgList.end()) {
+							CEGUI::Listbox *elist = static_cast<CEGUI::Listbox *>(wmgr.getWindow("EntityList"));
+							elist->deactivate();
 
-						if (camNum > 0 && mSubView)  {
-							for (int i = 0; i < 4; i++) {
-								std::string cam_name = (*it).second->getCameraName(i+1);
+							elist->clearAllSelections();
 
-								if (cam_name.length() > 0) {
-									Ogre::Camera *ocam = mSceneMgr->getCamera(cam_name);
-									mViews[i]->setCamera(ocam);
-
-									mSubWindows[i]->setVisible(true);
-									//mSubWindows[i]->setAlwaysOnTop(true);
-									mSubViews  [i]->setVisible(true);
-									mSubViews  [i]->setAlwaysOnTop(true);
-									this->mTidx = i;
-
-								} else{
-									if ( mSubWindows[i]->isVisible()) {
-										mSubWindows[i]->setVisible(false);
-									}
-									if ( mSubViews  [i]->isVisible()) {
-										mSubViews  [i]->setVisible(false);
-									}
-								}
-							}
-							// break;
-						} // if (camNum > 0 && !cameraFind)  {
-
-						if (wmgr.isWindowPresent("EntityList")) {
-
-							std::map<CEGUI::String, CEGUI::ListboxTextItem*>::iterator it;
-							it = mMsgList.find(namess);
-							if (it != mMsgList.end()) {
-								CEGUI::Listbox *elist = static_cast<CEGUI::Listbox *>(wmgr.getWindow("EntityList"));
-								elist->deactivate();
-
-								elist->clearAllSelections();
-
-								CEGUI::String str = (*it).second->getText();
-								bool selected = (*it).second->isSelected();
-								if (!selected) {
-									(*it).second->setSelected(true);
-									elist->activate();
-									elist->ensureItemIsVisible((*it).second);
-								}
+							CEGUI::String str = (*it).second->getText();
+							bool selected = (*it).second->isSelected();
+							if (!selected) {
+								(*it).second->setSelected(true);
+								elist->activate();
+								elist->ensureItemIsVisible((*it).second);
 							}
 						}
 					}
 				}
-				iter++;
-			} //  while (iter != result.end())
+			}
+			iter++;
+		} //  while (iter != result.end())
 		//} //   if (chpos1 == chpos2) {
 	} // if (id == OIS::MB_Left)
- 
+
 	else if (id == OIS::MB_Right)
 	{
 		//CEGUI::MouseCursor::getSingleton().hide();
 		mRMouseDown = true;
 	} // else if
 
-	if (CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id))) return true;
+
+	
+	if (CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id)))
+	{
+		return true;
+	}
+
 	if (mCurrentObject)
 	{
 		mCurrentObject->showBoundingBox(true);
@@ -1594,6 +1612,8 @@ bool SgvMain::quit(const CEGUI::EventArgs &e)
 
 bool SgvMain::connect(const CEGUI::EventArgs &e)
 {
+//	MessageBox( NULL, "start connect", "Error", MB_OK);
+//
 	HCURSOR hCursor;
 	HCURSOR hCursorOld;
 	hCursor = ::LoadCursor( NULL, IDC_WAIT );
@@ -1877,6 +1897,8 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
 
 bool SgvMain::createAllEntities()
 {
+//	MessageBox( NULL, "start createAllEntities", "Error", MB_OK);
+//
 	if (m_pX3D != NULL) {
 		delete m_pX3D;
 		m_pX3D = NULL;
@@ -1947,6 +1969,8 @@ bool SgvMain::createAllEntities()
 
 		Ogre::String name = strtok_s(NULL, delim, &ctx);
 
+//		MessageBox( NULL, ("createAllEntities name=" + name).c_str(), "Error", MB_OK);
+//
 		int shapeNum = atoi(strtok_s(NULL, delim, &ctx));
 
 		std::vector<Ogre::String> shapes;
@@ -2357,6 +2381,8 @@ bool SgvMain::createAllEntities()
 
 bool SgvMain::startRequest(const CEGUI::EventArgs &e)
 {
+//	MessageBox( NULL, "start startRequest", "Error", MB_OK);
+//
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 	if (!mSimRun) {
 		if (sendRequest(START)) {
@@ -2748,6 +2774,8 @@ bool SgvMain::sendMessage(const CEGUI::EventArgs &e)
 }
 bool SgvMain::sendRequest(RequestType type)
 {
+	//MessageBox( NULL, "start sendRequest", "Error", MB_OK);
+//
 	char msg[5];
 	unsigned short tmp = htons(type);
 	memcpy(msg, (char*)&tmp, 2); 
@@ -3286,6 +3314,8 @@ bool SgvMain::closeSendMessageTray(const CEGUI::EventArgs &e)
 
 void SgvMain::acceptFromService()
 {
+//	MessageBox( NULL, "start acceptFromService", "Error", MB_OK);
+
 	//WSADATA wsaData;
 	SOCKET sock0;
 	struct sockaddr_in addr;
@@ -3950,6 +3980,8 @@ shutdown:
 
 void SgvMain::transportData(int id)
 {
+//	MessageBox( NULL, "start transportData", "Error", MB_OK);
+//
 	int rc, i;
 	fd_set fds;
 	struct timeval tv;
@@ -4156,10 +4188,10 @@ bool SgvMain::addService(const CEGUI::EventArgs &e)
 
 	if (wmgr.isWindowPresent(filename))
 		wmgr.destroyWindow(wmgr.getWindow(filename));
-	CEGUI::Window *newWindow = wmgr.createWindow("TaharezLook/MenuItem", filename);
-	newWindow->setText(filename);
-	newWindow->setUserString("FullPath", filename_full);
-	startplugin_menu->addChildWindow(newWindow);
+	CEGUI::Window *serviceItemWindow = wmgr.createWindow("TaharezLook/MenuItem", filename);
+	serviceItemWindow->setText(filename);
+	serviceItemWindow->setUserString("FullPath", filename_full);
+	startplugin_menu->addChildWindow(serviceItemWindow);
 
 	CEGUI::Listbox *slist = static_cast<CEGUI::Listbox *>(wmgr.getWindow("Service_ServiceList"));
 	CEGUI::ListboxTextItem *item1 = new CEGUI::ListboxTextItem(filename);
@@ -4185,7 +4217,7 @@ bool SgvMain::addService(const CEGUI::EventArgs &e)
 	sprintf(val, tmpStr.c_str());
 	WritePrivateProfileSection("PLUGIN", val, mSettingPath);
 
-	newWindow->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService, this));
+	serviceItemWindow->subscribeEvent(CEGUI::PushButton::EventClicked, CEGUI::Event::Subscriber(&SgvMain::startService, this));
 
 	SetCurrentDirectory(curr);
 	return true;
@@ -4411,10 +4443,13 @@ bool SgvMain::okService(const CEGUI::EventArgs &e)
 
 bool SgvMain::displayEntityData(const CEGUI::EventArgs &e)
 {
+//	MessageBox( NULL, "start displayEntityData", "Error", MB_OK);
+//	mLog->warn(std::string("displayEntityData").c_str());
 
 	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 
 	CEGUI::Window *main = wmgr.getWindow("MainSheet");
+
 	if (!wmgr.isWindowPresent("EntityDataWindow")) {
 
 		CEGUI::Window *ent = wmgr.createWindow("OgreTray/FrameWindow", "EntityDataWindow");

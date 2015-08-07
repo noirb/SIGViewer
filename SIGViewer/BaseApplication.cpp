@@ -29,7 +29,6 @@ BaseApplication::BaseApplication(void)
     mCameraMan(0),
     mDetailsPanel(0),
     mCursorWasVisible(false),
-    mShutDown(false),
     mInputManager(0),
     mMouse(0),
     mKeyboard(0),
@@ -301,9 +300,6 @@ bool BaseApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
     if(mWindow->isClosed())
         return false;
 
-    if(mShutDown)
-        return false;
-
     //Need to capture/update each device
     mKeyboard->capture();
     mMouse->capture();
@@ -412,10 +408,6 @@ bool BaseApplication::keyPressed( const OIS::KeyEvent &arg )
     else if (arg.key == OIS::KC_SYSRQ)   // take a screenshot
     {
         mWindow->writeContentsToTimestampedFile("screenshot", ".jpg");
-    }
-    else if (arg.key == OIS::KC_ESCAPE)
-    {
-        mShutDown = true;
     }
 
     mCameraMan->injectKeyDown(arg);
