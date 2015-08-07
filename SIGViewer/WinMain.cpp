@@ -292,18 +292,6 @@ void SgvMain::createScene(void)
 	distport->setBackgroundColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
 	renderDstTexture->setAutoUpdated(true);
-
-#ifdef _OLD_VERSION
-	mLog = Sgv::LogFactory::getLog(0);
-	// ----------------------------------------------
-	// ----------------------------------------------
-	m_pX3D = new Sgv::X3D();
-	if (!m_pX3D->init())
-	{
-		mLog->err("failed to initialize X3D object");
-	}
-#endif
-
 }
 
 /*! 
@@ -587,12 +575,6 @@ void SgvMain::createInitWindow()
 		count++;
 	}
 
-
-#ifdef _OLD_VERSION
-	// Menu item
-	CEGUI::Window *add_plugin = wmgr.createWindow("TaharezLook/MenuItem", "add_plugin");
-	add_plugin->setText("Add");
-#endif
 	// remove plug-in
 	CEGUI::Window *add_plugin = wmgr.createWindow("TaharezLook/MenuItem", "add_plugin");
 	add_plugin->setText("  Add");
@@ -639,9 +621,6 @@ void SgvMain::createInitWindow()
 	display_menu->addChildWindow(dmode);
 	display_menu->addChildWindow(selectCamera);
 
-#ifdef _OLD_VERSION
-	settings_menu->addChildWindow(swo);
-#endif
 	plugin_menu->addChildWindow(add_plugin);
 	plugin_menu->addChildWindow(start_plugin);
 
@@ -1000,10 +979,8 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		}
 	}
 
-	if (mService != NULL) {
-#ifdef _OLD_VERSION
-		boost::unique_lock<boost::mutex> lock(mMutex);
-#endif
+	if (mService != NULL) 
+	{
 		if (mService->isMsg()) {
 			sigverse::RecvMsgEvent *mevt = mService->getRecvMsgEvent();
 			CEGUI::String msg = mevt->getMsg();
@@ -1119,7 +1096,7 @@ bool SgvMain::keyPressed( const OIS::KeyEvent &arg )
 		mCtrl = true;
 	}
  
-	mCameraMan->injectKeyDown(arg);
+//	mCameraMan->injectKeyDown(arg);
 	return true;
 }
 
