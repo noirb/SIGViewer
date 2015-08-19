@@ -713,7 +713,6 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 {
 	const CEGUI::MouseEventArgs mouseEventArgs = static_cast<const CEGUI::MouseEventArgs&>(eventArgs);
 
-	
 	if (mCurrentObject)
 	{
 		mCurrentObject->showBoundingBox(false);
@@ -780,8 +779,9 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 						iter++;
 						continue;
 					}
-					CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
 
+					CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+	
 					// entity data window 
 					if (wmgr.isWindowPresent("EntityDataWindow") && !display) 
 					{
@@ -2895,6 +2895,9 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
 
 	mService->disconnect();
 
+	mEntityData = NULL;
+	mEntityDataList.clear();
+
 	mConnectServer = false;
 
 	mHost.clear();
@@ -2946,7 +2949,6 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
 		mAllEntities.clear();
 	}
 
-//	mSubWindows.clear();
 	mSubViews.clear();
 
 	mSceneMgr->destroyAllEntities();
