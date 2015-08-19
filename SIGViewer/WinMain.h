@@ -112,13 +112,13 @@ protected:
 
 	//! Create event handler for each service provider
 	//TODO: Are there any smarter method?
-	bool cameraView_Down  (const CEGUI::EventArgs &e);
-	bool cameraView_Move  (const CEGUI::EventArgs &e);
-	bool cameraView_Up    (const CEGUI::EventArgs &e);
-	bool cameraView_Sized (const CEGUI::EventArgs &e);
-	bool cameraView_Sizing(const CEGUI::EventArgs &e);
+	bool cameraView_Down  (const CEGUI::EventArgs &eventArgs);
+	bool cameraView_Move  (const CEGUI::EventArgs &eventArgs);
+	bool cameraView_Up    (const CEGUI::EventArgs &eventArgs);
 
-	int cameraView_Select(const CEGUI::EventArgs &e, int *result);
+	bool mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs);
+
+//	int cameraView_Select(const CEGUI::EventArgs &e, int *result);
 
 	bool startService(const CEGUI::EventArgs &eventArgs);
 	bool startService(std::string fullpath);
@@ -242,9 +242,7 @@ protected:
 	std::string mPort;
 	CEGUI::Renderer *mGUIRenderer;      // our CEGUI renderer
 
-	bool mMove;
-	int  mTidx;
-	int  mBm[2];
+	bool mMovingSubView;
 
 	// Socket to receive entity data 
 	sigverse::SgvSocket *mSock;
@@ -258,9 +256,6 @@ protected:
 	Sgv::X3D *m_pX3D;
 
 	std::vector<Ogre::Viewport*> mViews;
-
-	//! Subwindow
-	std::vector<CEGUI::Window*> mSubWindows;
 
 	//! Window for superimpose
 	std::vector<CEGUI::Window*> mSubViews;
@@ -299,7 +294,7 @@ protected:
 	Ogre::Camera  *mDistanceCamera;
 
 	//! Camera for OcurusRift
-	Ogre::Camera  *OculusCamera;
+	Ogre::Camera  *oculusCamera;
 
 	//Ogre::Camera  *mDetectCamera;
 
