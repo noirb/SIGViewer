@@ -67,7 +67,7 @@ bool BaseApplication::configure(void)
 	}
 	rs->setConfigOption("Multi device memory hint", "Auto hardware buffers management");
 	mWindow = mRoot->initialise(true, "SIGViewer");
-
+	
 	mWindow->setDeactivateOnFocusChange(false);
 
 	return true;
@@ -173,8 +173,7 @@ void BaseApplication::setupResources(void)
 		{
 			typeName = i->first;
 			archName = i->second;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-				archName, typeName, secName);
+			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(archName, typeName, secName);
 		}
 	}
 }
@@ -342,6 +341,9 @@ CEGUI::MouseButton BaseApplication::convertButton(OIS::MouseButtonID buttonID)
 
 bool BaseApplication::mouseMoved( const OIS::MouseEvent &arg )
 {
+//	CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
+//	CEGUI::System::getSingleton().injectMouseMove(arg.state.X.rel,arg.state.Y.rel);
+
 	CEGUI::System::getSingleton().injectMousePosition(arg.state.X.abs, arg.state.Y.abs);
 
 	return true;
