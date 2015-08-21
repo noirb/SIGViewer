@@ -728,7 +728,7 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 
 		if (oculusMode)
 		{
-			mouseCamera = oculus.m_cameras[0];
+			mouseCamera = oculus.m_cameras[0]; //Left eye camera
 			mouseViewport = mouseCamera->getViewport();
 		}
 		else
