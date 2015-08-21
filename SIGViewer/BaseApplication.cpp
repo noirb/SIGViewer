@@ -29,9 +29,9 @@ BaseApplication::BaseApplication(void)
 	mMouse(0),
 	mKeyboard(0),
 	mBackGroundColor(0.5f,0.5f,0.7f,1.0f),
-	OculusMode(false),
-	FullscreenMode(false),
-	OculusCameraFlag(false)
+	oculusMode(false),
+	fullscreenMode(false),
+	oculusCameraFlag(false)
 {
 }
 
@@ -57,7 +57,7 @@ bool BaseApplication::configure(void)
 
 	Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	mRoot->setRenderSystem(rs);
-	if(FullscreenMode){
+	if(fullscreenMode){
 		rs->setConfigOption("Full Screen", "Yes");
 		rs->setConfigOption("Video Mode", "1280 x 720 @ 32-bit colour");
 	}
@@ -217,9 +217,9 @@ bool BaseApplication::setup(void)
 	sprintf_s(SettingPath, 128, inipath.c_str());
 	TCHAR pathText[256];
 	GetPrivateProfileString("MODE","OCULUS_MODE",'\0', pathText, 1024, SettingPath);
-	if(strcmp(pathText,"true") == 0)  OculusMode = true;
+	if(strcmp(pathText,"true") == 0)  oculusMode = true;
 	GetPrivateProfileString("MODE","FULLSCREEN_MODE",'\0', pathText, 1024, SettingPath);
-	if(strcmp(pathText,"true") == 0)  FullscreenMode = true;
+	if(strcmp(pathText,"true") == 0)  fullscreenMode = true;
 
 
 	mRoot = new Ogre::Root(mPluginsCfg);
@@ -228,7 +228,7 @@ bool BaseApplication::setup(void)
 	if (!carryOn) return false;
 	chooseSceneManager();
 
-	if(OculusMode){
+	if(oculusMode){
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media","FileSystem");
 		// Load resources
 		loadResources();

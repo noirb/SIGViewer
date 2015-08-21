@@ -101,12 +101,12 @@ protected:
 	bool mWindowResized; // True if just after the window is resized. (For preventing the automatic click after resizing.)
 
 	//mode flag
-	bool OculusMode;     //treate as oculus rift viewing
-	bool FullscreenMode; //fullscrean mode
+	bool oculusMode;     //treate as oculus rift viewing
+	bool fullscreenMode; //fullscrean mode
 
 	//oculus
 	Oculus oculus;
-	bool OculusCameraFlag;
+	bool oculusCameraFlag;
 };
 
 #endif // #ifndef __BaseApplication_h_
