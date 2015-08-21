@@ -2098,13 +2098,6 @@ bool SgvMain::startRequest(const CEGUI::EventArgs &e)
 }
 
 
-void swapptr(Ogre::Viewport **x, Ogre::Viewport **y)
-{
-	Ogre::Viewport *temp = *x;
-	*x = *y;
-	*y = temp;
-}
-
 bool SgvMain::agentView(const CEGUI::EventArgs &eventArgs)
 {
 	const CEGUI::WindowEventArgs windowEventArgs = static_cast<const CEGUI::WindowEventArgs&>(eventArgs);
@@ -2120,13 +2113,8 @@ bool SgvMain::agentView(const CEGUI::EventArgs &eventArgs)
 		Ogre::Camera *cam2 = mViewPort->getCamera();
 		mViewPort->setCamera(cam1);
 		mViews[subViewIndex]->setCamera(cam2);
-
-		//swapptr(&mViews[subViewIndex], &mViewPort);
-		//Ogre::Viewport **cam1 = &mViews[subViewIndex];
-		//Ogre::Viewport **cam2 = &mViewPort;
-		//mViewPort = *cam1;
-		//mViews[subViewIndex] = *cam2;
 	}
+
 	return true;
 }
 
