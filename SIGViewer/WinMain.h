@@ -296,8 +296,6 @@ protected:
 	//! Camera for OcurusRift
 	Ogre::Camera  *oculusCamera;
 
-	//Ogre::Camera  *mDetectCamera;
-
 	//! Ground (Grid)
 	Ogre::ManualObject* mPlane;
 

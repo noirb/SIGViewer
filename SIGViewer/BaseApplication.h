@@ -98,7 +98,7 @@ protected:
 	bool mCtrl;       // True if Ctrl is pressed
 	bool mLMouseDown; // True if it clicked
 	bool mRMouseDown; // True if it clicked
-
+	bool mWindowResized; // True if just after the window is resized. (For preventing the automatic click after resizing.)
 
 	//mode flag
 	bool OculusMode;     //treate as oculus rift viewing

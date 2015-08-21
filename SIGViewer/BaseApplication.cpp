@@ -99,10 +99,11 @@ void BaseApplication::createCamera(void)
 //-------------------------------------------------------------------------------------
 void BaseApplication::createFrameListener(void)
 {
-	mLMouseDown = false;
-	mRMouseDown = false;
-	mShift      = false;
-	mCtrl       = false;
+	mLMouseDown    = false;
+	mRMouseDown    = false;
+	mShift         = false;
+	mCtrl          = false;
+	mWindowResized = false;
 
 	Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 	OIS::ParamList pl;
@@ -341,8 +342,8 @@ CEGUI::MouseButton BaseApplication::convertButton(OIS::MouseButtonID buttonID)
 
 bool BaseApplication::mouseMoved( const OIS::MouseEvent &arg )
 {
-//	CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
-//	CEGUI::System::getSingleton().injectMouseMove(arg.state.X.rel,arg.state.Y.rel);
+	//Stop preventing the automatic click.
+	if (mWindowResized){ mWindowResized = false; }
 
 	CEGUI::System::getSingleton().injectMousePosition(arg.state.X.abs, arg.state.Y.abs);
 
@@ -351,6 +352,13 @@ bool BaseApplication::mouseMoved( const OIS::MouseEvent &arg )
 
 bool BaseApplication::mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id )
 {
+	//Stop preventing the automatic click. And return.
+	if (mWindowResized)
+	{
+		mWindowResized = false;
+		return true;
+	}
+
 	CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
 
 	if (id == OIS::MB_Left)
@@ -395,8 +403,11 @@ void BaseApplication::windowResized(Ogre::RenderWindow* rw)
 	const OIS::MouseState &ms = mMouse->getMouseState();
 	ms.width = width;
 	ms.height = height;
+	
 	CEGUI::Size size(width, height);
 	CEGUI::System::getSingleton().notifyDisplaySizeChanged(size);
+
+	mWindowResized = true;
 }
 
 //Unattach OIS before window shutdown (very important under Linux)
