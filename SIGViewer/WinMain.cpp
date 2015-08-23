@@ -2168,16 +2168,7 @@ bool SgvMain::selectCameraList(const CEGUI::EventArgs &eventArgs)
 
 	std::string cameraName = windowEventArgs.window->getUserString("CameraName").c_str();
 
-	Ogre::Camera *cam;
-
-	if (cameraName == "PlayerCam")
-	{
-		cam = mCamera;
-	}
-	else
-	{
-		cam = mSceneMgr->getCamera(cameraName);
-	}
+	Ogre::Camera *cam = mSceneMgr->getCamera(cameraName);
 
 	if (oculusMode)
 	{
