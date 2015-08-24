@@ -690,7 +690,6 @@ void SgvMain::createInitWindow()
 		si->setSize(CEGUI::UVector2(CEGUI::UDim(0.24f * R_DX, 0), CEGUI::UDim(0.24f * R_DY, 0)));
 		si->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f + rx, 0), CEGUI::UDim(0.04 + (0.24f * i) + ry, 0)));
 
-		si->setAlwaysOnTop(true);
 		si->addChildWindow(fb);
 		si->setMaxSize(CEGUI::UVector2(CEGUI::UDim(1.0f, 0), CEGUI::UDim(1.0f, 0)));
 		si->setUserString("SubViewIndex", std::to_string((long long)i));
@@ -979,7 +978,6 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 								mViews[i]->setCamera(ocam);
 
 								mSubViews[i]->setVisible(true);
-								mSubViews[i]->setAlwaysOnTop(true);
 							}
 							else{
 								if (mSubViews[i]->isVisible()) {
@@ -2141,13 +2139,14 @@ bool SgvMain::subView(const CEGUI::EventArgs &e)
 		{
 			if (!mSubViews[i]->isVisible())
 			{
+				if (mViews[i]->getCamera() == NULL){ continue; }
+
 				Ogre::Vector3 pos  = mViews[i]->getCamera()->getPosition();
 				Ogre::Vector3 mpos = mCamera->getPosition(); 
 
 				if (pos == mpos)
 				{
 					mSubViews  [i]->setVisible(true);
-					mSubViews  [i]->setAlwaysOnTop(true);
 				}
 			}
 			else{
