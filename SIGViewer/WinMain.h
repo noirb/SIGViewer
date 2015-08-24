@@ -230,7 +230,6 @@ private:
 protected:
 	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
 	int  mCount;                        // The number of robots on the screen
-	Ogre::SceneNode *mCurrentObject;    // pointer to our currently selected object
 	Ogre::SceneNode *mHeadNode;
 	float mRotateSpeed;
 	float mMoveXYSpeed;

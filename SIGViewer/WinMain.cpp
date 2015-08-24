@@ -713,11 +713,6 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 {
 	const CEGUI::MouseEventArgs mouseEventArgs = static_cast<const CEGUI::MouseEventArgs&>(eventArgs);
 
-	if (mCurrentObject)
-	{
-		mCurrentObject->showBoundingBox(false);
-	}
-
 	if (mouseEventArgs.button == CEGUI::LeftButton)
 	{
 		// Set up the ray scene query
@@ -1007,11 +1002,6 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 		} //  while (iter != result.end())
 	}
 
-	if (mCurrentObject)
-	{
-		mCurrentObject->showBoundingBox(true);
-	}
-
 	return true;
 }
 
@@ -1055,7 +1045,6 @@ void SgvMain::createFrameListener(void)
 	BaseApplication::createFrameListener();
 
 	mCount = 0;
-	mCurrentObject = NULL;
 
 	mRotateSpeed =.1f;
 	mMoveXYSpeed =.3f;
