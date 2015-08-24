@@ -438,31 +438,32 @@ void SgvMain::createInitWindow()
 	rtray->addChildWindow(mTelop);
 
 	// Menu bar
-	CEGUI::Window *menu = wmgr.createWindow("TaharezLook/Menubar", "MenuBar");
+	CEGUI::Menubar *menu = static_cast<CEGUI::Menubar*>(wmgr.createWindow("TaharezLook/Menubar", "MenuBar"));
 	menu->setSize(CEGUI::UVector2(CEGUI::UDim(0.3f, 0.0f), CEGUI::UDim(0.04f, 0.0f)));
 	menu->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f, 0.0f), CEGUI::UDim(0.0f, 0.0f)));
 	menu->setAlwaysOnTop(true);
 
 	// Menu item
-	CEGUI::Window *display = wmgr.createWindow("TaharezLook/MenuItem", "item1");
+	CEGUI::MenuItem *display = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "item1"));
 	display->setText("Display");
 	display->setAlwaysOnTop(true);
 
 	// Menu item
-	CEGUI::Window *plugin = wmgr.createWindow("TaharezLook/MenuItem", "item2");
+	CEGUI::MenuItem *plugin = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "item2"));
 	plugin->setText("Services");
 	plugin->setAlwaysOnTop(true);
 
-	CEGUI::Window *option = wmgr.createWindow("TaharezLook/MenuItem", "item3");
+	CEGUI::MenuItem *option = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "item3"));
 	option->setText("Option");
 	option->setAlwaysOnTop(true);
 	//////////
 
-	CEGUI::PopupMenu *display_menu = (CEGUI::PopupMenu*)wmgr.createWindow("TaharezLook/PopupMenu", "display");
+	CEGUI::PopupMenu *display_menu = static_cast<CEGUI::PopupMenu*>(wmgr.createWindow("TaharezLook/PopupMenu", "display"));
 	display_menu->setAlwaysOnTop(true);
+	display_menu->setAutoCloseNestedPopups(true);
 
 	// Menu item
-	CEGUI::Window *subview = wmgr.createWindow("TaharezLook/MenuItem", "subview");
+	CEGUI::MenuItem *subview = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "subview"));
 	subview->setAlwaysOnTop(true);
 	if (mSubView)
 	{
@@ -474,61 +475,43 @@ void SgvMain::createInitWindow()
 	}
 
 	// Menu item
-	CEGUI::Window *overwrite = wmgr.createWindow("TaharezLook/MenuItem", "overwrite");
+	CEGUI::MenuItem *overwrite = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "overwrite"));
 	overwrite->setAlwaysOnTop(true);
 	if (!mOverWrite) overwrite->setText("   Overwrite shape file");
 	else            overwrite->setText("* Overwrite shape file");
 
-	// Entity position
-	CEGUI::Window *entity_pos = wmgr.createWindow("TaharezLook/MenuItem", "EntityPosition");
-	entity_pos->setText("  Entity Position");
-	entity_pos->setAlwaysOnTop(true);
-
 	// Menu item mejirusi 
-	CEGUI::MenuItem *dmode = (CEGUI::MenuItem*)wmgr.createWindow("TaharezLook/MenuItem", "dynamicsview");
+	CEGUI::MenuItem *dmode = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "dynamicsview"));
 	dmode->setText("   Dynamics view");
 	dmode->setEnabled(false);
 	dmode->setAlwaysOnTop(true);
 
 	// Select Camera
-	CEGUI::Window *selectCamera = wmgr.createWindow("TaharezLook/MenuItem", "SelectCamera");
+	CEGUI::MenuItem *selectCamera = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "SelectCamera"));
 	selectCamera->setText("  Select Camera");
 	selectCamera->setEnabled(false);
 	selectCamera->setAlwaysOnTop(true);
 
 
-	CEGUI::Window *plugin_menu = wmgr.createWindow("TaharezLook/PopupMenu", "plugin_menu");
+	CEGUI::PopupMenu *plugin_menu = static_cast<CEGUI::PopupMenu*>(wmgr.createWindow("TaharezLook/PopupMenu", "plugin_menu"));
 	plugin_menu->setAlwaysOnTop(true);
-	CEGUI::Window *startplugin_menu = wmgr.createWindow("TaharezLook/PopupMenu", "startplugin_menu");
+	plugin_menu->setAutoCloseNestedPopups(true);
+
+	// add plug-in
+	CEGUI::MenuItem *add_plugin = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "add_plugin"));
+	add_plugin->setText("  Add");
+	add_plugin->setAlwaysOnTop(true);
+
+	// start plug-in
+	CEGUI::MenuItem *start_plugin = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "start_plugin"));
+	start_plugin->disable();
+	start_plugin->setText("  Start");
+	start_plugin->setAlwaysOnTop(true);
+
+	CEGUI::PopupMenu *startplugin_menu = static_cast<CEGUI::PopupMenu*>(wmgr.createWindow("TaharezLook/PopupMenu", "startplugin_menu"));
 	startplugin_menu->setAlwaysOnTop(true);
 
-	CEGUI::Window *option_menu = wmgr.createWindow("TaharezLook/PopupMenu", "option");
-	option_menu->setAlwaysOnTop(true);
-
-	// EntityPosition menu
-	CEGUI::Window *epm = wmgr.createWindow("TaharezLook/PopupMenu", "EntityPositionMenu");
-	epm->setAlwaysOnTop(true);
-	CEGUI::Window *mov = wmgr.createWindow("TaharezLook/MenuItem", "MeanOfVertex");
-	mov->setAlwaysOnTop(true);
-	CEGUI::Window *cov = wmgr.createWindow("TaharezLook/MenuItem", "CenterOfVertex");
-	cov->setAlwaysOnTop(true);
-
-	if (mAlgEntityPos == 1) {
-		mov->setText("* Average vertices (old)");
-		cov->setText("   Center of vertices (default)");
-	}
-	if (mAlgEntityPos == 2) {
-		mov->setText("   Average vertices (old)");
-		cov->setText("* Center of vertices (default)");
-	}
-
-	epm->addChildWindow(mov);
-	epm->addChildWindow(cov);
-
-	entity_pos->addChildWindow(epm);
-
-
-	if (!mPSrvs.empty()) mPSrvs.clear();
+		if (!mPSrvs.empty()) mPSrvs.clear();
 	int count = 0;
 	while (1) {
 		TCHAR pathText[MAX_STRING_NUM];
@@ -564,16 +547,37 @@ void SgvMain::createInitWindow()
 		count++;
 	}
 
-	// remove plug-in
-	CEGUI::Window *add_plugin = wmgr.createWindow("TaharezLook/MenuItem", "add_plugin");
-	add_plugin->setText("  Add");
-	add_plugin->setAlwaysOnTop(true);
+	CEGUI::PopupMenu *option_menu = static_cast<CEGUI::PopupMenu*>(wmgr.createWindow("TaharezLook/PopupMenu", "option"));
+	option_menu->setAlwaysOnTop(true);
+	option_menu->setAutoCloseNestedPopups(true);
 
-	// start plug-in
-	CEGUI::Window *start_plugin = wmgr.createWindow("TaharezLook/MenuItem", "start_plugin");
-	start_plugin->disable();
-	start_plugin->setText("  Start");
-	start_plugin->setAlwaysOnTop(true);
+	// Entity position
+	CEGUI::MenuItem *entity_pos = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "EntityPosition"));
+	entity_pos->setText("  Entity Position");
+	entity_pos->setAlwaysOnTop(true);
+
+	// EntityPosition
+	CEGUI::PopupMenu *epm = static_cast<CEGUI::PopupMenu*>(wmgr.createWindow("TaharezLook/PopupMenu", "EntityPositionMenu"));
+	epm->setAlwaysOnTop(true);
+	CEGUI::MenuItem *mov = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "MeanOfVertex"));
+	mov->setAlwaysOnTop(true);
+	CEGUI::MenuItem *cov = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "CenterOfVertex"));
+	cov->setAlwaysOnTop(true);
+
+	if (mAlgEntityPos == 1) {
+		mov->setText("* Average vertices (old)");
+		cov->setText("   Center of vertices (default)");
+	}
+	if (mAlgEntityPos == 2) {
+		mov->setText("   Average vertices (old)");
+		cov->setText("* Center of vertices (default)");
+	}
+
+	epm->addChildWindow(mov);
+	epm->addChildWindow(cov);
+
+	entity_pos->addChildWindow(epm);
+
 
 	subview     ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::subView,        this));
 	overwrite   ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::overwriteShape, this));
@@ -715,9 +719,16 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 
 	if (mouseEventArgs.button == CEGUI::LeftButton)
 	{
-		// Set up the ray scene query
-		CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
+		// Close Popup menu.
+		CEGUI::Menubar *menuBar = static_cast<CEGUI::Menubar*>(CEGUI::WindowManager::getSingleton().getWindow("MenuBar"));
+		
+		for (size_t i=0; i < menuBar->getChildCount(); i++)
+		{
+			CEGUI::MenuItem *popupMenu = static_cast<CEGUI::MenuItem*>(menuBar->getChildAtIdx(i));
+			popupMenu->closePopupMenu();
+		}
 
+		// Set up the ray scene query
 		Ogre::Camera *mouseCamera;
 		Ogre::Viewport *mouseViewport;
 
@@ -732,6 +743,7 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 			mouseCamera = mViewPort->getCamera();
 		}
 
+		CEGUI::Point mousePos = CEGUI::MouseCursor::getSingleton().getPosition();
 		Ray mouseRay = mouseCamera->getCameraToViewportRay(mousePos.d_x / mouseViewport->getActualWidth(), mousePos.d_y / mouseViewport->getActualHeight());
 		mRaySceneQuery->setRay(mouseRay);
 		mRaySceneQuery->setSortByDistance(true);
