@@ -32,7 +32,7 @@ http://www.zlib.net/
 http://msdn.microsoft.com/ja-jp/directx/default.aspx
 
 
-[6] boost(1.47.0)
+[6] boost(1.55.0)
 
 http://www.boost.org/
 
