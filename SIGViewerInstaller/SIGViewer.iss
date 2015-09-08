@@ -31,24 +31,22 @@ Name: "{app}\SIGViewer/bin/shape";Permissions: users-full
 
 [Files]
 Source: "../Release_2010/SIGViewer.exe" ; DestDir:{app}/SIGViewer/bin;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/src/OgreSDK_vc10_v1-8-0/media/*" ; DestDir:{app}/SIGViewer/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/GitHub/Client/SIGViewer/SIGViewer/OgreSDK_additions/media/*" ; DestDir:{app}/SIGViewer/media_additions/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/src/OgreSDK_vc10_v1-8-0/bin/release/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/src/CEGUI-0.7.6/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
-Source: "C:/SIGVerse/GitHub/Client/SIGViewer/SIGViewer/CEGUI_additions/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles_additions/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
-Source: "C:/SIGVerse/src/CEGUI-0.7.6/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/src/zlib/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "C:/SIGVerse/src/libssh2-1.4.2-openssl-x86-win32nt-msvc/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/GitHub/x3d/jars/*" ; DestDir:{app}/SIGViewer/bin/Xj3D/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGViewer/SIGViewer/OgreSDK_additions/media/*" ; DestDir:{app}/SIGViewer/media_additions/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGViewer/SIGViewer/CEGUI_additions/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles_additions/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
+Source: "C:/SIGVerse/GitHub/SIGViewer/SIGViewer/OculusResources/*" ; DestDir:{app}/SIGViewer/bin/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/ext/OgreSDK_vc10_v1-8-0/media/*" ; DestDir:{app}/SIGViewer/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/ext/OgreSDK_vc10_v1-8-0/bin/release/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/ext/CEGUI-0.7.6/datafiles/*" ; DestDir:{app}/SIGViewer/datafiles/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
+Source: "C:/SIGVerse/ext/CEGUI-0.7.6/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/ext/zlib/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
+Source: "C:/SIGVerse/ext/libssh2-1.4.2-openssl-x86-win32nt-msvc/bin/*.dll" ; DestDir:{app}/SIGViewer/bin/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 Source: "./licenses/*" ; DestDir:{app}/SIGViewer/licenses/;  Flags: recursesubdirs createallsubdirs;permissions:users-full
 Source: "resources.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "ogre.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "plugins.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "X3DParser.cfg" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 Source: "SIGVerse.ini" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
-Source: "C:/SIGVerse/GitHub/Client/SIGViewer/SIGViewer/OculusResources/*" ; DestDir:{app}/SIGViewer/bin/media/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "../SIGViewer/shape/*" ; DestDir:{app}/SIGViewer/bin/shape/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "../SIGViewer/x3d/*" ; DestDir:{app}/SIGViewer/bin/x3d/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
-Source: "../SIGViewer/Xj3D/*" ; DestDir:{app}/SIGViewer/bin/Xj3D/;  Flags: recursesubdirs createallsubdirs; permissions:users-full
 
 [Icons]
 Name: "{group}\SIGViewer"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"
