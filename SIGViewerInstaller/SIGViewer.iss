@@ -1,5 +1,4 @@
 [Setup]
-
 AppId={{E043678D-C2F9-45B3-93CD-9E3D6803E82E}}
 // Application name
 AppName=SIGViewer
@@ -16,6 +15,7 @@ OutputDir=SIGViewerSetup
 Compression=lzma
 SolidCompression=yes
 ChangesEnvironment=true
+SetupIconFile=icon.ico
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -255,3 +255,4 @@ end;
 [Run]
 ;Filename: "{app}/SIGViewer/Release/SIGViewer.exe"; Description: "{cm:LaunchProgram,SIGViewer}"; Flags: nowait postinstall skipifsilent
 ;Filename: "{app}/SIGViewer/Release/SIGViewer.exe"; Description: "{cm:LaunchProgram,SIGViewer}"; Flags: postinstall skipifsilent nowait
+
