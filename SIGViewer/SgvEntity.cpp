@@ -1187,9 +1187,9 @@ namespace Sgv
 
 		MinMaxFromMFNode(node, &min_x, &min_y, &min_z, &max_x, &max_y, &max_z);
 
-		m_gx = (min_x + max_x)/2;
-		m_gy = (min_y + max_y)/2;
-		m_gz = (min_z + max_z)/2;
+		m_gx = (float)((min_x + max_x)/2.0);
+		m_gy = (float)((min_y + max_y)/2.0);
+		m_gz = (float)((min_z + max_z)/2.0);
 
 		//LOG_MSG(("center of point(%f, %f, %f)",m_gx, m_gy, m_gz));
 		return true;
