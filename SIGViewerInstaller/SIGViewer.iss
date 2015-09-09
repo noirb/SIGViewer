@@ -256,3 +256,6 @@ end;
 ;Filename: "{app}/SIGViewer/Release/SIGViewer.exe"; Description: "{cm:LaunchProgram,SIGViewer}"; Flags: nowait postinstall skipifsilent
 ;Filename: "{app}/SIGViewer/Release/SIGViewer.exe"; Description: "{cm:LaunchProgram,SIGViewer}"; Flags: postinstall skipifsilent nowait
 
+[UninstallDelete]
+Type: filesandordirs; Name: "{app}\*"
+
