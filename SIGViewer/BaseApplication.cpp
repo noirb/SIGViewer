@@ -14,6 +14,7 @@ This source file is part of the
       http://www.ogre3d.org/tikiwiki/
 -----------------------------------------------------------------------------
 */
+#include "resource.h"
 #include "BaseApplication.h"
 #include "SIGVerse.h"
 
@@ -57,6 +58,7 @@ bool BaseApplication::configure(void)
 
 	Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
 	mRoot->setRenderSystem(rs);
+	
 	if(fullscreenMode){
 		rs->setConfigOption("Full Screen", "Yes");
 		rs->setConfigOption("Video Mode", "1280 x 720 @ 32-bit colour");
@@ -69,6 +71,13 @@ bool BaseApplication::configure(void)
 	mWindow = mRoot->initialise(true, "SIGViewer");
 	
 	mWindow->setDeactivateOnFocusChange(false);
+
+#ifdef WIN32
+	HWND hwnd;
+	mWindow->getCustomAttribute("WINDOW", &hwnd);
+	HINSTANCE hInst = (HINSTANCE)GetModuleHandle(NULL);
+	SetClassLong (hwnd, GCL_HICON, (LONG)LoadIcon (hInst, MAKEINTRESOURCE (IDI_ICON1)));
+ #endif
 
 	return true;
 }

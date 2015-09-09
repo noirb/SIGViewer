@@ -34,9 +34,6 @@
   <ItemGroup>
     <ResourceCompile Include="SIGViewer.rc" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="x3d\parser\cpp\X3DParser\Makefile" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{350505AC-7D68-4474-AA63-03C08DAD5A5C}</ProjectGuid>
     <RootNamespace>SIGViewer</RootNamespace>
