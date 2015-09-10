@@ -72,6 +72,7 @@ bool BaseApplication::configure(void)
 	
 	mWindow->setDeactivateOnFocusChange(false);
 
+	// Icon setting.
 #ifdef WIN32
 	HWND hwnd;
 	mWindow->getCustomAttribute("WINDOW", &hwnd);
