@@ -1,8 +1,8 @@
 [Setup]
-AppId={{E043678D-C2F9-45B3-93CD-9E3D6803E82E}}
+AppId={{57A3DEDD-F549-4907-AA01-BE28F916F1D5}}
 // Application name
 AppName=SIGViewer
-// Application name and version number
+// Application name and version number                    
 AppVerName=SIGViewer 2.3.1
 AppPublisher=National Institute of Informatics
 AppPublisherURL=http://www.sigverse.org/
@@ -69,19 +69,6 @@ var
 procedure InitializeWizard;
 begin
         // -----------------------------------------------
-        //      DirectX 9.0 Runtime Install Page
-        // -----------------------------------------------  
-        DX9RuntimePage := CreateInputOptionPage(
-                wpWelcome,
-                'Install Library for SIGViewer',
-                'DirectX runtime install',
-                'SIGViewer needs DirectX runtime. Do you want to install DirectX runtime?', 
-                True, False);
-        DX9RuntimePage.Add('Yes. please proceed');
-        DX9RuntimePage.Add('No. skip DirectX runtime install');
-        DX9RuntimePage.Values[0]:=True;
-
-        // -----------------------------------------------
         //      VC++ Runtime Install Page
         // -----------------------------------------------
         VC2010RuntimePage := CreateInputOptionPage(
@@ -109,40 +96,6 @@ begin
         jvmpath := '{pf}\Java\jre1.8.0_45\bin\client\';
 end;
 
-// **************************************************************
-//      Installation of DirectX9 runtime
-// **************************************************************
-function InstallDX9Runtime: Boolean;
-var
-        rc: Integer;
-        DX9RuntimePath: String;
-begin
-        Result:=False;
-
-        if DX9RuntimePage.SelectedValueIndex = 0 then begin
-                // ------------------------------------
-                //      get path of the installer
-                // ------------------------------------
-                DX9RuntimePath := ExpandConstant('{src}\downloads\dxwebsetup.exe');
-
-                // ------------------------------------
-                //      run installer
-                // ------------------------------------
-                if Exec(
-                        DX9RuntimePath,
-                        '',
-                        '',
-                        SW_SHOW,
-                        ewWaitUntilTerminated, rc) then begin
-                        // exec succeeded. rc = return code
-                end else begin
-                        // exec failed. rc = error code
-                        exit;
-                end;
-        end;
-
-        Result:=True;
-end;
 
 
 // **************************************************************

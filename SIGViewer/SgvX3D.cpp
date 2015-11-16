@@ -1,6 +1,5 @@
 
 #include "SgvX3D.h"
-#include "Ogre.h"
 #include "CX3DParser.h"
 #include "CX3DParserUtil.h"
 #include "CX3DField.h"
@@ -14,7 +13,8 @@
 #include "CX3DNormalNode.h"
 #include "CX3DTextureCoordinateNode.h"
 #include "CSimplifiedShape.h"
-#include "WinMain.h"
+//#include "WinMain.h"
+#include "Ogre.h"
 //#include "SgvMainWindow.h"
 //#include "SgvLog.h"
 
