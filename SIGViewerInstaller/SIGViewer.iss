@@ -1,5 +1,5 @@
 [Setup]
-AppId={{57A3DEDD-F549-4907-AA01-BE28F916F1D5}}
+AppId={{71EC0A2E-9BBF-494E-AF2B-F1144A3111DB}}
 // Application name
 AppName=SIGViewer
 // Application name and version number                    
@@ -182,10 +182,7 @@ end;
 function NextButtonClick(CurPageID: Integer): Boolean;
 begin
         Result := False;
-
-        if CurPageID = DX9RuntimePage.ID then begin
-                if not InstallDX9Runtime then exit;
-        end else if CurPageID = VC2010RuntimePage.ID then begin
+        if CurPageID = VC2010RuntimePage.ID then begin
                 if not InstallVC2010Runtime then exit;
         end else if CurPageID = JREPage.ID then begin
                 if not InstallJRE then exit;
