@@ -72,7 +72,7 @@ begin
         //      VC++ Runtime Install Page
         // -----------------------------------------------
         VC2010RuntimePage := CreateInputOptionPage(
-                DX9RuntimePage.ID,
+                 wpWelcome,
                 'Install Library for SIGViewer',
                 'Visual C++ runtime install',
                 'SIGViewer needs to install Visual C++ runtime. Do you accept it?',
