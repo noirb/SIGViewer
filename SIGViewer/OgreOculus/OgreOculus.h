@@ -1,5 +1,4 @@
 #pragma once
-#include <OVR_CAPI.h>
 #include <OVR.h>
 #include <OgreRectangle2D.h>
 
@@ -20,7 +19,7 @@ public:
 	~Oculus(void);
 	bool setupOculus();
 	bool setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Root *mRoot, Ogre::SceneNode *parent = 0);
-    void shutDownOculus();
+	void shutDownOculus();
 	void shutDownOgre();
 	bool InitOculusVR();
 	void setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win,Ogre::Root* root);
@@ -53,7 +52,7 @@ public:
 
 	Ogre::TexturePtr mLeftEyeRenderTexture;
 	Ogre::TexturePtr mRightEyeRenderTexture;
-	                 
+	
 	Ogre::MaterialPtr mMatLeft;
 	Ogre::MaterialPtr mMatRight;
 
