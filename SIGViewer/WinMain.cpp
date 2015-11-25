@@ -18,7 +18,7 @@
 #include <boost/bind.hpp>
 #include <libssh2.h>
 #include <ws2tcpip.h>
-
+//#include "OgreOculus/OgreOculus.h"
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -1076,6 +1076,16 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		oculus.m_cameras[0]->setOrientation(oculusCamera->getRealOrientation());
 		oculus.m_cameras[1]->setOrientation(oculusCamera->getRealOrientation());
 	}
+
+
+
+			//static bool sended;
+
+	if (mWindow->isClosed()) {
+		return false;
+	}
+
+
 
 	if (mSended && mConnectServer) {
 		if (!recvMoveEntities()) {
@@ -3262,28 +3272,28 @@ bool SgvMain::detectEntities()
 
 	// top plane
 	vol.planes.push_back(
-		Plane(
+		Ogre::Plane(
 		topLeft.getOrigin(),
 		topLeft.getPoint(100),
 		topRight.getPoint(100)));
 
 	// left plane
 	vol.planes.push_back(
-		Plane(
+		Ogre::Plane(
 		topLeft.getOrigin(),
 		bottomLeft.getPoint(100),
 		topLeft.getPoint(100)));
 
 	//      bottom plane
 	vol.planes.push_back(
-		Plane(
+		Ogre::Plane(
 		topLeft.getOrigin(),
 		bottomRight.getPoint(100),
 		bottomLeft.getPoint(100)));
 
 	//      right plane
 	vol.planes.push_back(
-		Plane(
+		Ogre::Plane(
 		topLeft.getOrigin(),
 		topRight.getPoint(100),
 		bottomRight.getPoint(100)));

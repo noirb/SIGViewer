@@ -431,7 +431,7 @@ namespace Sgv
 			SceneNode *parentNode,
 			const std::string &visObjElemName,
 			MFNode *pShapeNodes,
-			Vector3& gShapes);
+			Ogre::Vector3& gShapes);
 
 		// ------------------------------------------------------------------------
 		///
@@ -450,8 +450,8 @@ namespace Sgv
 			//ExtEntityInfo *ei,
 			char *materialName,
 			bool bSetPosRelToG,
-			Vector3 *gin,
-			Vector3& gout,
+			Ogre::Vector3 *gin,
+			Ogre::Vector3& gout,
 			ColourValue *pColor = NULL);
 
 	};

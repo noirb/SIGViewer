@@ -1,46 +1,30 @@
-/// Copyright (C) 2013 Kojack
-///
-/// Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), 
-/// to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, 
-/// and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-/// DEALINGS IN THE SOFTWARE.
-
+#include <OgreTextureManager.h>
+#include <OgreHardwarePixelBuffer.h>
 #include "OgreOculus.h"
-#include "OVR.h"
 #include "OgreSceneManager.h"
 #include "OgreRenderWindow.h"
-#include "OgreCompositorManager.h"
-#include "OgreCompositorInstance.h"
-#include "OgreCompositionTargetPass.h"
-#include "OgreCompositionPass.h"
+#include <OgreSharedPtr.h>
+#include <OgreManualObject.h>
+#include <OgreRoot.h>
+#include <OVR_CAPI_GL.h>
 
+
+#include <math.h> 
+#include <vector>
 using namespace OVR;
 
 namespace
 {
 	const float g_defaultNearClip = 0.01f;
-	const float g_defaultFarClip = 10000.0f;
+	const float g_defaultFarClip = 100000.0f;
 	const float g_defaultIPD = 0.064f;
 	const Ogre::ColourValue g_defaultViewportColour(97/255.0f, 97/255.0f, 200/255.0f);
-	const float g_defaultProjectionCentreOffset = 0.14529906f;
-	const float g_defaultDistortion[4] = {1.0f, 0.22f, 0.24f, 0};
+
 }
 
 
-Oculus::Oculus(void):m_sensorFusion(0),
-					 m_stereoConfig(0),
-					 m_hmd(0),
-					 m_deviceManager(0),
-					 m_oculusReady(false),
-					 m_ogreReady(false),
-					 m_sensor(0),
-					 m_centreOffset(g_defaultProjectionCentreOffset),
+Oculus::Oculus(void):
+
 					 m_window(0),
 					 m_sceneManager(0),
 					 m_cameraNode(0)
@@ -49,53 +33,22 @@ Oculus::Oculus(void):m_sensorFusion(0),
 	{
 		m_cameras[i] = 0;
 		m_viewports[i] = 0;
-		m_compositors[i] = 0;
 	}
 }
 
 Oculus::~Oculus(void)
 {
 	shutDownOgre();
-	shutDownOculus();
+	ovrHmd_Destroy(mHMD);
 }
 
-void Oculus::shutDownOculus()
-{
-	m_oculusReady = false;
-
-	delete m_stereoConfig;
-	m_stereoConfig = 0;
-	delete m_sensorFusion;
-	m_sensorFusion = 0;
-
-	if(m_sensor)
-	{
-		m_sensor->Release();
-	}
-	if(m_hmd)
-	{
-		m_hmd->Release();
-		m_hmd = 0;
-	}
-	if(m_deviceManager)
-	{
-		m_deviceManager->Release();
-		m_deviceManager = 0;
-	}
-
-	System::Destroy();
-}
 
 void Oculus::shutDownOgre()
 {
-	m_ogreReady = false;
+
 	for(int i=0;i<2;++i)
 	{
-		if(m_compositors[i])
-		{
-			Ogre::CompositorManager::getSingleton().removeCompositor(m_viewports[i], "Oculus");
-			m_compositors[i] = 0;
-		}
+
 		if(m_viewports[i])
 		{
 			m_window->removeViewport(i);
@@ -116,188 +69,291 @@ void Oculus::shutDownOgre()
 	}
 	m_window = 0;
 	m_sceneManager = 0;
+	
 }
 
-bool Oculus::isOculusReady() const
+
+
+
+
+void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, Ogre::Root* root )
 {
-	return m_oculusReady;
+
+
+		mSceneMgr = root->createSceneManager(Ogre::ST_GENERIC);
+    	mSceneMgr->setAmbientLight( Ogre::ColourValue( 0.5, 0.5, 0.5 ) );
+		mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	
+
+	Ogre::SceneNode* meshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+
+
+		// Configure Render Textures:
+		Sizei recommendedTex0Size = ovrHmd_GetFovTextureSize( mHMD, ovrEye_Left,
+				mHMD->DefaultEyeFov[0], 1.0f );
+		Sizei recommendedTex1Size = ovrHmd_GetFovTextureSize( mHMD, ovrEye_Right,
+				mHMD->DefaultEyeFov[1], 1.0f );
+
+		// Generate a texture for each eye, as a rendertarget:
+		mLeftEyeRenderTexture = Ogre::TextureManager::getSingleton().createManual(
+				"RiftRenderTextureLeft", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+				Ogre::TEX_TYPE_2D, recommendedTex0Size.w, recommendedTex0Size.h, 0, Ogre::PF_X8B8G8R8,
+				Ogre::TU_RENDERTARGET );
+		mRightEyeRenderTexture = Ogre::TextureManager::getSingleton().createManual(
+				"RiftRenderTextureRight", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+				Ogre::TEX_TYPE_2D, recommendedTex1Size.w, recommendedTex1Size.h, 0, Ogre::PF_X8B8G8R8,
+				Ogre::TU_RENDERTARGET );
+
+		// Assign the textures to the eyes used later:
+		mMatLeft = Ogre::MaterialManager::getSingleton().getByName( "Oculus/LeftEye" );
+		mMatLeft->getTechnique(0)->getPass(0)->getTextureUnitState(0)->
+			setTexture( mLeftEyeRenderTexture );
+		
+		mMatRight = Ogre::MaterialManager::getSingleton().getByName( "Oculus/RightEye" );
+		mMatRight->getTechnique(0)->getPass(0)->getTextureUnitState(0)->
+			setTexture( mRightEyeRenderTexture );
+		
+		ovrEyeRenderDesc eyeRenderDesc[2];
+
+		eyeRenderDesc[0] = ovrHmd_GetRenderDesc( mHMD, ovrEye_Left, mHMD->DefaultEyeFov[0] );
+		eyeRenderDesc[1] = ovrHmd_GetRenderDesc( mHMD, ovrEye_Right, mHMD->DefaultEyeFov[1] );
+
+		ovrVector2f UVScaleOffset[2];
+		ovrRecti viewports[2];
+		viewports[0].Pos.x = 0;
+		viewports[0].Pos.y = 0;
+		viewports[0].Size.w = recommendedTex0Size.w;
+		viewports[0].Size.h = recommendedTex0Size.h;
+		viewports[1].Pos.x = recommendedTex0Size.w;
+		viewports[1].Pos.y = 0;
+		viewports[1].Size.w = recommendedTex1Size.w;
+		viewports[1].Size.h = recommendedTex1Size.h;
+		Ogre::ManualObject* manual;
+		// Create the Distortion Meshes:
+		for ( int eyeNum = 0; eyeNum < 2; eyeNum ++ )
+		{
+			ovrDistortionMesh meshData;
+			ovrHmd_CreateDistortionMesh( mHMD,
+					eyeRenderDesc[eyeNum].Eye,
+					eyeRenderDesc[eyeNum].Fov,
+					0,
+					&meshData );
+
+			Ogre::GpuProgramParametersSharedPtr params;
+
+			if( eyeNum == 0 )
+			{
+				ovrHmd_GetRenderScaleAndOffset( eyeRenderDesc[eyeNum].Fov,
+						recommendedTex0Size, viewports[eyeNum],
+						UVScaleOffset);
+				params = mMatLeft->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+			} else {
+				ovrHmd_GetRenderScaleAndOffset( eyeRenderDesc[eyeNum].Fov,
+						recommendedTex1Size, viewports[eyeNum],
+						UVScaleOffset);
+				params = mMatRight->getTechnique(0)->getPass(0)->getVertexProgramParameters();
+			}
+
+			params->setNamedConstant( "eyeToSourceUVScale",
+					Ogre::Vector4( UVScaleOffset[0].x, UVScaleOffset[0].y,0,0 ) );
+			params->setNamedConstant( "eyeToSourceUVOffset",
+					Ogre::Vector4( UVScaleOffset[1].x, UVScaleOffset[1].y,0,0 ) );
+
+			std::cout << "UVScaleOffset[0]: " << UVScaleOffset[0].x << ", " << UVScaleOffset[0].y << std::endl;
+			std::cout << "UVScaleOffset[1]: " << UVScaleOffset[1].x << ", " << UVScaleOffset[1].y << std::endl;
+
+			// create ManualObject
+			// TODO: Destroy the manual objects!!
+			
+			if( eyeNum == 0 )
+			{
+				manual = mSceneMgr->createManualObject("RiftRenderObjectLeft");
+				manual->begin("Oculus/LeftEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+				//manual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+			}
+			else
+			{
+				manual = mSceneMgr->createManualObject("RiftRenderObjectRight");
+				manual->begin("Oculus/RightEye", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+				//manual->begin("BaseWhiteNoLighting", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+			}
+
+			for( unsigned int i = 0; i < meshData.VertexCount; i++ )
+			{
+				ovrDistortionVertex v = meshData.pVertexData[i];
+				manual->position( v.ScreenPosNDC.x,
+						v.ScreenPosNDC.y, 0 );
+				manual->textureCoord( v.TanEyeAnglesR.x,//*UVScaleOffset[0].x + UVScaleOffset[1].x,
+						v.TanEyeAnglesR.y);//*UVScaleOffset[0].y + UVScaleOffset[1].y);
+				manual->textureCoord( v.TanEyeAnglesG.x,//*UVScaleOffset[0].x + UVScaleOffset[1].x,
+						v.TanEyeAnglesG.y);//*UVScaleOffset[0].y + UVScaleOffset[1].y);
+				manual->textureCoord( v.TanEyeAnglesB.x,//*UVScaleOffset[0].x + UVScaleOffset[1].x,
+						v.TanEyeAnglesB.y);//*UVScaleOffset[0].y + UVScaleOffset[1].y);
+				//float vig = std::max( v.VignetteFactor, (float)0.0 );
+				//manual->colour( vig, vig, vig, vig );
+				manual->colour( 1, 1, 1, 1 );
+
+			}
+			for( unsigned int i = 0; i < meshData.IndexCount; i++ )
+			{
+				manual->index( meshData.pIndexData[i] );
+			}
+
+			// tell Ogre, your definition has finished
+			manual->end();
+
+			ovrHmd_DestroyDistortionMesh( &meshData );
+
+			meshNode->attachObject( manual );
+		}
+	
+		// Set up IPD in meters:
+		mIPD = ovrHmd_GetFloat(mHMD, OVR_KEY_IPD,  0.064f);
+	
+		// Set a default value for interpupillary distance:
+		mIPD = 0.064;
+	
+	// Create a camera in the (new, external) scene so the mesh can be rendered onto it:
+	mCamera = mSceneMgr->createCamera("OculusRiftExternalCamera");
+	mCamera->setFarClipDistance(1000000.0f);
+	mCamera->setNearClipDistance( 0.1 );
+	mCamera->setProjectionType( Ogre::PT_ORTHOGRAPHIC );
+	mCamera->setOrthoWindow(2 , 2);
+	mCamera->lookAt( 0, 0, -1 );
+	
+
+	mSceneMgr->getRootSceneNode()->attachObject( mCamera );
+
+	meshNode->setPosition( 0, 0, -1 );
+	meshNode->setScale( 1, 1, -0.1 );
+
+	mViewport = m_window->addViewport( mCamera);
+	mViewport->setBackgroundColour(Ogre::ColourValue::Black);
+	mViewport->setOverlaysEnabled(true);
+	
 }
 
-bool Oculus::isOgreReady() const
+
+void Oculus::setCameras()
 {
-	return m_ogreReady;
+
+	Ogre::Camera* camLeft = m_cameras[0] ;
+	Ogre::Camera* camRight = m_cameras[1] ; 
+	Ogre::RenderTexture* renderTexLeft = mLeftEyeRenderTexture->getBuffer()->getRenderTarget();
+	std::cout << "[Rift] Adding viewport to left texture" << std::endl;
+	m_viewports[0] = renderTexLeft->addViewport(m_cameras[0]);
+	renderTexLeft->getViewport(0)->setOverlaysEnabled(true);
+
+	std::cout << "[Rift] Adding viewport to right texture" << std::endl;
+	Ogre::RenderTexture* renderTexRight = mRightEyeRenderTexture->getBuffer()->getRenderTarget();
+	m_viewports[1] = renderTexRight->addViewport(m_cameras[1]);
+
+	renderTexRight->getViewport(0)->setOverlaysEnabled(true);
+
+	m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
+	m_viewports[1]->setBackgroundColour(g_defaultViewportColour);
+	
+
+
+
+		ovrFovPort fovLeft = mHMD->DefaultEyeFov[ovrEye_Left];
+		ovrFovPort fovRight = mHMD->DefaultEyeFov[ovrEye_Right];
+
+		float combinedTanHalfFovHorizontal = std::max( fovLeft.LeftTan, fovLeft.RightTan );
+		float combinedTanHalfFovVertical = std::max( fovLeft.UpTan, fovLeft.DownTan );
+
+		float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
+
+		m_cameras[0]->setAspectRatio( aspectRatio );
+		m_cameras[1]->setAspectRatio( aspectRatio );
+
+		ovrMatrix4f projL = ovrMatrix4f_Projection ( fovLeft, g_defaultNearClip, g_defaultFarClip, true );
+		ovrMatrix4f projR = ovrMatrix4f_Projection ( fovRight, g_defaultNearClip, g_defaultFarClip, true );
+
+		m_cameras[0]->setCustomProjectionMatrix( true,
+				Ogre::Matrix4( projL.M[0][0], projL.M[0][1], projL.M[0][2], projL.M[0][3],
+					projL.M[1][0], projL.M[1][1], projL.M[1][2], projL.M[1][3],
+					projL.M[2][0], projL.M[2][1], projL.M[2][2], projL.M[2][3],
+					projL.M[3][0], projL.M[3][1], projL.M[3][2], projL.M[3][3] ) );
+		m_cameras[1]->setCustomProjectionMatrix( true,
+				Ogre::Matrix4( projR.M[0][0], projR.M[0][1], projR.M[0][2], projR.M[0][3],
+					projR.M[1][0], projR.M[1][1], projR.M[1][2], projR.M[1][3],
+					projR.M[2][0], projR.M[2][1], projR.M[2][2], projR.M[2][3],
+					projR.M[3][0], projR.M[3][1], projR.M[3][2], projR.M[3][3] ) );
+	
 }
 
-bool Oculus::setupOculus()
-{
-	if(m_oculusReady)
+
+
+bool Oculus::InitOculusVR()
 	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Already Initialised");
+		if (!ovr_Initialize())
+		{
+			Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Initalization for LibOVR is failed.");
+			return false;
+		}//if
+		
+		mHMD = ovrHmd_Create(0);
+		if (nullptr == mHMD) {
+         
+         mHMD = ovrHmd_CreateDebug(ovrHmd_DK2);
+         }
+		if (!mHMD)
+		{
+			Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "HMD is not found.");
+			return false;
+		}
+
 		return true;
 	}
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Initialising system");
-	System::Init(Log::ConfigureDefaultLog(LogMask_All));
-	m_deviceManager = DeviceManager::Create();
-	if(!m_deviceManager)
-	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create Device Manager");
-		return false;
-	}
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Created Device Manager");
-	m_stereoConfig = new Util::Render::StereoConfig();
-	if(!m_stereoConfig)
-	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create StereoConfig");
-		return false;
-	}
-	m_centreOffset = m_stereoConfig->GetProjectionCenterOffset();
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Created StereoConfig");
-	m_hmd = m_deviceManager->EnumerateDevices<HMDDevice>().CreateDevice();
-	if(!m_hmd)
-	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create HMD");
-		return false;
-	}
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Created HMD");
-	HMDInfo devinfo;
-	m_hmd->GetDeviceInfo(&devinfo);
-	m_stereoConfig->SetHMDInfo(devinfo);
-	m_sensor = m_hmd->GetSensor();
-	if(!m_sensor)
-	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create sensor");
-		return false;
-	}
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Created sensor");
-	m_sensorFusion = new SensorFusion();
-	if(!m_sensorFusion)
-	{
-		Ogre::LogManager::getSingleton().logMessage("Oculus: Failed to create SensorFusion");
-		return false;
-	}
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Created SensorFusion");
-	m_sensorFusion->AttachToSensor(m_sensor);
-	m_oculusReady = true;
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
-	m_deviceManager->Release();
-	m_hmd->Release();
-	m_sensor->Release();
-	return true;
-}
 
-bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::SceneNode *parent)
+
+bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Root *mRoot, Ogre::SceneNode *parent)
 {
+	InitOculusVR();
+
 	m_window = win;
 	m_sceneManager = sm;
-	Ogre::LogManager::getSingleton().logMessage("Oculus: Setting up Ogre");
+
+    setupOgreOculus( m_sceneManager, m_window,mRoot);
+
 	if(parent)
-		m_cameraNode = parent->createChildSceneNode("StereoCameraNode");
-	else
-		m_cameraNode = sm->getRootSceneNode()->createChildSceneNode("StereoCameraNode");
-
-	m_cameras[0] = sm->createCamera("CameraLeft");
-	m_cameras[1] = sm->createCamera("CameraRight");
-	
-	Ogre::MaterialPtr matLeft = Ogre::MaterialManager::getSingleton().getByName("Ogre/Compositor/Oculus");
-	Ogre::MaterialPtr matRight = matLeft->clone("Ogre/Compositor/Oculus/Right");
-	Ogre::GpuProgramParametersSharedPtr pParamsLeft = matLeft->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-	Ogre::GpuProgramParametersSharedPtr pParamsRight = matRight->getTechnique(0)->getPass(0)->getFragmentProgramParameters();
-	Ogre::Vector4 hmdwarp;
-	if(m_stereoConfig)
 	{
-		hmdwarp = Ogre::Vector4(m_stereoConfig->GetDistortionK(0),
-								m_stereoConfig->GetDistortionK(1),
-								m_stereoConfig->GetDistortionK(2),
-								m_stereoConfig->GetDistortionK(3));
+		m_cameraNode = parent->createChildSceneNode("CameraNode");
 	}
 	else
 	{
-		hmdwarp = Ogre::Vector4(g_defaultDistortion[0],
-								g_defaultDistortion[1],
-								g_defaultDistortion[2],
-								g_defaultDistortion[3]);
+		m_cameraNode = sm->getRootSceneNode()->createChildSceneNode("CameraNode");
 	}
-	pParamsLeft->setNamedConstant("HmdWarpParam", hmdwarp);
-	pParamsRight->setNamedConstant("HmdWarpParam", hmdwarp);
-	pParamsLeft->setNamedConstant("LensCentre", 0.5f+(m_stereoConfig->GetProjectionCenterOffset()/2.0f));
-	pParamsRight->setNamedConstant("LensCentre", 0.5f-(m_stereoConfig->GetProjectionCenterOffset()/2.0f));
+	m_cameras[0] = sm->createCamera("Camera1");
+	m_cameras[1] = sm->createCamera("Camera2");
 
-	Ogre::CompositorPtr comp = Ogre::CompositorManager::getSingleton().getByName("OculusRight");
-	comp->getTechnique(0)->getOutputTargetPass()->getPass(0)->setMaterialName("Ogre/Compositor/Oculus/Right");
+// Set a default value for interpupillary distance:
+mIPD = ovrHmd_GetFloat(mHMD, OVR_KEY_IPD,  0.064f);
 
-	for(int i=0;i<2;++i)
+
+for(int i=0;i<2;++i)
 	{
-		m_cameraNode->attachObject(m_cameras[i]);
-		if(m_stereoConfig)
-		{
-			// Setup cameras.
-			m_cameras[i]->setNearClipDistance(m_stereoConfig->GetEyeToScreenDistance());
-			m_cameras[i]->setFarClipDistance(g_defaultFarClip);
-			m_cameras[i]->setPosition((i * 2 - 1) * m_stereoConfig->GetIPD() * 0.5f, 0, 0);
-			m_cameras[i]->setAspectRatio(m_stereoConfig->GetAspect());
-			m_cameras[i]->setFOVy(Ogre::Radian(m_stereoConfig->GetYFOVRadians()));
-			
-			// Oculus requires offset projection, create a custom projection matrix
-			Ogre::Matrix4 proj = Ogre::Matrix4::IDENTITY;
-			float temp = m_stereoConfig->GetProjectionCenterOffset();
-			proj.setTrans(Ogre::Vector3(-m_stereoConfig->GetProjectionCenterOffset() * (2 * i - 1), 0, 0));
-			m_cameras[i]->setCustomProjectionMatrix(true, proj * m_cameras[i]->getProjectionMatrix());
-		}
-		else
-		{
-			m_cameras[i]->setNearClipDistance(g_defaultNearClip);
-			m_cameras[i]->setFarClipDistance(g_defaultFarClip);
-			m_cameras[i]->setPosition((i*2-1) * g_defaultIPD * 0.5f, 0, 0);
-		}
-		m_viewports[i] = win->addViewport(m_cameras[i], i, 0.5f*i, 0, 0.5f, 1.0f);
-		m_viewports[i]->setBackgroundColour(g_defaultViewportColour);
-		m_compositors[i] = Ogre::CompositorManager::getSingleton().addCompositor(m_viewports[i],i==0?"OculusLeft":"OculusRight");
-		m_compositors[i]->setEnabled(true);
+
+		    m_cameraNode->attachObject(m_cameras[i]);
+		    m_cameras[i]->setNearClipDistance(g_defaultNearClip);
+			m_cameras[i]->setFarClipDistance(g_defaultFarClip);			
+			m_cameras[i]->setPosition((i * 2 - 1) * mIPD * 0.5f, 0, 0);
+
 	}
 
-	m_ogreReady = true;
+
+setCameras( );
+
 	Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
 	return true;
 }
 
-void Oculus::update()
-{
-	if(m_ogreReady)
-	{
-		m_cameraNode->setOrientation(getOrientation());
-	}
-}
+
 
 Ogre::SceneNode *Oculus::getCameraNode()
 {
 	return m_cameraNode;
 }
 
-Ogre::Quaternion Oculus::getOrientation() const
-{
-	if(m_oculusReady)
-	{
-		Quatf q = m_sensorFusion->GetOrientation();
-		return Ogre::Quaternion(q.w,q.x,q.y,q.z);
-	}
-	else
-	{
-		return Ogre::Quaternion::IDENTITY;
-	}
-}
 
-Ogre::CompositorInstance *Oculus::getCompositor(unsigned int i)
-{
-	return m_compositors[i];
-}
-
-float Oculus::getCentreOffset() const
-{
-	return m_centreOffset;
-}
-
-void Oculus::resetOrientation()
-{
-	if(m_sensorFusion)
-		m_sensorFusion->Reset();
-}

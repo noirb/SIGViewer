@@ -1,60 +1,68 @@
-fragment_program Ogre/Compositor/OculusFP_cg cg
+vertex_program OculusDistortionVertex glsl
 {
-	source oculus.cg
-	entry_point main_fp
-	profiles ps_4_0 ps_2_0 arbfp1
-	
+    source OculusDistortionVertex.glsl
 	default_params
 	{
-		param_named LensCentre float2 0.5 0.5
-		param_named Scale float2 0.3 0.3
-		param_named ScaleIn float2 2 2
-		param_named HmdWarpParam float4 1.0f, 0.22f, 0.24f, 0
-	}
-}
-
-vertex_program oculusBaseLightMap_vp cg
-{
-	source oculus.cg
-	entry_point oculusBaseLightMap_vp
-	profiles vs_4_0 vs_2_0 arbvp1
-	default_params
-	{
+		param_named eyeToSourceUVScale float2 1.0 1.0
+		param_named eyeToSourceUVOffset float2 0.0 0.0
+		param_named eyeRotationStart matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
+		param_named eyeRotationEnd matrix4x4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0;
 		param_named_auto worldViewProj worldviewproj_matrix
-        param_named_auto ambient ambient_light_colour
 	}
 }
-
-fragment_program oculusBaseLightMap_fp cg
+fragment_program OculusDistortionFragment glsl
 {
-	source oculus.cg
-	entry_point oculusBaseLightMap_fp
-	profiles ps_4_0 ps_2_0 arbfp1
+    source OculusDistortionFragment.glsl
 }
 
-material Ogre/Compositor/Oculus
+
+material Oculus/LeftEye
 {
-	technique
-	{
-		pass
-		{
-			depth_check off
+    receive_shadows off
 
-			vertex_program_ref Ogre/Compositor/StdQuad_vp
+    technique
+    {
+        pass Oculus/LeftEye
+        {
+			vertex_program_ref OculusDistortionVertex
 			{
 			}
 
-			fragment_program_ref Ogre/Compositor/OculusFP_cg
+			fragment_program_ref OculusDistortionFragment
+			{
+				param_named diffuseMap int 0
+			}
+
+            lighting off
+			texture_unit
+            {
+            }
+        }
+    }
+}
+
+material Oculus/RightEye
+{
+    receive_shadows off
+
+    technique
+    {
+        pass Oculus/RightEye
+        {
+			vertex_program_ref OculusDistortionVertex
 			{
 			}
 
-			texture_unit RT
+			fragment_program_ref OculusDistortionFragment
 			{
-				tex_coord_set 0
-				tex_address_mode border
-				tex_border_colour 0 0 0
-				filtering linear linear linear
+				param_named diffuseMap int 0
 			}
-		}
-	}
+
+            lighting off
+
+			texture_unit 
+            {
+            }
+        }
+    }
 }

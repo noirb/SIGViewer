@@ -17,7 +17,7 @@ This source file is part of the
 #include "resource.h"
 #include "BaseApplication.h"
 #include "SIGVerse.h"
-
+//#include "OgreOculus/OgreOculus.h"
 //-------------------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
 	: mRoot(0),
@@ -56,7 +56,7 @@ bool BaseApplication::configure(void)
 	// You can skip this and use root.restoreConfig() to load configuration
 	// settings if you were sure there are valid ones saved in ogre.cfg
 
-	Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("Direct3D9 Rendering Subsystem");
+	Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
 	mRoot->setRenderSystem(rs);
 	
 	if(fullscreenMode){
@@ -67,12 +67,13 @@ bool BaseApplication::configure(void)
 		rs->setConfigOption("Full Screen", "No");
 		rs->setConfigOption("Video Mode", "1024 x 768 @ 32-bit colour");
 	}
-	rs->setConfigOption("Multi device memory hint", "Auto hardware buffers management");
+	//rs->setConfigOption("Multi device memory hint", "Auto hardware buffers management");
 	mWindow = mRoot->initialise(true, "SIGViewer");
 	
 	mWindow->setDeactivateOnFocusChange(false);
 
 	// Icon setting.
+
 #ifdef WIN32
 	HWND hwnd;
 	mWindow->getCustomAttribute("WINDOW", &hwnd);
@@ -242,8 +243,8 @@ bool BaseApplication::setup(void)
 		Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media","FileSystem");
 		// Load resources
 		loadResources();
-		oculus.setupOculus();
-		oculus.setupOgre(mSceneMgr, mWindow);
+		//oculus.setupOculus();
+		oculus.setupOgre(mSceneMgr, mWindow,mRoot);
 
 		createCamera();
 	}
