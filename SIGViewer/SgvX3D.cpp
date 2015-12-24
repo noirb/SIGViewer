@@ -1161,8 +1161,16 @@ error_return:
 
 		// -----------------------------------------
 		// -----------------------------------------
+		SFVec3f *scal = pJointNode->getScale();
+
+		// -----------------------------------------
+		// -----------------------------------------
 		SceneNode *pSceneNode = parentNode->createChildSceneNode();
 		setTransAndRot(pSceneNode, trans, rot);
+
+
+
+
 
 		// -------------------------------------------
 		// -------------------------------------------
@@ -1323,11 +1331,15 @@ error_return:
 
 		// -----------------------------------------
 		// -----------------------------------------
+		SFVec3f *scal = pTransNode->getScale();
+
+		// -----------------------------------------
+		// -----------------------------------------
 		SceneNode *pSceneNode = parentNode->createChildSceneNode();
 		setTransAndRot(pSceneNode, trans, rot);
 
-		//Sgv::Log::printIndent(indent);
-		//Sgv::Log::println("TRANSFORM");
+
+
 
 		//Sgv::Log::printIndent(indent);
 		//Sgv::Log::println("translation (%f %f %f)", trans->x(), trans->y(), trans->z());
@@ -1796,6 +1808,7 @@ error_return:
 
 		// -----------------------------------------
 		// -----------------------------------------
+
 		SceneNode *pSceneNode = parentNode->createChildSceneNode();
 		setTransAndRot(pSceneNode, trans, rot);
 
@@ -2111,23 +2124,25 @@ error_return:
 		return node;
 	}
 
-	void X3D::setTransAndRot(SceneNode *pSceneNode, SFVec3f *trans, SFRotation *rot)
+void X3D::setTransAndRot(SceneNode *pSceneNode, SFVec3f *trans, SFRotation *rot )
 	{
 		Vector3 axis(rot->x(), rot->y(), rot->z());
-
+		//scale (Real x, Real y, Real z)
 		// ********************************************
 		axis.normalise();
 		// ********************************************
 #if 1
-		pSceneNode->translate(Vector3(trans->x(), trans->y(), trans->z()));
-		pSceneNode->rotate(axis, Radian(rot->rot()));
+		//pSceneNode->translate(Vector3(trans->x(), trans->y(), trans->z()));
+		//pSceneNode->rotate(axis, Radian(rot->rot()));
+		//pSceneNode->scale(scal->x(), scal->y(), scal->z());
 #else
-		pSceneNode->translate(Vector3(trans->x(), trans->y(), trans->z()), Ogre::Node::TransformSpace::TS_PARENT);
-		pSceneNode->rotate(axis, Radian(rot->rot()), Ogre::Node::TransformSpace::TS_PARENT);
+		//pSceneNode->translate(Vector3(trans->x(), trans->y(), trans->z()), Ogre::Node::TransformSpace::TS_PARENT);
+		//pSceneNode->rotate(axis, Radian(rot->rot()), Ogre::Node::TransformSpace::TS_PARENT);
 #endif
 	}
 
-	void X3D::printAllChildrenOfNode(SceneNode *node, int level)
+
+void X3D::printAllChildrenOfNode(SceneNode *node, int level)
 	{
 		if (!node) return;
 

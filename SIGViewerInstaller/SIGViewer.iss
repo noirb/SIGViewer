@@ -1,14 +1,14 @@
 [Setup]
-AppId={{71EC0A2E-9BBF-494E-AF2B-F1144A3111DB}}
+AppId={{072CDBA3-0429-4F16-B6DE-4862CD792F9D}}
 // Application name
 AppName=SIGViewer
 // Application name and version number                    
-AppVerName=SIGViewer 2.3.1
+AppVerName=SIGViewer 2.3.2
 AppPublisher=National Institute of Informatics
 AppPublisherURL=http://www.sigverse.org/
 AppSupportURL=http://www.sigverse.org/
 AppUpdatesURL=http://www.sigverse.org/
-DefaultDirName={pf}\SIGViewer_2.3.1
+DefaultDirName={pf}\SIGViewer_2.3.2
 DefaultGroupName=SIGViewer
 OutputBaseFilename=setup
 OutputDir=SIGViewerSetup
@@ -50,7 +50,7 @@ Source: "SIGVerse.ini" ; DestDir:{app}/SIGViewer/bin; permissions:users-full
 
 [Icons]
 Name: "{group}\SIGViewer"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"
-Name: "{commondesktop}\SIGViewer 2.3.1"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"; Tasks: desktopicon
+Name: "{commondesktop}\SIGViewer 2.3.2"; Filename: "{app}\SIGViewer\bin\SIGViewer.exe"; WorkingDir: "{app}\SIGViewer\bin"; Tasks: desktopicon
 ; begin(add)(2010/2/24) install SIGWorldEditor.exe
 
 
@@ -59,7 +59,6 @@ Name: "{commondesktop}\SIGViewer 2.3.1"; Filename: "{app}\SIGViewer\bin\SIGViewe
 
 [Code]
 var
-        DX9RuntimePage: TInputOptionWizardPage;
         VC2010RuntimePage: TInputOptionWizardPage;
         JREPage: TInputOptionWizardPage;
         jvmpath: string;  
@@ -72,7 +71,7 @@ begin
         //      VC++ Runtime Install Page
         // -----------------------------------------------
         VC2010RuntimePage := CreateInputOptionPage(
-                DX9RuntimePage.ID,
+                wpWelcome,
                 'Install Library for SIGViewer',
                 'Visual C++ runtime install',
                 'SIGViewer needs to install Visual C++ runtime. Do you accept it?',

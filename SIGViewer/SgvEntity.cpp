@@ -398,10 +398,10 @@ namespace Sgv
 	{
 		SFVec3f    *vec = trans->getTranslation();
 		SFRotation *rot = trans->getRotation();
-
+		SFVec3f    *scal = trans->getScale();
 		// Convert into Ogre vector
 		Ogre::Vector3 ovec(vec->x(), vec->y(), vec->z());
-
+		Ogre::Vector3 cc(scal->x(), scal->y(), scal->z());
 		//Calculate quaternion from axis and rotational angle
 		float a = cos(rot->rot()/2);
 		float b = sin(rot->rot()/2);
@@ -415,7 +415,8 @@ namespace Sgv
 
 		Ogre::String pname = parent->getName();
 		Ogre::SceneNode *node = (Ogre::SceneNode*)parent->createChild(pname + tname, ovec, qua);
-		
+		//node->scale(scal->x(),scal->z(), scal->y());
+		node->setScale(cc);
 		// Search Shape node which is owned by Transform node
 		MFNode *shape = trans->searchNodesFromDirectChildren("Shape");
 
