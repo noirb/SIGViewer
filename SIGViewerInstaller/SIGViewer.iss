@@ -92,7 +92,7 @@ begin
         JREPage.Add('Yes. please install JRE 8.0');
         JREPage.Add('No. I have already installed JRE 8.0 No need to install it again.');
         JREPage.Values[0]:=True;
-        jvmpath := '{pf}\Java\jre1.8.0_45\bin\client\';
+        jvmpath := '{pf}\Java\jre1.8.0_66\bin\client\';
 end;
 
 
@@ -146,7 +146,7 @@ begin
                 // ------------------------------------
                 //      get path of the installer
                 // ------------------------------------
-                JREInstellerPath := ExpandConstant('{src}\downloads\jre-8u45-windows-i586-iftw.exe');
+                JREInstellerPath := ExpandConstant('{src}\downloads\jre-8u66-windows-i586-iftw.exe');
 
                 // ------------------------------------
                 //      run installer
