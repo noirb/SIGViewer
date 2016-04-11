@@ -1,9 +1,5 @@
 [Setup]
-<<<<<<< HEAD
-AppId={{072CDBA3-0429-4F16-B6DE-4862CD792F9D}}
-=======
 AppId={{63A7E5E4-7859-4661-A386-020E854DB851}}
->>>>>>> master
 // Application name
 AppName=SIGViewer
 // Application name and version number                    
