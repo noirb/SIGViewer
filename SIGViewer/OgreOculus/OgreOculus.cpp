@@ -200,12 +200,12 @@ void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, O
 	mIPD = ovrHmd_GetFloat(mHMD, OVR_KEY_IPD,  0.064f);
 	
 	// Set a default value for interpupillary distance:
-	mIPD = 0.064;
+	mIPD = 0.064f;
 	
 	// Create a camera in the (new, external) scene so the mesh can be rendered onto it:
 	mCamera = mSceneMgr->createCamera("OculusRiftExternalCamera");
 	mCamera->setFarClipDistance(1000000.0f);
-	mCamera->setNearClipDistance( 0.1 );
+	mCamera->setNearClipDistance( 0.1f );
 	mCamera->setProjectionType( Ogre::PT_ORTHOGRAPHIC );
 	mCamera->setOrthoWindow(2 , 2);
 	mCamera->lookAt( 0, 0, -1 );
@@ -214,7 +214,7 @@ void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, O
 	mSceneMgr->getRootSceneNode()->attachObject( mCamera );
 
 	meshNode->setPosition( 0, 0, -1 );
-	meshNode->setScale( 1, 1, -0.1 );
+	meshNode->setScale( 1, 1, -0.1f );
 
 	mViewport = m_window->addViewport( mCamera);
 	mViewport->setBackgroundColour(Ogre::ColourValue::Black);

@@ -857,7 +857,7 @@ namespace Sgv
 				m_allMaterials.insert(std::map<Ogre::MaterialPtr, float>::value_type(mptr, a));
 			}
 			else {
-				m_allMaterials.insert(std::map<Ogre::MaterialPtr, float>::value_type(mptr, 1.0));
+				m_allMaterials.insert(std::map<Ogre::MaterialPtr, float>::value_type(mptr, 1.0f));
 			}
 			entity->setMaterial(mptr);
 			//m_allMaterials.push_back(mptr);
@@ -1139,6 +1139,8 @@ namespace Sgv
 				}
 			}
 		}
+
+		return true;
 	}
 
 	bool SgvEntity::MinMaxFromIndexedNode(CX3DCoordinateNode* Coord,

@@ -408,7 +408,7 @@ namespace Sgv
 		{
 			GG += gShapesVec[iTrans];
 		}
-		GG /= nTrans;
+		GG /= (float)nTrans;
 
 		for (int iTrans=0; iTrans<nTrans; iTrans++)
 		{
@@ -626,8 +626,8 @@ namespace Sgv
 			CX3DParser::printLog("gs[%d]=(%f, %f, %f)\n", i, gs[i].x, gs[i].y, gs[i].z);
 			G += gs[i];
 		}
-		G /= n;
-
+		G /= (float)n;
+		
 		CX3DParser::printLog("G=(%f, %f, %f)\n", G.x, G.y, G.z);
 
 		for (i=0; i<n; i++)

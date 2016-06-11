@@ -221,7 +221,7 @@ void SgvMain::createScene(void)
 	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
 
 	Ogre::Light *l = mSceneMgr->createLight("MainLight");
-	l->setType( Ogre::Light::LightTypes::LT_DIRECTIONAL );
+	l->setType( Ogre::Light::LT_DIRECTIONAL );
 	l->setPosition(1000.0f, 1000.0f, -1000.0f);
 	l->setDirection(Ogre::Vector3(0, -1, 0));
 	l->setDiffuseColour(Ogre::ColourValue(0.8f, 0.8f, 0.8f));
@@ -4565,7 +4565,9 @@ bool SgvMain::checkRequestFromService()
 		}
 		it++;
 	}
-	//MessageBox(NULL, _T("check!"), _T("Attention"), MB_OKCANCEL); 
+	//MessageBox(NULL, _T("check!"), _T("Attention"), MB_OKCANCEL);
+
+	return true;
 }
 
 bool SgvMain::getImage(Ogre::Camera *cam, unsigned char *image, int headSize,  ColorBitType ctype, ImageType itype)

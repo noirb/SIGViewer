@@ -97,7 +97,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>C:\SIGVerse\GitHub\SIGService\Windows\SIGService;C:\SIGVerse\GitHub\x3d\parser\cpp\X3DParser;C:\SIGVerse\ext\Java\jdk1.8.0_45\include;C:\SIGVerse\ext\Java\jdk1.8.0_45\include\win32;C:\SIGVerse\ext\boost_1_55_0;C:\SIGVerse\ext\OgreSDK_vc10_v1-8-0\include;C:\SIGVerse\ext\OgreSDK_vc10_v1-8-0\include\OIS;C:\SIGVerse\ext\OgreSDK_vc10_v1-8-0\include\OGRE;C:\SIGVerse\ext\OgreSDK_vc10_v1-8-0\Samples\Common\include;C:\SIGVerse\ext\CEGUI-0.7.6\cegui\include;C:\SIGVerse\ext\libssh2-1.4.2-openssl-x86-win32nt-msvc\include;C:\SIGVerse\ext\zlib\include;C:\SIGVerse\ext\OculusSDK_0.4.3\LibOVR\Include</AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
-      <RuntimeTypeInfo>false</RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
     </ClCompile>
     <Link>
