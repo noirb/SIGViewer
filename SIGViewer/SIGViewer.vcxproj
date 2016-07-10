@@ -90,7 +90,6 @@
 			$(JDK_PATH)\include\win32;
 			$(X3D_ROOT_PATH)\parser\cpp\X3DParser;
 			$(LIBSSH2_ROOT_PATH)\include;
-			$(ZLIB_PATH)\include;
 			$(SIGSERVICE_ROOT_PATH)\Windows\SIGService;
 			$(BOOST_ROOT_PATH);
 			$(LIBOVR_ROOT_PATH)\Include
@@ -104,7 +103,6 @@
 		$(JDK_PATH)\lib;
 		$(BOOST_ROOT_PATH)\stage\lib;
 		$(LIBSSH2_ROOT_PATH)\lib;
-		$(ZLIB_PATH)\lib;
 		$(SIGSERVICE_ROOT_PATH)\Windows\Release_2010;
 		$(LIBOVR_ROOT_PATH)\Lib\Win32
 	  </AdditionalLibraryDirectories>
@@ -135,7 +133,6 @@
 		$(OGRE_SDK_PATH)\Samples\Common\include;
 		$(CEGUI_ROOT_PATH)\cegui\include;
 		$(LIBSSH2_ROOT_PATH)\include;
-		$(ZLIB_PATH)\include;
 		$(LIBOVR_ROOT_PATH)\Include
       </AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
@@ -157,7 +154,6 @@
 		$(OGRE_SDK_PATH)\lib\$(Configuration);
 		$(CEGUI_ROOT_PATH)\lib;
 		$(LIBSSH2_ROOT_PATH)\win32\Release_dll\;
-		$(ZLIB_PATH)\lib;
 		$(LIBOVR_ROOT_PATH)\Lib\Win32\VS2012;
 		%(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
