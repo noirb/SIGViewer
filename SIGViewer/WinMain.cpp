@@ -790,7 +790,7 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 
                     CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
                     CEGUI::Window* root_win = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
-                    CEGUI::Window* ent_win = root_win->getChild("EntityDataWindow");
+                    CEGUI::Window* ent_win = root_win->getChildRecursive("EntityDataWindow");
                     // entity data window 
                     if (ent_win != NULL && wmgr.isAlive(ent_win) && !display)
                     {
@@ -823,7 +823,7 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
 
                             (*it).second->setTransparency(0.6f);
 
-                            CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(root_win->getChild(("EntityDataList")));
+                            CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(root_win->getChildRecursive(("EntityDataList")));
 
                             int dataSize = mEntityDataList.size();
                             for (int i = 0; i < dataSize; i++) {
@@ -994,7 +994,7 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
                         std::map<CEGUI::String, CEGUI::ListboxTextItem*>::iterator it;
                         it = mMsgList.find(namess);
                         if (it != mMsgList.end()) {
-                            CEGUI::Listbox *elist = static_cast<CEGUI::Listbox *>(root_win->getChild("EntityList"));
+                            CEGUI::Listbox *elist = static_cast<CEGUI::Listbox *>(root_win->getChildRecursive("EntityList"));
                             elist->deactivate();
 
                             elist->clearAllSelections();
@@ -1140,7 +1140,7 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
             mEntityDataList[1]->setText(tmp);
 
             CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
-            CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow()->getChild("EntityDataList"));
+            CEGUI::Listbox *eDataList = static_cast<CEGUI::Listbox *>(CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow()->getChildRecursive("EntityDataList"));
         }
 
 
