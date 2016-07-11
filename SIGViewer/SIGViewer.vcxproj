@@ -80,18 +80,18 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>
-			$(OGRE_SDK_PATH)\include;
-			$(OGRE_SDK_PATH)\include\OGRE\Overlay;
-			$(OGRE_SDK_PATH)\include\OIS;
-			$(OGRE_SDK_PATH)\include\OGRE;
-			$(OGRE_SDK_PATH)\Samples\Common\include;
+			$(OGRE_SDK)\include;
+			$(OGRE_SDK)\include\OGRE\Overlay;
+			$(OGRE_SDK)\include\OIS;
+			$(OGRE_SDK)\include\OGRE;
+			$(OGRE_SDK)\Samples\Common\include;
 			$(CEGUI_ROOT_PATH)\cegui\include;
 			$(JDK_PATH)\include;
 			$(JDK_PATH)\include\win32;
 			$(X3D_ROOT_PATH)\parser\cpp\X3DParser;
 			$(LIBSSH2_ROOT_PATH)\include;
 			$(SIGSERVICE_ROOT_PATH)\Windows\SIGService;
-			$(BOOST_ROOT_PATH);
+			$(BOOST_ROOT);
 			$(LIBOVR_ROOT_PATH)\Include
       </AdditionalIncludeDirectories>
     </ClCompile>
@@ -101,7 +101,7 @@
 		$(OGRE_SDK_PATH)\lib\$(ConfigurationName);
 		$(CEGUI_ROOT_PATH)\lib;
 		$(JDK_PATH)\lib;
-		$(BOOST_ROOT_PATH)\stage\lib;
+		$(BOOST_ROOT)\stage\lib;
 		$(LIBSSH2_ROOT_PATH)\lib;
 		$(SIGSERVICE_ROOT_PATH)\Windows\Release_2010;
 		$(LIBOVR_ROOT_PATH)\Lib\Win32
@@ -121,19 +121,19 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>
-	    $(SIGSERVICE_ROOT_PATH)\Windows\SIGService;
-		$(X3D_ROOT_PATH)\parser\cpp\X3DParser;
-		$(JDK_PATH)\include;
-		$(JDK_PATH)\include\win32;
-		$(BOOST_ROOT_PATH);
-		$(OGRE_SDK_PATH)\include;
-		$(OGRE_SDK_PATH)\include\OGRE\Overlay;
-		$(OGRE_SDK_PATH)\include\OIS;
-		$(OGRE_SDK_PATH)\include\OGRE;
-		$(OGRE_SDK_PATH)\Samples\Common\include;
-		$(CEGUI_ROOT_PATH)\cegui\include;
-		$(LIBSSH2_ROOT_PATH)\include;
-		$(LIBOVR_ROOT_PATH)\Include
+	    $(BUILD_SIGSERVICE_INC);
+		$(BUILD_X3D_INC);
+		$(JDK_ROOT_PATH)\include;
+		$(JDK_ROOT_PATH)\include\win32;
+		$(BUILD_BOOST_INC);
+		$(BUILD_OGRE_INC);
+		$(BUILD_OGRE_INC)\OGRE\Overlay;
+		$(BUILD_OGRE_INC)\OIS;
+		$(BUILD_OGRE_INC)\OGRE;
+		$(OGRE_SDK)\Samples\Common\include;
+		$(BUILD_CEGUI_INC);
+		$(BUILD_LIBSSH2_INC);
+		$(BUILD_LIBOVR_INC)
       </AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -147,14 +147,15 @@
 	    OgreMain.lib;OIS.lib;OgreTerrain.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>
-	    $(SIGSERVICE_ROOT_PATH)\Windows\Release_2010;
-		$(X3D_ROOT_PATH)\parser\cpp\Release;
-		$(JDK_PATH)\lib;
-		$(BOOST_ROOT_PATH)\stage\lib;
-		$(OGRE_SDK_PATH)\lib\$(Configuration);
-		$(CEGUI_ROOT_PATH)\lib;
-		$(LIBSSH2_ROOT_PATH)\win32\Release_dll\;
-		$(LIBOVR_ROOT_PATH)\Lib\Win32\VS2012;
+	    $(BUILD_SIGSERVICE_LIB);
+		$(BUILD_X3D_LIB);
+		$(JDK_ROOT_PATH)\lib;
+		$(BUILD_BOOST_LIB);
+		$(BUILD_OGRE_LIB)\$(Configuration);
+		$(BUILD_CEGUI_LIB);
+		$(BUILD_LIBSSH2_LIB);
+		$(BUILD_LIBOVR_LIB);
+        K:\dev\SIGVerse\test\extern\openssl-0.9.8k_WIN32\lib;
 		%(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
     </Link>
