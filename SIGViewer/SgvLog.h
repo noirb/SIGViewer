@@ -18,18 +18,18 @@
 #include "boost/config.hpp"
 
 #if (defined BOOST_WINDOWS) && !(defined BOOST_DISABLE_WIN32)
-	#include <windows.h> 
-	#include <direct.h>
+    #include <windows.h> 
+    #include <direct.h>
 #else
-	#include <unistd.h>
-	#include <sys/stat.h>
+    #include <unistd.h>
+    #include <sys/stat.h>
 #endif
 
 using namespace std;
 using namespace boost;
 
 namespace Sgv{
-	
+    
 using namespace std;
 
 
@@ -37,34 +37,34 @@ using namespace std;
 
 inline void sleep(const long& msec)
 {
-	::Sleep(static_cast<DWORD>(msec));
+    ::Sleep(static_cast<DWORD>(msec));
 };
 
 inline const int makeDir(const char* file)
 {
-	return static_cast<int>(::_mkdir(file));
+    return static_cast<int>(::_mkdir(file));
 };
 
 inline const int removeDir(const char* file)
 {
-	return static_cast<int>(::_rmdir(file));
+    return static_cast<int>(::_rmdir(file));
 };
 
 #else
 
 inline void sleep(const long& msec)
 {
-	::usleep(static_cast<useconds_t>(msec*1000));
+    ::usleep(static_cast<useconds_t>(msec*1000));
 };
 
 inline const int makeDir(const char* file)
 {
-	return static_cast<int>(::mkdir(file, 0));
+    return static_cast<int>(::mkdir(file, 0));
 };
 
 inline const int removeDir(const char* file)
 {
-	return static_cast<int>(::rmdir(file));
+    return static_cast<int>(::rmdir(file));
 };
 
 #endif
@@ -87,32 +87,32 @@ name of directory is [file path] + "__lock_"
 class FileLock : noncopyable
 {
 public:
-	/**
-	@param file [in] file path to be locked
-	*/
-	FileLock(const string& file)
-		: m_filepath(file), m_folderpath(file + string("__lock_")), m_isLocked(false), m_sleepMsec(200)
-	{};
+    /**
+    @param file [in] file path to be locked
+    */
+    FileLock(const string& file)
+        : m_filepath(file), m_folderpath(file + string("__lock_")), m_isLocked(false), m_sleepMsec(200)
+    {};
 
-	~FileLock(){};
+    ~FileLock(){};
 
-	/**
-	Lock
-	@return true if succeeded
-	*/
-	const bool lock();
+    /**
+    Lock
+    @return true if succeeded
+    */
+    const bool lock();
 
-	/**
-	 Unlock
-	 @return true if succeeded
-	 */
-	const bool unlock();
+    /**
+     Unlock
+     @return true if succeeded
+     */
+    const bool unlock();
 
 private:
-	string m_filepath;   // Log file name
-	string m_folderpath; // Folder name for the log file
-	bool m_isLocked;     // Flag whether this object locks the file?
-	long m_sleepMsec;    // Time [msec] to try again  to lock
+    string m_filepath;   // Log file name
+    string m_folderpath; // Folder name for the log file
+    bool m_isLocked;     // Flag whether this object locks the file?
+    long m_sleepMsec;    // Time [msec] to try again  to lock
 };
 
 
@@ -122,25 +122,25 @@ private:
 class LogFileWriter : noncopyable
 {
 public:
-	virtual ~LogFileWriter(){};
+    virtual ~LogFileWriter(){};
 
-	/**
-	 Save message
-	 Some derived classes may write on the log file directly,
+    /**
+     Save message
+     Some derived classes may write on the log file directly,
      other may store in the memory and write them when flush() is called
-	 @param msg [in] string to be written
-	*/
-	virtual void write(const char* msg)=0;
+     @param msg [in] string to be written
+    */
+    virtual void write(const char* msg)=0;
 
-	/**
-	 Flush the log
-	*/
-	virtual void flush()=0;
+    /**
+     Flush the log
+    */
+    virtual void flush()=0;
 
-	virtual LogFileWriter* clone() const =0;
+    virtual LogFileWriter* clone() const =0;
 
 protected:
-	LogFileWriter(){};
+    LogFileWriter(){};
 };
 
 
@@ -157,42 +157,42 @@ template <class TFileLock>
 class SimpleFileWriter : public LogFileWriter
 {
 public:
-	/**
-	 Constructor
-	 @param file [in] Path of the log file
-	*/
-	SimpleFileWriter(const string& file) : m_file(file), m_lock(file)
-	{};
+    /**
+     Constructor
+     @param file [in] Path of the log file
+    */
+    SimpleFileWriter(const string& file) : m_file(file), m_lock(file)
+    {};
 
-	~SimpleFileWriter()
-	{};
+    ~SimpleFileWriter()
+    {};
 
-	void write(const char* msg)
-	{
-		if(!m_lock.lock()){
-			cerr << "SimpleFileWriter::write error, msg=" << msg << endl;
-			return;
-		}
+    void write(const char* msg)
+    {
+        if(!m_lock.lock()){
+            cerr << "SimpleFileWriter::write error, msg=" << msg << endl;
+            return;
+        }
 
-		//
-		ofstream ofs(m_file.c_str(), ios_base::app);
-		ofs << msg << endl;
-		
-		m_lock.unlock();
-		return;
-	};
-	//Nothing to do
-	void flush(){};
+        //
+        ofstream ofs(m_file.c_str(), ios_base::app);
+        ofs << msg << endl;
+        
+        m_lock.unlock();
+        return;
+    };
+    //Nothing to do
+    void flush(){};
 
-	//
-	LogFileWriter* clone() const
-	{
-		return new SimpleFileWriter<TFileLock>(m_file);
-	};
+    //
+    LogFileWriter* clone() const
+    {
+        return new SimpleFileWriter<TFileLock>(m_file);
+    };
 
 private:
-	string m_file;
-	TFileLock m_lock;
+    string m_file;
+    TFileLock m_lock;
 };
 
 
@@ -204,56 +204,56 @@ class DelayFileWriterBase : public LogFileWriter
 {
 public:
 
-	/**
-	 Write on temporary file
+    /**
+     Write on temporary file
      @param msg [in] message to be sent
-	*/
-	void write(const char* msg)
-	{
-		if(!m_isStart){
-			createTmpFile();
-		}
-		//
-		m_ofs << msg << endl;
-	};
+    */
+    void write(const char* msg)
+    {
+        if(!m_isStart){
+            createTmpFile();
+        }
+        //
+        m_ofs << msg << endl;
+    };
 
 
 protected:
-	/**
-	 Constructor
-	 @param file [in] path of log file
-	*/
-	DelayFileWriterBase(const string& file)	: m_file(file), m_isStart(false)
-	{};
+    /**
+     Constructor
+     @param file [in] path of log file
+    */
+    DelayFileWriterBase(const string& file)	: m_file(file), m_isStart(false)
+    {};
 
-	///
-	virtual ~DelayFileWriterBase(){};
-	
-	// Output to the log file. Callced from destructor
-	void writeLog();
+    ///
+    virtual ~DelayFileWriterBase(){};
+    
+    // Output to the log file. Callced from destructor
+    void writeLog();
 
-	void createTmpFile();
+    void createTmpFile();
 
-	// File name for temporary
-	const string createFileName() const;
+    // File name for temporary
+    const string createFileName() const;
 
-	const string& getFile() const
-	{ return m_file;};
+    const string& getFile() const
+    { return m_file;};
 
-	inline const bool& getIsStart() const
-	{ return m_isStart; };
+    inline const bool& getIsStart() const
+    { return m_isStart; };
 
-	inline void close()
-	{ 
-		m_ofs.close(); 
-		m_isStart = false;
-	};
+    inline void close()
+    { 
+        m_ofs.close(); 
+        m_isStart = false;
+    };
 
 private:
-	string m_file;
-	string m_tmpfile;
-	ofstream m_ofs;
-	bool m_isStart;
+    string m_file;
+    string m_tmpfile;
+    ofstream m_ofs;
+    bool m_isStart;
 };
 
 
@@ -267,42 +267,42 @@ template <class TFileLock>
 class DelayFileWriter : public DelayFileWriterBase
 {
 public:
-	///
-	DelayFileWriter(const string& file)
-		: DelayFileWriterBase(file), m_lock(file)
-	{};
+    ///
+    DelayFileWriter(const string& file)
+        : DelayFileWriterBase(file), m_lock(file)
+    {};
 
-	// Output to the log file when the object is destructed
-	// If it failed, the temporary file should be remained without deletion
-	virtual ~DelayFileWriter()
-	{
-		flush();
-	};
+    // Output to the log file when the object is destructed
+    // If it failed, the temporary file should be remained without deletion
+    virtual ~DelayFileWriter()
+    {
+        flush();
+    };
 
-	// Write the contents of temporary file, and delete the temporary file
-	void flush()
-	{
-		// Nothing to do if the log is not started
-		if(!getIsStart()) return;
+    // Write the contents of temporary file, and delete the temporary file
+    void flush()
+    {
+        // Nothing to do if the log is not started
+        if(!getIsStart()) return;
 
-		// Start of the lock
-		if(!m_lock.lock()) return;
-		
-		// Output to the log file
-		writeLog();
-		close();
+        // Start of the lock
+        if(!m_lock.lock()) return;
+        
+        // Output to the log file
+        writeLog();
+        close();
 
-		// End of the lock
-		m_lock.unlock();
-	};
+        // End of the lock
+        m_lock.unlock();
+    };
 
-	LogFileWriter* clone() const
-	{
-		return new DelayFileWriter<TFileLock>(getFile());
-	};
+    LogFileWriter* clone() const
+    {
+        return new DelayFileWriter<TFileLock>(getFile());
+    };
 
 private:
-	TFileLock m_lock;
+    TFileLock m_lock;
 };
 
 
@@ -333,42 +333,42 @@ void writeLogHeader(ostream& os);
 class LogBase
 {
 public:
-	
-	enum LogLevel{ERR=0, INFO, DEBUG, WARNING};
+    
+    enum LogLevel{ERR=0, INFO, DEBUG, WARNING};
 
-	inline const LogLevel& getLevel() const
-	{ return m_level; };
+    inline const LogLevel& getLevel() const
+    { return m_level; };
 
-	inline const string& getId() const
-	{ return m_id; };
+    inline const string& getId() const
+    { return m_id; };
 
 protected:
-	/**
-	@param level [in] Log level
-	@param id    [in] ID string (program name, display name and so on)
-	*/	
-	LogBase(const enum LogLevel level, const string& id)
-		: m_level(level), m_id(id)
-	{};
+    /**
+    @param level [in] Log level
+    @param id    [in] ID string (program name, display name and so on)
+    */	
+    LogBase(const enum LogLevel level, const string& id)
+        : m_level(level), m_id(id)
+    {};
 
-	~LogBase(){};
+    ~LogBase(){};
 
-	/**
-	Output of the log regardless the log level
-	*/
-	void write(LogFileWriter& writer, const char* level, const char* msg)
-	{
-		ostringstream oss;
-		writeLogHeader(oss);
-		oss << '[' << level << "] " << '[' << m_id << "] " << msg;
-		
-		writer.write(oss.str().c_str());
-	};
+    /**
+    Output of the log regardless the log level
+    */
+    void write(LogFileWriter& writer, const char* level, const char* msg)
+    {
+        ostringstream oss;
+        writeLogHeader(oss);
+        oss << '[' << level << "] " << '[' << m_id << "] " << msg;
+        
+        writer.write(oss.str().c_str());
+    };
 
 private:
-	LogLevel m_level;
-	// ID string (program name, display name and so on)
-	string m_id;
+    LogLevel m_level;
+    // ID string (program name, display name and so on)
+    string m_id;
 };
 
 
@@ -394,7 +394,7 @@ Used by Log::printObj()
 template <class Obj>
 void toString(ostream& os, const Obj& obj)
 {
-	os << obj;
+    os << obj;
 };
 
 
@@ -419,112 +419,112 @@ If you want to output in other ways, refer the following methods
    Create file lock class following FileLock class
    The requied methods in file lock class are the followings:
     - Constructer which take an argument for file path string (const string& file)
-	・const bool lock();
-	・const bool unlock();
+    ・const bool lock();
+    ・const bool unlock();
 
 - In a case that output method should be changed
    Create file lock class following SimpleFileWriter class
    The requied methods in file lock class are the followings:
     - Constructer which take an argument for file path string (const string& file)
     - const bool write(const char* msg) which writes on a file
-	- template class should be used. File lock class should be managed by member variables
+    - template class should be used. File lock class should be managed by member variables
 </pre>
 */
 class Log : public LogBase
 {
 public:
-	/**
-	Constructer
-	@param file  [in] file path
-	@param level [in] log level
-	@param id    [in] ID
-	*/
-	Log(const enum LogLevel level, const string& id, auto_ptr<LogFileWriter> writer)
-		: LogBase(level, id), m_writer(writer)
-	{};
+    /**
+    Constructer
+    @param file  [in] file path
+    @param level [in] log level
+    @param id    [in] ID
+    */
+    Log(const enum LogLevel level, const string& id, auto_ptr<LogFileWriter> writer)
+        : LogBase(level, id), m_writer(writer)
+    {};
 
-	~Log(){};
-	
-	LogPtr clone() const
-	{
-		return LogPtr(
-			new Log(
-				getLevel(), getId(), auto_ptr<LogFileWriter>(m_writer->clone())
-			)
-		);
-	};
+    ~Log(){};
+    
+    LogPtr clone() const
+    {
+        return LogPtr(
+            new Log(
+                getLevel(), getId(), auto_ptr<LogFileWriter>(m_writer->clone())
+            )
+        );
+    };
 
-	inline void info(const char* msg)
-	{
-		if(getLevel() < INFO) return;
-		write(*m_writer, logLevelToStr(INFO), msg);
-	};
+    inline void info(const char* msg)
+    {
+        if(getLevel() < INFO) return;
+        write(*m_writer, logLevelToStr(INFO), msg);
+    };
 
-	inline void debug(const char* msg)
-	{
-		if(getLevel() < DEBUG) return;
-		write(*m_writer, logLevelToStr(DEBUG), msg);
-	};
+    inline void debug(const char* msg)
+    {
+        if(getLevel() < DEBUG) return;
+        write(*m_writer, logLevelToStr(DEBUG), msg);
+    };
 
-	inline void err(const char* msg)
-	{
-		if(getLevel() < ERR) return;
-		write(*m_writer, logLevelToStr(ERR), msg);
-	};
-	
-	inline void warning(const char* msg)
-	{
-		if(getLevel() < WARNING) return;
-		write(*m_writer, logLevelToStr(WARNING), msg);
-	};
+    inline void err(const char* msg)
+    {
+        if(getLevel() < ERR) return;
+        write(*m_writer, logLevelToStr(ERR), msg);
+    };
+    
+    inline void warning(const char* msg)
+    {
+        if(getLevel() < WARNING) return;
+        write(*m_writer, logLevelToStr(WARNING), msg);
+    };
 
-	/**
-	Log output by variable arguments. Refer the format in makeMsg()
-	This method is no to fast. Not so recommended to use <br>
-	If different number of arguments is given, it may occur serious problems
-	*/
-	void printf(const LogLevel level, const char* msg, ...)
-	{
-		if(getLevel() < level) return;
+    /**
+    Log output by variable arguments. Refer the format in makeMsg()
+    This method is no to fast. Not so recommended to use <br>
+    If different number of arguments is given, it may occur serious problems
+    */
+    void printf(const LogLevel level, const char* msg, ...)
+    {
+        if(getLevel() < level) return;
 
-		va_list ap;
-		va_start(ap, msg);
-		ostringstream oss;
-		makeMsg(oss, msg, ap);
-		write(*m_writer, logLevelToStr(level), oss.str().c_str());
-		va_end(ap);
-	};
+        va_list ap;
+        va_start(ap, msg);
+        ostringstream oss;
+        makeMsg(oss, msg, ap);
+        write(*m_writer, logLevelToStr(level), oss.str().c_str());
+        va_end(ap);
+    };
 
-	/**
-	Output template <class Obj> void toString(ostream& os, const Obj& obj) after msg
-	*/
-	template <class Object>
-	void printObj(const LogLevel level, const char* msg, const Object& obj)
-	{
-		if(getLevel() < level) return;
-		
-		ostringstream oss;
-		oss << msg << " ";
-		toString<Object>(oss, obj);
-		
-		write(*m_writer, logLevelToStr(level), oss.str().c_str());
-	};
+    /**
+    Output template <class Obj> void toString(ostream& os, const Obj& obj) after msg
+    */
+    template <class Object>
+    void printObj(const LogLevel level, const char* msg, const Object& obj)
+    {
+        if(getLevel() < level) return;
+        
+        ostringstream oss;
+        oss << msg << " ";
+        toString<Object>(oss, obj);
+        
+        write(*m_writer, logLevelToStr(level), oss.str().c_str());
+    };
 
-	/**
-	Flush the log. Delay sometimes occurs depends on type of LogFileWriter<br>
-	Output is executed when destructor is called, but estimation is difficult when the destructor is called<br>
-	Thus, this method should be used to output any favority timing
-	*/	
-	inline void flush()
-	{
-		m_writer->flush();
-	};
+    /**
+    Flush the log. Delay sometimes occurs depends on type of LogFileWriter<br>
+    Output is executed when destructor is called, but estimation is difficult when the destructor is called<br>
+    Thus, this method should be used to output any favority timing
+    */	
+    inline void flush()
+    {
+        m_writer->flush();
+    };
 
 protected:
 
 private:
-	// Log output class
-	auto_ptr<LogFileWriter> m_writer;
+    // Log output class
+    auto_ptr<LogFileWriter> m_writer;
 };
 
 
@@ -540,27 +540,27 @@ Currently, the same object is return if the ID is the same
 */
 class LogFactory
 {
-	typedef std::map<int, boost::shared_ptr<Log> > LogMap;
+    typedef std::map<int, boost::shared_ptr<Log> > LogMap;
 public:
-	/**
-	@exception When runtime_error id is not found
-	*/
-	static LogPtr getLog(const int id)
-	{
-		LogMap::iterator i = m_logMap.find(id);
-		if(i == m_logMap.end()) throw runtime_error("the id not exists. error in Logfactory::getLog()");
-		return i->second;
-	};
+    /**
+    @exception When runtime_error id is not found
+    */
+    static LogPtr getLog(const int id)
+    {
+        LogMap::iterator i = m_logMap.find(id);
+        if(i == m_logMap.end()) throw runtime_error("the id not exists. error in Logfactory::getLog()");
+        return i->second;
+    };
 
-	static void setLog(const int id, const LogPtr& log)
-	{
-		m_logMap[id] = log;
-	};
+    static void setLog(const int id, const LogPtr& log)
+    {
+        m_logMap[id] = log;
+    };
 
 protected:
-	LogFactory(){};
+    LogFactory(){};
 private:
-	static LogMap m_logMap;
+    static LogMap m_logMap;
 };
 
 

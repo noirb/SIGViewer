@@ -31,8 +31,8 @@ This source file is part of the
 #include <OISKeyboard.h>
 #include <OISMouse.h>
 
-#include <CEGUI.h>
-#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
+#include <CEGUI/CEGUI.h>
+#include <CEGUI/RendererModules/Ogre/Renderer.h>
 
 #include <SdkTrays.h>
 #include <SdkCameraMan.h>
@@ -42,71 +42,71 @@ This source file is part of the
 class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
 {
 public:
-	BaseApplication(void);
-	virtual ~BaseApplication(void);
+    BaseApplication(void);
+    virtual ~BaseApplication(void);
 
-	virtual void go(void);
+    virtual void go(void);
 
 protected:
-	virtual bool setup();
-	virtual bool configure(void);
-	virtual void chooseSceneManager(void);
-	virtual void createCamera(void);
-	virtual void createFrameListener(void);
-	virtual void createScene(void) = 0; // Override me!
-	virtual void destroyScene(void);
-	virtual void createViewports(void);
-	virtual void setupResources(void);
-	virtual void createResourceListener(void);
-	virtual void loadResources(void);
+    virtual bool setup();
+    virtual bool configure(void);
+    virtual void chooseSceneManager(void);
+    virtual void createCamera(void);
+    virtual void createFrameListener(void);
+    virtual void createScene(void) = 0; // Override me!
+    virtual void destroyScene(void);
+    virtual void createViewports(void);
+    virtual void setupResources(void);
+    virtual void createResourceListener(void);
+    virtual void loadResources(void);
 
-	// Ogre::FrameListener
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    // Ogre::FrameListener
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
-	// OIS::KeyListener
-	virtual bool keyPressed( const OIS::KeyEvent &arg );
-	virtual bool keyReleased( const OIS::KeyEvent &arg );
-	CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
+    // OIS::KeyListener
+    virtual bool keyPressed( const OIS::KeyEvent &arg );
+    virtual bool keyReleased( const OIS::KeyEvent &arg );
+    CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID);
 
-	// OIS::MouseListener
-	virtual bool mouseMoved( const OIS::MouseEvent &arg );
-	virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
-	virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+    // OIS::MouseListener
+    virtual bool mouseMoved( const OIS::MouseEvent &arg );
+    virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+    virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
 
-	// Ogre::WindowEventListener
-	//Adjust mouse clipping area
-	virtual void windowResized(Ogre::RenderWindow* rw);
-	//Unattach OIS before window shutdown (very important under Linux)
-	virtual void windowClosed(Ogre::RenderWindow* rw);
+    // Ogre::WindowEventListener
+    //Adjust mouse clipping area
+    virtual void windowResized(Ogre::RenderWindow* rw);
+    //Unattach OIS before window shutdown (very important under Linux)
+    virtual void windowClosed(Ogre::RenderWindow* rw);
 
-	Ogre::Root *mRoot;
-	Ogre::Camera* mCamera;
-	Ogre::Viewport* mViewPort;
-	Ogre::SceneManager* mSceneMgr;
-	Ogre::RenderWindow* mWindow;
-	Ogre::String mResourcesCfg;
-	Ogre::String mPluginsCfg;
+    Ogre::Root *mRoot;
+    Ogre::Camera* mCamera;
+    Ogre::Viewport* mViewPort;
+    Ogre::SceneManager* mSceneMgr;
+    Ogre::RenderWindow* mWindow;
+    Ogre::String mResourcesCfg;
+    Ogre::String mPluginsCfg;
 
-	Ogre::ColourValue mBackGroundColor;
+    Ogre::ColourValue mBackGroundColor;
 
-	//OIS Input devices
-	OIS::InputManager* mInputManager;
-	OIS::Mouse*    mMouse;
-	OIS::Keyboard* mKeyboard;
+    //OIS Input devices
+    OIS::InputManager* mInputManager;
+    OIS::Mouse*    mMouse;
+    OIS::Keyboard* mKeyboard;
 
-	bool mShift;      // True if shift is pressed
-	bool mCtrl;       // True if Ctrl is pressed
-	bool mLMouseDown; // True if it clicked
-	bool mRMouseDown; // True if it clicked
-	bool mWindowResized; // True if just after the window is resized. (For preventing the automatic click after resizing.)
+    bool mShift;      // True if shift is pressed
+    bool mCtrl;       // True if Ctrl is pressed
+    bool mLMouseDown; // True if it clicked
+    bool mRMouseDown; // True if it clicked
+    bool mWindowResized; // True if just after the window is resized. (For preventing the automatic click after resizing.)
 
-	//mode flag
-	bool oculusMode;     //treate as oculus rift viewing
-	bool fullscreenMode; //fullscrean mode
+    //mode flag
+    bool oculusMode;     //treate as oculus rift viewing
+    bool fullscreenMode; //fullscrean mode
 
-	//oculus
-	Oculus oculus;
-	bool oculusCameraFlag;
+    //oculus
+    Oculus oculus;
+    bool oculusCameraFlag;
 };
 
 #endif // #ifndef __BaseApplication_h_
