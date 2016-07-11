@@ -371,8 +371,8 @@ ac $dev_script 'exit /B 1'
 
 ac $dev_script ':end'
 
-#cd 'scripts'
-#cmd /C 'build_boost.bat'
-#cmd /C 'build_cegui.bat'
-#cmd /C 'build_libssh2.bat'
-#cd $projectRoot
+cd 'scripts'
+cmd /C 'build_boost.bat'
+cmd /C 'build_cegui.bat'
+cmd /C 'build_libssh2.bat'
+cd $projectRoot
