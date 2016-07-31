@@ -9,6 +9,27 @@ if NOT EXIST %BOOST_ROOT% (
     goto error
 )
 
+setlocal 
+
+rem determine which compiler to tell Boost to use
+if %VS_VERSION% == "Visual Studio 14 2015" (
+    set BOOST_VS_TOOLSET=msvc-14.0
+)
+if %VS_VERSION% == "Visual Studio 12 2013" (
+    set BOOST_VS_TOOSET=msvc-12.0
+)
+if %VS_VERSION% == "Visual Studio 11 2012" (
+    set BOOST_VS_TOOLSET=msvc-11.0
+)
+if %VS_VERSION% == "Visual Studio 10 2010" (
+    set BOOST_VS_TOOLSET=msvc-10.0
+)
+if %VS_VERSION% == "Visual Studio 9 2008" (
+    set BOOST_VS_TOOLSET=msvc-9.0
+)
+
+
+echo Using toolset: %BOOST_VS_TOOLSET%
 
 :Boostrap
 echo Configuring BOOST...
@@ -19,7 +40,9 @@ if ERRORLEVEL 1 goto error
 
 :Build
 echo Building BOOST libraries...
-bjam toolset=msvc-11.0 --build-type=complete --with-thread --with-system --with-timer --with-chrono --with-date_time
+bjam toolset=%BOOST_VS_TOOLSET% --build-type=complete --with-thread --with-system --with-timer --with-chrono --with-date_time
+
+endlocal
 if ERRORLEVEL 1 goto error
 
 if ERRORLEVEL 0 goto end

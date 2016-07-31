@@ -12,15 +12,17 @@ if NOT EXIST %LIBSSH2_ROOT_PATH% (
 
 :Build
 echo Building LIBSSH2...
-cd %LIBSSH2_ROOT_PATH%\win32
+cd %LIBSSH2_ROOT_PATH%
 
-rem Make an .sln
-devenv /Upgrade libssh2.dsw
+if NOT EXIST build (
+mkdir build
+)
 
-rem Build just the libssh2 project
-set INCLUDE=%BUILD_OPENSSL_INC%;%INCLUDE%
-set LIB=%BUILD_OPENSSL_LIB%;%BUILD_ZLIB_LIB%;%LIB%
-devenv libssh2.sln /Build "OpenSSL DLL Release" /Project libssh2 /UseEnv 
+cd build
+
+%CMAKE% .. -G %VS_VERSION% -DBUILD_EXAMPLES=false -DBUILD_TESTING=false
+
+devenv /Build "Release|Win32" libssh2.sln
 
 if ERRORLEVEL 1 goto error
 

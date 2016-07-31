@@ -1,16 +1,16 @@
+
 $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
+# The root directory of the whole project
+$projectRoot = $PWD.Path
 
 # A directory to store temporary downloaded files
-$tmp_dir = "$scriptPath\setup_tmp"
+$tmp_dir = "$projectRoot\setup_tmp"
 if ( !(Test-Path $tmp_dir) ) {
     new-item $tmp_dir -type directory
 }
 
-# The root directory of the whole project
-$projectRoot = $scriptPath
-
 # The root directory to store non-SIGVerse dependencies in
-$projectDepsRoot = "$scriptPath\extern"
+$projectDepsRoot = "$projectRoot\extern"
 if ( !(Test-Path $projectDepsRoot) ) {
     new-item $projectDepsRoot -type directory
 }
@@ -21,12 +21,21 @@ $build_vars = @{
     "CEGUI_ROOT_PATH"      = "";
     "CEGUI_DEPS_ROOT"      = "";
     "LIBSSH2_ROOT_PATH"    = "";
-    "OPENSSL_ROOT_DIR"    = "";
+    "OPENSSL_ROOT_DIR"     = "";
     "X3D_ROOT_PATH"        = "";
     "SIGSERVICE_ROOT_PATH" = "";
     "BOOST_ROOT"           = "";
     "LIBOVR_ROOT_PATH"     = "";
     "VS_TOOLS_PATH"        = "";
+}
+
+# These are used as an argument to CMake when generating project files
+$vsVersionNames = @{
+    "VS14" = "Visual Studio 14 2015";
+    "VS12" = "Visual Studio 12 2013";
+    "VS11" = "Visual Studio 11 2012";
+    "VS10" = "Visual Studio 10 2010";
+    "VS09" = "Visual Studio 9 2008"
 }
 
 # Find installed visual studio versions
@@ -39,11 +48,48 @@ foreach ($item in (dir Env:)) {
 }
 
 echo 'Found the following Visual Studio installations:'
+$iter = 1
 foreach ($item in $vsEnvVars) {
-	echo $item.Value
+    $shortName = $item.Key.Substring(0,4)
+    if ($vsVersionNames.ContainsKey($shortName))
+    {
+        write-host [ $iter ] : $vsVersionNames[$shortName]
+    }
+    else
+    {
+        write-host [ $iter ] : Unknown VS Version: $iter.Key
+    }
+    $iter++
 }
 
-$vsVersion = "Visual Studio 11 2012"
+$vsVersion = ""
+$vsToolsPath = ""
+do{
+    $resp = Read-Host -prompt "Select Version (1-$($iter-1))"
+    [int]$choice = $null
+    [void][int32]::TryParse( $resp, [ref]$choice )
+    if ( !$choice -Or $choice -lt 1 -Or $choice -ge $iter)
+    {
+      write-host "Please enter a number between 1 and $($iter-1)"
+    }
+    else
+    {
+        $vsVersion   = $vsVersionnames[$vsEnvVars[$choice-1].Key.Substring(0,4)]
+        $vsToolsPath = $vsEnvVars[$choice-1].Value
+        write-host "Selected: $vsVersion"
+    }
+  } until ($vsVersion.length -gt 0 -And $vsToolsPath.length -gt 0)
+
+# if we're using VS 2015, OGRE SDK must be manually downloaded...
+if ($vsVersion -eq "Visual Studio 14 2015")
+{
+    write-host "--"
+    write-host "Please download the OGRE SDK for your compiler from here: http://ogre3d.org/forums/viewtopic.php?t=69274"
+    write-host "And extract it into the directory: $projectDepsRoot\OGRE-SDK-1.9.0-vc140-x86-12.03.2016"
+    write-host "--"
+    Read-Host "Press enter to continue..."
+    $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\OGRE-SDK-1.9.0-vc140-x86-12.03.2016")
+}
 
 # Find 7-Zip
 $7zPath = ''
@@ -97,11 +143,11 @@ if (!$cmakePath) {
 }
 $cmake = """$cmakePath\cmake.exe"""
 
-# Grab first version
-# TODO: Make this selectable
-$build_vars.Set_Item("VS_TOOLS_PATH", $vsEnvVars[0].Value)
 
-echo "Current working directory: $scriptPath"
+$build_vars.Set_Item("VS_TOOLS_PATH", $vsToolsPath)
+
+echo ""
+echo "Current working directory: $projectRoot"
 echo "========================================================="
 echo "    Temporary files will be copied to:   $tmp_dir"
 echo "    SIGVerse projects will be set up in: $projectRoot"
@@ -126,8 +172,8 @@ $CEGUI_www      = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zi
 $CEGUI_deps_www = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip"
 $libSSH2_www    = "https://www.libssh2.org/download/libssh2-1.7.0.tar.gz"
 $openSSL_www    = "https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip"
-$boost_www      = "http://sourceforge.net/projects/boost/files/boost/1.55.0/boost_1_55_0.zip"
-$libovr_www     = "https://static.oculus.com/sdk-downloads/ovr_sdk_win_0.4.3.zip"
+$boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip"
+$libovr_www     = "https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip"
 
 $net = new-object System.Net.WebClient
 
@@ -289,12 +335,12 @@ if (!($build_vars.Get_Item("LIBSSH2_ROOT_PATH"))) {
 if (!($build_vars.Get_Item("OPENSSL_ROOT_DIR"))) {
     $filename = "$($openSSL_www.Substring($openSSL_www.LastIndexOf(""/"") + 1))"
     iex "$7zX -o$projectDepsRoot\$($filename.substring(0, $filename.length-4)) $tmp_dir\$filename"
-    $build_vars.Set_Item("OPENSSL_ROOT_DIR", "$projectDepsRoot\libssh2-1.7.0")
+    $build_vars.Set_Item("OPENSSL_ROOT_DIR", "$projectDepsRoot\openssl-0.9.8k_WIN32")
 }
 
 if (!($build_vars.Get_Item("BOOST_ROOT"))) {
     iex "$7zX -o$projectDepsRoot $tmp_dir\$($boost_www.Substring($boost_www.LastIndexOf(""/"") + 1))"
-    $build_vars.Set_Item("BOOST_ROOT", "$projectDepsRoot\boost_1_55_0")
+    $build_vars.Set_Item("BOOST_ROOT", "$projectDepsRoot\boost_1_61_0")
 }
 
 if (!($build_vars.Get_Item("LIBOVR_ROOT_PATH"))) {
@@ -307,10 +353,11 @@ echo ''
 echo '=============================='
 echo '     BUILD CONFIGURATION      '
 echo '=============================='
-echo "    Project Root:`t $projectRoot"
-echo "    CMake:       `t $cmakePath"
+echo "    Project Root:`t   $projectRoot"
+echo "    CMake:       `t   $cmakePath"
 foreach ($item in $build_vars.GetEnumerator()) {
-    echo "    $($item.Name):`t $($item.Value)"
+    "{0, -3} {1, -22} {2, -80}" -f `
+    "", $($item.Name + ":"), $item.Value
 }
 echo "    Visual Studio:"
 echo "                  Version: $vsVersion"
@@ -318,7 +365,7 @@ echo "                  Tools:   $($build_vars.Get_Item(""VS_TOOLS_PATH""))"
 echo ''
 $t = Read-Host "Press Enter to continue..."
 
-$dev_script = '.\scripts\setenv.bat'
+$dev_script = "$scriptPath\scripts\setenv.bat"
 
 sc $dev_script '' -en ASCII
 ac $dev_script '@echo off'
@@ -348,18 +395,18 @@ ac $dev_script "set BUILD_BOOST_INC=$($build_vars.Get_Item(""BOOST_ROOT""))"
 ac $dev_script "set BUILD_CEGUI_INC=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\cegui\include"
 ac $dev_script "set BUILD_LIBSSH2_INC=$($build_vars.Get_Item(""LIBSSH2_ROOT_PATH""))\include"
 ac $dev_script "set BUILD_OPENSSL_INC=$($build_vars.Get_Item(""OPENSSL_ROOT_DIR""))\include"
-ac $dev_script "set BUILD_LIBOVR_INC=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Include"
+ac $dev_script "set BUILD_LIBOVR_INC=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Include;$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\LibOVRKernel\Src"
 
 # Lib paths used by VS
 ac $dev_script "set BUILD_SIGSERVICE_LIB=$($build_vars.Get_Item(""SIGSERVICE_ROOT_PATH""))\Windows\Release_2010"
 ac $dev_script "set BUILD_X3D_LIB=$($build_vars.Get_Item(""X3D_ROOT_PATH""))\parser\cpp\Release"
 ac $dev_script "set BUILD_OGRE_LIB=$($build_vars.Get_Item(""OGRE_SDK""))\lib"
 ac $dev_script "set BUILD_BOOST_LIB=$($build_vars.Get_Item(""BOOST_ROOT""))\stage\lib"
-ac $dev_script "set BUILD_CEGUI_LIB=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\lib"
-ac $dev_script "set BUILD_LIBSSH2_LIB=$($build_vars.Get_Item(""LIBSSH2_ROOT_PATH""))\win32\Release_dll"
+ac $dev_script "set BUILD_CEGUI_LIB=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\lib;$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\dependencies\lib\static"
+ac $dev_script "set BUILD_LIBSSH2_LIB=$($build_vars.Get_Item(""LIBSSH2_ROOT_PATH""))\build\src\Release"
 ac $dev_script "set BUILD_OPENSSL_LIB=$($build_vars.Get_Item(""OPENSSL_ROOT_DIR""))\lib"
 ac $dev_script "set BUILD_ZLIB_LIB=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\dependencies\lib\static"
-ac $dev_script "set BUILD_LIBOVR_LIB=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Lib\Win32\VS2012"
+ac $dev_script "set BUILD_LIBOVR_LIB=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Lib\Windows\Win32\Release\VS2015"
 
 ac $dev_script "call %VS_TOOLS_PATH%\VsDevCmd.bat"
 
@@ -371,7 +418,7 @@ ac $dev_script 'exit /B 1'
 
 ac $dev_script ':end'
 
-cd 'scripts'
+cd "$scriptPath\scripts"
 cmd /C 'build_boost.bat'
 cmd /C 'build_cegui.bat'
 cmd /C 'build_libssh2.bat'

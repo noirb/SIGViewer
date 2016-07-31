@@ -334,7 +334,7 @@ class LogBase
 {
 public:
     
-    enum LogLevel{ERR=0, INFO, DEBUG, WARNING};
+    enum LogLevel{ERR=0, WARNING, INFO, DEBUG};
 
     inline const LogLevel& getLevel() const
     { return m_level; };
