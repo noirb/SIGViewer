@@ -87,7 +87,7 @@ do{
     }
   } until ($vsVersion.length -gt 0 -And $vsToolsPath.length -gt 0)
 
-# if we're using VS 2015, OGRE SDK must be manually downloaded...
+# if we're using VS 2015 or 2013, OGRE SDK must be manually downloaded...
 if ($vsVersion -eq "Visual Studio 14 2015")
 {
     write-host "--"
@@ -96,6 +96,15 @@ if ($vsVersion -eq "Visual Studio 14 2015")
     write-host "--"
     Read-Host "Press enter to continue..."
     $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\OGRE-SDK-1.9.0-vc140-x86-12.03.2016")
+}
+if ($vsVersion -eq "Visual Studio 12 2013")
+{
+    write-host "--"
+    write-host "Please download the OGRE SDK for your compiler from here: http://ogre3d.org/forums/viewtopic.php?t=69274"
+    write-host "And extract it into the directory: $projectDepsRoot\OGRE-SDK-1.9.0-vc120-x86-12.03.2016"
+    write-host "--"
+    Read-Host "Press enter to continue..."
+    $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\OGRE-SDK-1.9.0-vc120-x86-12.03.2016")
 }
 
 # Find 7-Zip
@@ -174,13 +183,22 @@ if ( !((Read-Host -Prompt "Proceed with this configuration? (y/n)").ToLower().St
 $SIGViewer_www  = "https://github.com/SIGVerse/SIGViewer/archive/master.zip"
 $SIGService_www = "https://github.com/SIGVerse/SIGService/archive/master.zip"
 $X3D_www        = "https://github.com/SIGVerse/x3d/archive/master.zip"
-$Ogre_SDK_www   = "http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc11_v1-9-0.exe"
 $CEGUI_www      = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip"
 $CEGUI_deps_www = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip"
 $libSSH2_www    = "https://www.libssh2.org/download/libssh2-1.7.0.tar.gz"
 $openSSL_www    = "https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip"
 $boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip"
 $libovr_www     = "https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip"
+
+# set download URL for Ogre only if we're using VS 2010 or 2012
+if ($vsVersion -eq "Visual Studio 11 2012")
+{
+	$Ogre_SDK_www   = "http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc11_v1-9-0.exe"
+}
+if ($vsVersion -eq "Visual Studio 10 2010")
+{
+	$Ogre_SDK_www   = "http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc10_v1-9-0.exe"
+}
 
 $net = new-object System.Net.WebClient
 
@@ -201,16 +219,22 @@ function doDownload
     }
 }
 
+# download all 
 doDownload -url $SIGViewer_www  -destFile "sigviewer.zip"  -destDir $tmp_dir -wc $net
 doDownload -url $SIGService_www -destFile "sigservice.zip" -destDir $tmp_dir -wc $net
 doDownload -url $X3D_www        -destFile "x3d.zip"        -destDir $tmp_dir -wc $net
-doDownload -url $Ogre_SDK_www   -destFile $Ogre_SDK_www.Substring($Ogre_SDK_www.LastIndexOf("/") + 1)     -destDir $tmp_dir -wc $net
 doDownload -url $CEGUI_www      -destFile $CEGUI_www.Substring($CEGUI_www.LastIndexOf("/") + 1)           -destDir $tmp_dir -wc $net
 doDownload -url $CEGUI_deps_www -destFile $CEGUI_deps_www.Substring($CEGUI_deps_www.LastIndexOf("/") + 1) -destDir $tmp_dir -wc $net
 doDownload -url $libSSH2_www    -destFile $libSSH2_www.Substring($libSSH2_www.LastIndexOf("/") + 1)       -destDir $tmp_dir -wc $net
 doDownload -url $openSSL_www    -destFile $openSSL_www.Substring($openSSL_www.LastIndexOf("/") + 1)       -destDir $tmp_dir -wc $net
 doDownload -url $boost_www      -destFile $boost_www.Substring($boost_www.LastIndexOf("/") + 1)           -destDir $tmp_dir -wc $net
 doDownload -url $libovr_www     -destFile $libovr_www.Substring($libovr_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
+
+# only download Ogre if we're using VS 2012 or earlier
+if ($vsVersion -eq "Visual Studio 10 2010" -Or $vsVersion -eq "Visual Studio 11 2012")
+{
+	doDownload -url $Ogre_SDK_www   -destFile $Ogre_SDK_www.Substring($Ogre_SDK_www.LastIndexOf("/") + 1)     -destDir $tmp_dir -wc $net
+}
 
 # check for existing code
 foreach ($item in (dir $projectRoot)) {

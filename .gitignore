@@ -10,7 +10,7 @@
 
 *.dat
 
-
+scripts/setenv.*
 
 
 ## Ignore Visual Studio temporary files, build results, and
