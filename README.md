@@ -124,6 +124,19 @@ If you didn't use the setup script and have built or obtained the dependencies a
 
 Either set these globally or through a batch script before launching Visual Studio and everything should be fine.
 
+## Running SIGViewer
+
+Still with me? :)
+
+One final step which must be taken before SIGViewer will run is to ensure the executable has access to all the resources it depends on. The first step is to ensure that all the DLLs it links against are in a location it can find them. The easiest (though perhaps not the cleanest) way to do this is to copy them directly into the build folder next to SIGViewer.exe. You will need to copy:
+
+* The System, Thread, and Chrono DLLs from `BOOST_ROOT\stage\lib` (or whatever other staging directory you specified if you built Boost yourself)
+* All the DLLs which do not end in "Demo" from `CEGUI_ROOT\bin`
+* All the DLLs from `CEGUI_ROOT\dependencies\bin`
+* All the DLLs from `OGRE_SDK\bin\Release` which *do not* start with "Sample_"
+* `libeay32.dll` and `ssleay32.dll` from the OpenSSL bin directory
+* And last but not least, SIGViewer and Ogre both require a small collection of configuration and resource files. Since these are spread out across multple projects, the easiest thing to do to get the viewer running is to [download this package](https://mega.nz/#!95ZkGDYJ!4mEQfQfCoCpJIjTYvYq-jntqqfubbIsZHPR5WeTEPqs) and unzip it into your binary directory. (there should be a script to collect these all for you, but this will have to make do for now).
+
 ## Notes
 Although everything **should** work as long as you're using VS 2010 or newer, not every combination of compiler and library version has been tested, so it's possible you might run into issues depending on your configuration.
 
