@@ -47,6 +47,13 @@ foreach ($item in (dir Env:)) {
 	}
 }
 
+# If no VS installation was found, bail
+if ($vsEnvVars.length -eq 0) {
+	echo 'No Version of Visual Studio was detected! Please ensure you have VS 2010 or later installed!'
+	echo 'Exiting...'
+	exit
+}
+
 echo 'Found the following Visual Studio installations:'
 $iter = 1
 foreach ($item in $vsEnvVars) {
