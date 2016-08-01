@@ -23,14 +23,14 @@ To build this project and its dependecies, you need:
 
 * [SIGService](https://github.com/SIGVerse/SIGService)
 * [X3D Parser](https://github.com/SIGVerse/x3d)
-* [The Ogre SDK](http://www.ogre3d.org/download/sdk)
-* [CEGUI](http://cegui.org.uk/) (built with Ogre support)
+* [The Ogre SDK](http://www.ogre3d.org/download/sdk), version 1.9
+* [CEGUI](http://cegui.org.uk/), version 0.8+ (built with Ogre support)
 * [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
-* [Boost](http://www.boost.org/doc/libs/1_55_0/more/getting_started/windows.html)
+* [Boost](http://www.boost.org/users/history/version_1_61_0.html), version 1.61.0+
 * [LibSSH2](https://www.libssh2.org/)
 * [OpenSSL](https://www.openssl.org/)
 * [Zlib](http://www.zlib.net/) (actually included with CEGUI's dependencies, so not necessary to install separately)
-* [Oculus SDK](https://developer.oculus.com/downloads/), version 0.4.3
+* [Oculus SDK](https://developer.oculus.com/downloads/), version 0.8.0
 * [CMake](https://cmake.org/download/)
 * (recommended) [7-Zip](http://www.7-zip.org/)
 
@@ -39,7 +39,7 @@ Run this script from the directory you want to make your "SIGVerse Root" (e.g. o
 It will:
 
 1. Detect any Visual Studio installations on your machine and prompt you to choose one
-2. Download recent versions of all of the above dependencies, excluding CMake and 7-Zip (which you should install yourself). If you're using a version of Visual Studio newer than 2012, you will also need to [download it yourself from here](http://ogre3d.org/forums/viewtopic.php?t=69274) since those builds aren't hosted in a location the script can automatically pull from.
+2. Download recent versions of all of the above dependencies, excluding [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html), [CMake](https://cmake.org/download/) and [7-Zip](http://www.7-zip.org/) (which you should install yourself before starting). If you're using a version of Visual Studio newer than 2012, you will also need to [download the Ogre SDK yourself from here](http://ogre3d.org/forums/viewtopic.php?t=69274), since those builds aren't hosted in a location the script can automatically pull from.
 3. Unzip them into your "SIGVerse Root" with the following structure:
     `SIGVerseRoot\*        -- SIGVerse projects (SIGViewer, etc.)`
     `SIGVerseRoot\external -- All other dependencies`
@@ -57,18 +57,20 @@ This will allow you to run local scripts, even when *not* running powershell as 
 It should only be necessary to run `setup_env.ps1` once, but if you do run it again it will attempt to detect any existing code and prompt you for what you want to keep and what you want to replace (in this way you can update just one library without having to re-download and rebuild everything).
 
 ## Building
-If you ran the `setup_env.ps1` script above, then the project should be built by:
+**Always make sure to use the same compiler and release settings across dependencies where applicable! This means if you're building the 32-bit Release version of SIGViewer, you should be building the 32-bit Release version of all its dependencies as well!**
+
+If you ran the `setup_env.ps1` script above and it completed without errors, then you just need to build the Win32|Release targets of X3d and SIGService, then the SIGViewer project should be built by:
 
 1. Launching a new command prompt and running `setenv.bat` (located in the `scripts` directory)
 2. Invoking `devenv SIGViewer_2010.sln` to launch Visual Stuio
 
-This will ensure Visual Studio is launched with the correct environment for building against all of the dependencies above, and if you have multiple versions of VS installed it will only launch the one used to build all the dependencies. If you didn't use the setup script, the environment variables you need to set are:
+This will ensure Visual Studio is launched with the correct environment for building against all of the dependencies above, and if you have multiple versions of VS installed it will only launch the one used to build all the dependencies. If you didn't use the setup script and have built or obtained the dependencies above, the environment variables you need to set are:
 
     ### Used for Include Directories:
     ```
     BUILD_SIGSERVICE_INC -- Path to SIGService\Windows\SIGService
     BUILD_X3D_INC        -- Path to X3D\parser\cpp\X3DParser
-    JDK_PATH             -- Path to your JDK installation directory
+    JDK_ROOT_PATH        -- Path to your JDK installation directory
     BUILD_BOOST_INC      -- Path to Boost root
     BUILD_OGRE_INC       -- Path to OgreSDK\include
     BUILD_CEGUI_INC      -- Path to Cegui-src\cegui\include
@@ -78,11 +80,11 @@ This will ensure Visual Studio is launched with the correct environment for buil
 
     ### Used for Lib Directories
     ```
-    SIGSERVICE_ROOT_PATH -- Path to SIGService
-    BUILD_X3D_INC        -- Path to X3D
-    JDK_PATH             -- Path to your JDK installation directory
-    BOOS_ROOT            -- Path to Boost root
-    OGRE_SDK             -- Path to OgreSDK
-    LIBSSH2_ROOT_PATH    -- Path to libSSH2 root
-    LIBOVR_ROOT_PATH     -- Path to OculusSDK\LibOVR
+    BUILD_SIGSERVICE_LIB -- Path to SIGService\Windows\<Target>\
+    BUILD_X3D_LIB        -- Path to X3D\parser\cpp\<Target>\
+    JDK_ROOT_PATH        -- Path to your JDK installation directory
+    BUILD_BOOST_LIB      -- Path to Boost\<staging_dir>\lib
+    BUILD_OGRE_LIB       -- Path to OgreSDK\lib
+    BUILD_LIBSSH2_LIB    -- Path to libSSH2\<build_dir>\src\<Target>\
+    BUILD_LIBOVR_LIB     -- Path to OculusSDK\LibOVR\Lib\Windows\Win32\Release\<VS_Version>\
     ```
