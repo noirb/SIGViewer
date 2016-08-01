@@ -38,16 +38,21 @@ A PowerShell script, `setup_env.ps1`, is provided to help build and configure th
 Run this script from the directory you want to make your "SIGVerse Root" (e.g. one directory level above the location you cloned SIGViewer to).
 It will:
 
-1. Download recent versions of all of the above dependencies, excluding CMake and 7-Zip (which you should install yourself). The versions used at the moment are all compatible with Visual Studio 2012.
-2. Unzip them into your "SIGVerse Root" with the following structure:
+1. Detect any Visual Studio installations on your machine and prompt you to choose one
+2. Download recent versions of all of the above dependencies, excluding CMake and 7-Zip (which you should install yourself). If you're using a version of Visual Studio newer than 2012, you will also need to [download it yourself from here](http://ogre3d.org/forums/viewtopic.php?t=69274) since those builds aren't hosted in a location the script can automatically pull from.
+3. Unzip them into your "SIGVerse Root" with the following structure:
     `SIGVerseRoot\*        -- SIGVerse projects (SIGViewer, etc.)`
     `SIGVerseRoot\external -- All other dependencies`
-3. Compile necessary Boost libraries used by Ogre and CEGUI
-4. Compile CEGUI and its dependencies
-5. Compile libSSH2 (using the zlib from CEGUI's dependencies)
-6. Generate a script named `setenv.bat`, which can be invoked any time in the future to set all the necessary environment variables to build SIGViewer. After running this script, you can open the project from the commandline via `devenv SIGViewer_2010.sln`.
+4. Compile necessary Boost libraries used by Ogre and CEGUI
+5. Compile CEGUI and its dependencies
+6. Compile libSSH2 (using the zlib from CEGUI's dependencies)
+7. Generate a script named `setenv.bat`, which can be invoked any time in the future to set all the necessary environment variables to build SIGViewer. After running this script, you can open the project from the commandline via `devenv SIGViewer_2010.sln`.
 
 You will need to build X3D and SIGService yourself, using the including solution files. Make sure to use the same version of Visual Studio for this as for everything else!
+
+Before running the powershell script, you may need to change powershell's execution policy, which is `restricted` by default. To do so, run powershell as an administrator, and then execute the command: `Set-ExecutionPolicy RemoteSigned`
+
+This will allow you to run local scripts, even when *not* running powershell as an administrator (which is not required for any of the scripts in this project, and is in general not recommended unless you really *need* it).
 
 It should only be necessary to run `setup_env.ps1` once, but if you do run it again it will attempt to detect any existing code and prompt you for what you want to keep and what you want to replace (in this way you can update just one library without having to re-download and rebuild everything).
 
