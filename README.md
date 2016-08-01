@@ -99,8 +99,8 @@ This will ensure Visual Studio is launched with the correct environment for buil
 
 If you didn't use the setup script and have built or obtained the dependencies above in another way, the environment variables you need to set are:
 
-    ### Used for Include Directories:
-    ```
+### Used for Include Directories:
+
     BUILD_SIGSERVICE_INC -- Path to SIGService\Windows\SIGService
     BUILD_X3D_INC        -- Path to X3D\parser\cpp\X3DParser
     JDK_ROOT_PATH        -- Path to your JDK installation directory
@@ -109,10 +109,10 @@ If you didn't use the setup script and have built or obtained the dependencies a
     BUILD_CEGUI_INC      -- Path to Cegui-src\cegui\include
     BUILD_LIBSSH2_INC    -- Path to libSSH2\include
     BUILD_LIBOVR_INC     -- Path to OculusSDK\LibOVR\Include
-    ```
 
-    ### Used for Lib Directories
-    ```
+
+### Used for Lib Directories
+
     BUILD_SIGSERVICE_LIB -- Path to SIGService\Windows\<Target>\
     BUILD_X3D_LIB        -- Path to X3D\parser\cpp\<Target>\
     JDK_ROOT_PATH        -- Path to your JDK installation directory
@@ -120,7 +120,7 @@ If you didn't use the setup script and have built or obtained the dependencies a
     BUILD_OGRE_LIB       -- Path to OgreSDK\lib
     BUILD_LIBSSH2_LIB    -- Path to libSSH2\<build_dir>\src\<Target>\
     BUILD_LIBOVR_LIB     -- Path to OculusSDK\LibOVR\Lib\Windows\Win32\Release\<VS_Version>\
-    ```
+
 
 Either set these globally or through a batch script before launching Visual Studio and everything should be fine.
 
@@ -129,24 +129,22 @@ Although everything **should** work as long as you're using VS 2010 or newer, no
 
 The most recently-tested versions of all dependecies found to work together were:
 
-    ```
-    Visual Studio 2015
-    [Ogre SDK](http://ogre3d.org/forums/viewtopic.php?t=69274) 1.9.0-vc140-x86-12.03.2016
-    [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
-    [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
-    [Boost](http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip) 1.61.0
-    [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
-    [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
-    [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
-    [CMake](https://cmake.org/download/) 3.6.1
+#### With Visual Studio 2015
+* [Ogre SDK](http://ogre3d.org/forums/viewtopic.php?t=69274) 1.9.0-vc140-x86-12.03.2016
+* [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
+* [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
+* [Boost](http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip) 1.61.0
+* [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
+* [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
+* [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+* [CMake](https://cmake.org/download/) 3.6.1
     
-    Visual Studio 2012
-    [Ogre SDK](http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc11_v1-9-0.exe) 1.9.0-vc11-x86
-    [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
-    [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
-    [Boost](http://www.boost.org/users/history/version_1_55_0.html) 1.55.0
-    [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
-    [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
-    [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
-    [CMake](https://cmake.org/download/) 3.6.1
-    ```
+#### With Visual Studio 2012
+* [Ogre SDK](http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc11_v1-9-0.exe) 1.9.0-vc11-x86
+* [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
+* [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
+* [Boost](http://www.boost.org/users/history/version_1_55_0.html) 1.55.0
+* [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
+* [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
+* [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+* [CMake](https://cmake.org/download/) 3.6.1
