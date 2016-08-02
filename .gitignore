@@ -80,6 +80,8 @@ ipch/
 *.aps
 *.ncb
 *.opensdf
+*.VC.db
+*.VC.opendb
 *.sdf
 *.cachefile
 

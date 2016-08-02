@@ -10,6 +10,7 @@ if NOT EXIST %BOOST_ROOT% (
 )
 
 setlocal 
+set SCRIPT_DIR = %cd%
 
 rem determine which compiler to tell Boost to use
 if %VS_VERSION% == "Visual Studio 14 2015" (
@@ -42,14 +43,15 @@ if ERRORLEVEL 1 goto error
 echo Building BOOST libraries...
 bjam toolset=%BOOST_VS_TOOLSET% --build-type=complete --with-thread --with-system --with-timer --with-chrono --with-date_time
 
-endlocal
 if ERRORLEVEL 1 goto error
 
 if ERRORLEVEL 0 goto end
 
 :error
 echo ERROR: One or more build steps failed! Exiting...
+cd %SCRIPT_DIR%
 exit /B 1
 
 :end
+cd %SCRIPT_DIR%
 echo Done building BOOST!

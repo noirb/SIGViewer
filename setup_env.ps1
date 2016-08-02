@@ -71,21 +71,30 @@ foreach ($item in $vsEnvVars) {
 
 $vsVersion = ""
 $vsToolsPath = ""
-do{
-    $resp = Read-Host -prompt "Select Version (1-$($iter-1))"
-    [int]$choice = $null
-    [void][int32]::TryParse( $resp, [ref]$choice )
-    if ( !$choice -Or $choice -lt 1 -Or $choice -ge $iter)
-    {
-      write-host "Please enter a number between 1 and $($iter-1)"
-    }
-    else
-    {
-        $vsVersion   = $vsVersionnames[$vsEnvVars[$choice-1].Key.Substring(0,4)]
-        $vsToolsPath = $vsEnvVars[$choice-1].Value
-        write-host "Selected: $vsVersion"
-    }
-  } until ($vsVersion.length -gt 0 -And $vsToolsPath.length -gt 0)
+
+if ($vsEnvVars.length -gt 1) {
+
+    do{
+        $resp = Read-Host -prompt "Select Version (1-$($iter-1))"
+        [int]$choice = $null
+        [void][int32]::TryParse( $resp, [ref]$choice )
+        if ( !$choice -Or $choice -lt 1 -Or $choice -ge $iter)
+        {
+          write-host "Please enter a number between 1 and $($iter-1)"
+        }
+        else
+        {
+            $vsVersion   = $vsVersionnames[$vsEnvVars[$choice-1].Key.Substring(0,4)]
+            $vsToolsPath = $vsEnvVars[$choice-1].Value
+            write-host "Selected: $vsVersion"
+        }
+      } until ($vsVersion.length -gt 0 -And $vsToolsPath.length -gt 0)
+}
+else {
+    $vsVersion   = $vsVersionNames[$vsEnvVars[0].Key.Substring(0,4)]
+    $vsToolsPath = $vsEnvVars[0].Value
+    write-host "Selected: $vsVersion"
+}
 
 # if we're using VS 2015 or 2013, OGRE SDK must be manually downloaded...
 if ($vsVersion -eq "Visual Studio 14 2015")
@@ -180,9 +189,10 @@ if ( !((Read-Host -Prompt "Proceed with this configuration? (y/n)").ToLower().St
 }
 
 # Locations to download dependencies from
-$SIGViewer_www  = "https://github.com/SIGVerse/SIGViewer/archive/master.zip"
-$SIGService_www = "https://github.com/SIGVerse/SIGService/archive/master.zip"
-$X3D_www        = "https://github.com/SIGVerse/x3d/archive/master.zip"
+## TODO: check for git and prefer cloning over downloading when possible
+$SIGViewer_www  = "https://github.com/noirb/SIGViewer/archive/dev.zip"
+$SIGService_www = "https://github.com/noirb/SIGService/archive/dev.zip"
+$X3D_www        = "https://github.com/noirb/x3d/archive/dev.zip"
 $CEGUI_www      = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip"
 $CEGUI_deps_www = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip"
 $libSSH2_www    = "https://www.libssh2.org/download/libssh2-1.7.0.tar.gz"
@@ -400,10 +410,11 @@ $dev_script = "$scriptPath\scripts\setenv.bat"
 
 sc $dev_script '' -en ASCII
 ac $dev_script '@echo off'
-#ac $dev_script 'setlocal'
+ac $dev_script 'title S I G V E R S E  x86 Release'
 ac $dev_script 'rem --------------------------------------------------------'
 ac $dev_script 'rem This is a script-generated file! Edit at your own risk!'
 ac $dev_script 'rem --------------------------------------------------------'
+ac $dev_script "set SIGVERSE_ROOT=""$projectRoot"""
 ac $dev_script 'echo Checking for JDK path...'
 ac $dev_script 'call .\find_jdk.bat'
 
@@ -449,8 +460,47 @@ ac $dev_script 'exit /B 1'
 
 ac $dev_script ':end'
 
+
+# Attempt to build all dependencies
 cd "$scriptPath\scripts"
 cmd /C 'build_boost.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: Boost build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
 cmd /C 'build_cegui.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: CEGUI build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
 cmd /C 'build_libssh2.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: LIBSSH2 build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
+cmd /C 'build_x3d.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: X3D build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
+cmd /C 'build_sigservice.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: SIGService build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
+echo ""
+echo " ======================= "
+echo " SIGVerse SETUP COMPLETE"
+echo " ======================= "
+echo ""
 cd $projectRoot

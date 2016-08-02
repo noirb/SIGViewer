@@ -3,7 +3,7 @@ SIGVerse/SIGViewer
 
 How to change normal SIGViewer to oculus SIGViewer.
 
-open:SIGViewer\Release\SIGVerse.ini
+open: SIGViewer\Release\SIGVerse.ini
 
 change  
 OCULUS_MODE=false  
@@ -21,8 +21,8 @@ FULLSCREEN_MODE=true
 ## Dependencies
 To build this project and its dependecies, you need:
 
-* [SIGService](https://github.com/SIGVerse/SIGService)
-* [X3D Parser](https://github.com/SIGVerse/x3d)
+* [SIGService](https://github.com/noirb/SIGService/tree/dev)
+* [X3D Parser](https://github.com/noirb/x3d/tree/dev)
 * [The Ogre SDK](http://www.ogre3d.org/download/sdk), version 1.9
 * [CEGUI](http://cegui.org.uk/), version 0.8+ (built with Ogre support)
 * [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
@@ -38,17 +38,17 @@ A PowerShell script, `setup_env.ps1`, is provided to help build and configure th
 Run this script from the directory you want to make your "SIGVerse Root" (e.g. one directory level above the location you cloned SIGViewer to).
 It will:
 
-1. Detect any Visual Studio installations on your machine and prompt you to choose one
-2. Download recent versions of all of the above dependencies, excluding [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html), [CMake](https://cmake.org/download/) and [7-Zip](http://www.7-zip.org/) (which you should install yourself before starting). If you're using a version of Visual Studio newer than 2012, you will also need to [download the Ogre SDK yourself from here](http://ogre3d.org/forums/viewtopic.php?t=69274), since those builds aren't hosted in a location the script can automatically pull from.
-3. Unzip them into your "SIGVerse Root" with the following structure:
+1. Detect any Visual Studio installations on your machine (and prompt you to choose one if there are several)
+2. Check for CMake and 7-Zip, and if they can't be found prompt you for their location (in case you have them on your desktop or something)
+3. Download recent versions of all of the above dependencies, excluding [JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html), [CMake](https://cmake.org/download/) and [7-Zip](http://www.7-zip.org/) (which you should install yourself before starting). If you're using a version of Visual Studio newer than 2012, you will also need to [download the Ogre SDK yourself from here](http://ogre3d.org/forums/viewtopic.php?t=69274), since those builds aren't hosted in a location the script can automatically pull from.
+4. Unzip them into your "SIGVerse Root" with the following structure:
     `SIGVerseRoot\*        -- SIGVerse projects (SIGViewer, etc.)`
     `SIGVerseRoot\external -- All other dependencies`
-4. Compile necessary Boost libraries used by Ogre and CEGUI
-5. Compile CEGUI and its dependencies
-6. Compile libSSH2 (using the zlib from CEGUI's dependencies)
-7. Generate a script named `setenv.bat`, which can be invoked any time in the future to set all the necessary environment variables to build SIGViewer. After running this script, you can open the project from the commandline via `devenv SIGViewer_2010.sln`.
-
-You will need to build X3D and SIGService yourself, using the including solution files. Make sure to use the same version of Visual Studio for this as for everything else!
+5. Compile necessary Boost libraries used by Ogre and CEGUI
+6. Compile CEGUI and its dependencies
+7. Compile libSSH2 (using the zlib from CEGUI's dependencies)
+8. Compile X3D and SIGService
+9. Generate a script named `setenv.bat`, which can be invoked any time in the future to set all the necessary environment variables to build SIGViewer. After running this script, you can open the project from the commandline via `devenv SIGViewer_2010.sln`.
 
 Before running the powershell script, you may need to change powershell's execution policy, which is `restricted` by default. To do so, run powershell as an administrator, and then execute the command: `Set-ExecutionPolicy RemoteSigned`
 
@@ -59,12 +59,45 @@ It should only be necessary to run `setup_env.ps1` once, but if you do run it ag
 ## Building
 **Always make sure to use the same compiler and release settings across dependencies where applicable! This means if you're building the 32-bit Release version of SIGViewer, you should be building the 32-bit Release version of all its dependencies as well!**
 
-If you ran the `setup_env.ps1` script above and it completed without errors, then you just need to build the Win32|Release targets of X3d and SIGService, then the SIGViewer project should be built by:
+The `setup_env.ps1` script will generate 32-bit Release builds of all dependecies (if there's demand, it will be updated to allow Debug builds as well, but SIGViewer does not currently support 64-bit builds). To use it, simply run the script from the location you want all of your SIGVerse-related files to live. This is most likely the directory in which you put the SIGViewer code (e.g. if SIGViewer is in `C:\SIGVerse\SIGViewer`, then `C:\SIGVerse` is the `SIGVerse Root` you want to run the script from).
 
-1. Launching a new command prompt and running `setenv.bat` (located in the `scripts` directory)
-2. Invoking `devenv SIGViewer_2010.sln` to launch Visual Stuio
+The script will first check to ensure Visual Studio, CMake, and 7-zip are installed, then allow you to confirm that the correct versions of each are selected before beginning. It will then download and set up the necessary dependecies, and give you one last chance to confirm or cancel before building them all. If any errors are detected they should be logged in the script output.
 
-This will ensure Visual Studio is launched with the correct environment for building against all of the dependencies above, and if you have multiple versions of VS installed it will only launch the one used to build all the dependencies. If you didn't use the setup script and have built or obtained the dependencies above, the environment variables you need to set are:
+```
+    C:\Users\nao\SIGVerse> .\SIGViewer\setup_env.ps1 
+    Found the following Visual Studio installations:
+    [ 1 ] : Visual Studio 14 2015
+    Selected: Visual Studio 14 2015
+    --
+    Please download the OGRE SDK for your compiler from here: http://ogre3d.org/forums/viewtopic.php?t=69274
+    And extract it into the directory: C:\Users\nao\SIGVerse\extern\OGRE-SDK-1.9.0-vc140-x86-12.03.2016
+    --
+    Press enter to continue...:
+
+    7-Zip not found in PATH. Searching for installation directory.
+
+    Current working directory: C:\Users\nao\SIGVerse
+    =========================================================
+        Temporary files will be copied to:   C:\Users\nao\SIGVerse\setup_tmp
+        SIGVerse projects will be set up in: C:\Users\nao\SIGVerse
+        Dependencies will be set up in:      C:\Users\nao\SIGVerse\extern
+        Visual Studio:
+                      Version: Visual Studio 14 2015
+                      Tools:   C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\
+        7-Zip Directory:                     C:\Program Files\7-Zip
+        CMake Directory:                     C:\Program Files\CMake\bin
+    =========================================================
+    Proceed with this configuration? (y/n): y
+```
+
+If you ran the `setup_env.ps1` script above and it completed without errors, then you're ready to build the SIGViewer project!
+
+1. Launch a new command prompt and run `setenv.bat` (located in the `scripts` directory of the SIGViewer project)
+2. Invoke `devenv SIGViewer_2010.sln` to launch Visual Studio with all the correct environment variables set
+
+This will ensure Visual Studio is launched with the correct environment for building against all of the dependencies above, and if you have multiple versions of VS installed it will only launch the one used to build all the dependencies so there's no chance of mixing up compiler versions. There are forks of [X3D](https://github.com/noirb/x3d/tree/dev) and [SIGService](https://github.com/noirb/SIGService/tree/dev) available which use the same environment variables for their builds, so everything can be built from the same command prompt.
+
+If you didn't use the setup script and have built or obtained the dependencies above in another way, the environment variables you need to set are:
 
     ### Used for Include Directories:
     ```
@@ -87,4 +120,33 @@ This will ensure Visual Studio is launched with the correct environment for buil
     BUILD_OGRE_LIB       -- Path to OgreSDK\lib
     BUILD_LIBSSH2_LIB    -- Path to libSSH2\<build_dir>\src\<Target>\
     BUILD_LIBOVR_LIB     -- Path to OculusSDK\LibOVR\Lib\Windows\Win32\Release\<VS_Version>\
+    ```
+
+Either set these globally or through a batch script before launching Visual Studio and everything should be fine.
+
+## Notes
+Although everything **should** work as long as you're using VS 2010 or newer, not every combination of compiler and library version has been tested, so it's possible you might run into issues depending on your configuration.
+
+The most recently-tested versions of all dependecies found to work together were:
+
+    ```
+    Visual Studio 2015
+    [Ogre SDK](http://ogre3d.org/forums/viewtopic.php?t=69274) 1.9.0-vc140-x86-12.03.2016
+    [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
+    [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
+    [Boost](http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip) 1.61.0
+    [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
+    [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
+    [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+    [CMake](https://cmake.org/download/) 3.6.1
+    
+    Visual Studio 2012
+    [Ogre SDK](http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc11_v1-9-0.exe) 1.9.0-vc11-x86
+    [CEGUI](http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip) 0.8.7, and [CEGUI Deps](http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip) 0.8.x
+    [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html) 1.8.0_101
+    [Boost](http://www.boost.org/users/history/version_1_55_0.html) 1.55.0
+    [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
+    [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
+    [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+    [CMake](https://cmake.org/download/) 3.6.1
     ```

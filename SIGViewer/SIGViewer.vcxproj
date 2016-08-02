@@ -86,8 +86,8 @@
 			$(OGRE_SDK)\include\OGRE;
 			$(OGRE_SDK)\Samples\Common\include;
 			$(CEGUI_ROOT_PATH)\cegui\include;
-			$(JDK_PATH)\include;
-			$(JDK_PATH)\include\win32;
+			$(JDK_ROOT_PATH)\include;
+			$(JDK_ROOT_PATH)\include\win32;
 			$(X3D_ROOT_PATH)\parser\cpp\X3DParser;
 			$(LIBSSH2_ROOT_PATH)\include;
 			$(SIGSERVICE_ROOT_PATH)\Windows\SIGService;
@@ -100,7 +100,7 @@
       <AdditionalLibraryDirectories>
 		$(OGRE_SDK_PATH)\lib\$(ConfigurationName);
 		$(CEGUI_ROOT_PATH)\lib;
-		$(JDK_PATH)\lib;
+		$(JDK_ROOT_PATH)\lib;
 		$(BOOST_ROOT)\stage\lib;
 		$(LIBSSH2_ROOT_PATH)\lib;
 		$(SIGSERVICE_ROOT_PATH)\Windows\Release_2010;

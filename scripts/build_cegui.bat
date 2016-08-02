@@ -20,6 +20,9 @@ if NOT EXIST %BOOST_ROOT% (
     goto error
 )
 
+setlocal
+set SCRIPT_DIR = %cd%
+
 :BuildDeps
 echo Building CEGUI deps...
 cd %CEGUI_DEPS_ROOT%
@@ -54,9 +57,11 @@ if ERRORLEVEL 1 goto error
 if ERRORLEVEL 0 goto end
 
 :error
+cd %SCRIPT_DIR%
 echo ERROR: One or more build steps failed! Exiting...
 exit /B 1
 
 :end
+cd %SCRIPT_DIR%
 echo Done building CEGUI!
 echo Binaries are located at: %CEGUI_ROOT_PATH%\build\bin
