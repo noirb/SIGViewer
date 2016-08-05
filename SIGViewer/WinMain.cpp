@@ -84,7 +84,11 @@ mAlgEntityPos(2)
 //-------------------------------------------------------------------------------------
 SgvMain::~SgvMain(void)
 {
-    CEGUI::OgreRenderer::destroySystem();
+	if (mSetupSuccessful)
+	{
+		CEGUI::OgreRenderer::destroySystem();
+		mLog->flush();
+	}
 
     if (mSock != NULL)    delete mSock;
     if (mService != NULL) delete mService;
@@ -93,7 +97,6 @@ SgvMain::~SgvMain(void)
         delete m_pX3D;
         m_pX3D = NULL;
     }
-    mLog->flush();
 }
 
 void SgvMain::destroyScene()
@@ -287,6 +290,8 @@ void SgvMain::createScene(void)
     distport->setBackgroundColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
     renderDstTexture->setAutoUpdated(true);
+
+	Ogre::LogManager::getSingleton().logMessage("Base Scene Creation Complete!");
 }
 
 /*! 
@@ -735,7 +740,8 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
         if (oculusMode)
         {
             mouseCamera = oculus.m_cameras[0]; //Left eye camera
-            mouseViewport = mouseCamera->getViewport();
+            //mouseViewport = mouseCamera->getViewport();
+			mouseViewport = oculus.m_viewports[0];
         }
         else
         {

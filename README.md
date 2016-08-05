@@ -24,13 +24,14 @@ To build this project and its dependecies, you need:
 * [SIGService](https://github.com/noirb/SIGService/tree/dev)
 * [X3D Parser](https://github.com/noirb/x3d/tree/dev)
 * [The Ogre SDK](http://www.ogre3d.org/download/sdk), version 1.9
+* [GL3W](https://github.com/skaslev/gl3w)
 * [CEGUI](http://cegui.org.uk/), version 0.8+ (built with Ogre support)
 * [Java JDK](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 * [Boost](http://www.boost.org/users/history/version_1_61_0.html), version 1.61.0+
 * [LibSSH2](https://www.libssh2.org/)
 * [OpenSSL](https://www.openssl.org/)
 * [Zlib](http://www.zlib.net/) (actually included with CEGUI's dependencies, so not necessary to install separately)
-* [Oculus SDK](https://developer.oculus.com/downloads/), version 0.8.0
+* [Oculus SDK](https://developer.oculus.com/downloads/), version 1.6.0
 * [CMake](https://cmake.org/download/)
 * (recommended) [7-Zip](http://www.7-zip.org/)
 
@@ -58,6 +59,8 @@ It should only be necessary to run `setup_env.ps1` once, but if you do run it ag
 
 ## Building
 **Always make sure to use the same compiler and release settings across dependencies where applicable! This means if you're building the 32-bit Release version of SIGViewer, you should be building the 32-bit Release version of all its dependencies as well!**
+
+**You will need to obtain or build [gl3w](https://github.com/skaslev/gl3w) yourself and place it in `<sigverse_root>\extern`**
 
 The `setup_env.ps1` script will generate 32-bit Release builds of all dependecies (if there's demand, it will be updated to allow Debug builds as well, but SIGViewer does not currently support 64-bit builds). To use it, simply run the script from the location you want all of your SIGVerse-related files to live. This is most likely the directory in which you put the SIGViewer code (e.g. if SIGViewer is in `C:\SIGVerse\SIGViewer`, then `C:\SIGVerse` is the `SIGVerse Root` you want to run the script from).
 

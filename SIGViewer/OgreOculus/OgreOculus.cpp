@@ -1,8 +1,12 @@
+#include "OgreOculus.h"
 #include <OgreTextureManager.h>
 #include <OgreHardwarePixelBuffer.h>
-#include "OgreOculus.h"
+#include <RenderSystems\GL3Plus\OgreGL3PlusRenderTexture.h>
+#include <RenderSystems\GL3Plus\OgreGL3PlusFBORenderTexture.h>
+#include <RenderSystems\GL3Plus\OgreGL3PlusFrameBufferObject.h>
 #include "OgreSceneManager.h"
 #include "OgreRenderWindow.h"
+#include <OgreViewport.h>
 #include <OgreSharedPtr.h>
 #include <OgreManualObject.h>
 #include <OgreRoot.h>
@@ -11,12 +15,17 @@
 #include <math.h>
 #include <vector>
 
+
+/*
+	Oculus Setup & Update code based on Kojack's work from here: http://www.ogre3d.org/forums/viewtopic.php?f=5&t=81627&start=100#p525592
+*/
+
 namespace
 {
     const float g_defaultNearClip = 0.01f;
     const float g_defaultFarClip = 100000.0f;
     const float g_defaultIPD = 0.064f;
-    const Ogre::ColourValue g_defaultViewportColour(97/255.0f, 97/255.0f, 200/255.0f);
+    const Ogre::ColourValue g_defaultViewportColour(97/255.0f, 200/255.0f, 200/255.0f);
 }
 
 
@@ -32,7 +41,7 @@ Oculus::Oculus(void):m_window(0), m_sceneManager(0), m_cameraNode(0)
 Oculus::~Oculus(void)
 {
     shutDownOgre();
-    ovr_Shutdown();
+    //ovr_Shutdown();
 }
 
 
@@ -68,164 +77,175 @@ void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, O
     mSceneMgr->setAmbientLight( Ogre::ColourValue( 0.5, 0.5, 0.5 ) );
     mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
+    m_cameras[0] = mSceneMgr->createCamera("Oculus Left Eye");
+    m_cameras[1] = mSceneMgr->createCamera("Oculus Right Eye");
 
-    Ogre::SceneNode* meshNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
-
-    m_cameras[0] = mSceneMgr->createCamera("Lcam");
-    m_cameras[0]->setAutoAspectRatio(true);
-    m_cameras[1] = mSceneMgr->createCamera("Rcam");
-    m_cameras[1]->setAutoAspectRatio(true);
-
-    texSizeL = ovr_GetFovTextureSize(mSession, ovrEye_Left, mHmdDesc.MaxEyeFov[0], 1.0f);
-    texSizeR = ovr_GetFovTextureSize(mSession, ovrEye_Right, mHmdDesc.MaxEyeFov[1], 1.0f);
-    bufferSize.w = texSizeL.w + texSizeR.w;
-    bufferSize.h = std::max(texSizeL.h, texSizeR.h);
-
-    ovrResult res = ovr_CreateSwapTextureSetGL(mSession, 0x8C43, bufferSize.w, bufferSize.h, &mTextureSet);
-    if (OVR_FAILURE(res))
+    Ogre::Matrix4 proj;
+    for (size_t i = 0; i < 2; ++i)
     {
-        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Creation of Oculus SwapTextureSet failed.");
-        return;
-    }
-
-    //Ogre::GLTextureManager* textureManager(static_cast<Ogre::GLTextureManager*>(Ogre::GLTextureManager::getSingletonPtr()));
-    Ogre::TexturePtr rtt_texture(Ogre::TextureManager::getSingletonPtr()->createManual("RttTex", Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-        Ogre::TEX_TYPE_2D, bufferSize.w, bufferSize.h, 0, Ogre::PF_R8G8B8, Ogre::TU_RENDERTARGET));
-    Ogre::RenderTexture* rttEyes = rtt_texture->getBuffer(0, 0)->getRenderTarget();
-
-    //Ogre::GLTexture* gltex = static_cast<Ogre::GLTexture*>(textureManager->getByName("RttTex").getPointer());
-    //mRenderTextureID = gltex->getGLID();
-
-    m_viewports[0] = rttEyes->addViewport(m_cameras[0], 0, 0,    0, 0.5f);
-    m_viewports[1] = rttEyes->addViewport(m_cameras[1], 1, 0.5f, 0, 0.5f);
-
-    eyeRenderDesc[0] = ovr_GetRenderDesc(mSession, ovrEye_Left, mHmdDesc.MaxEyeFov[0]);
-    eyeRenderDesc[1] = ovr_GetRenderDesc(mSession, ovrEye_Right, mHmdDesc.MaxEyeFov[1]);
-    offset[0] = eyeRenderDesc[0].HmdToEyeViewOffset;
-    offset[1] = eyeRenderDesc[1].HmdToEyeViewOffset;
-
-    mLayer.Header.Type     = ovrLayerType_EyeFov;
-    mLayer.Header.Flags    = 0;
-    mLayer.ColorTexture[0] = mTextureSet;
-    mLayer.ColorTexture[1] = mTextureSet;
-    mLayer.Fov[0]          = eyeRenderDesc[0].Fov;
-    mLayer.Fov[1]          = eyeRenderDesc[1].Fov;
-    mLayer.Viewport[0].Pos.x  = 0;
-    mLayer.Viewport[0].Pos.y  = 0;
-    mLayer.Viewport[0].Size.w = bufferSize.w / 2;
-    mLayer.Viewport[0].Size.h = bufferSize.h;
-    mLayer.Viewport[1].Pos.x  = bufferSize.w / 2;
-    mLayer.Viewport[1].Pos.y  = 0;
-    mLayer.Viewport[1].Size.w = bufferSize.w / 2;
-    mLayer.Viewport[1].Size.h = bufferSize.h;
-
-    // Create a camera in the (new, external) scene so the mesh can be rendered onto it:
-    mCamera = mSceneMgr->createCamera("OculusRiftExternalCamera");
-    mCamera->setFarClipDistance(1000000.0f);
-    mCamera->setNearClipDistance( 0.1f );
-    mCamera->setProjectionType( Ogre::PT_ORTHOGRAPHIC );
-    mCamera->setOrthoWindow(2 , 2);
-    mCamera->lookAt( 0, 0, -1 );
-
-
-    mSceneMgr->getRootSceneNode()->attachObject( mCamera );
-
-    meshNode->setPosition( 0, 0, -1 );
-    meshNode->setScale( 1, 1, -0.1f );
-
-    mViewport = m_window->addViewport( mCamera);
-    mViewport->setBackgroundColour(Ogre::ColourValue::Black);
-    mViewport->setOverlaysEnabled(true);
-}
-
-
-void Oculus::setCameras()
-{
-    Ogre::Camera* camLeft = m_cameras[0] ;
-    Ogre::Camera* camRight = m_cameras[1] ; 
-    Ogre::RenderTexture* renderTexLeft = mLeftEyeRenderTexture->getBuffer()->getRenderTarget();
-    std::cout << "[Rift] Adding viewport to left texture" << std::endl;
-    m_viewports[0] = renderTexLeft->addViewport(m_cameras[0]);
-    renderTexLeft->getViewport(0)->setOverlaysEnabled(true);
-
-    std::cout << "[Rift] Adding viewport to right texture" << std::endl;
-    Ogre::RenderTexture* renderTexRight = mRightEyeRenderTexture->getBuffer()->getRenderTarget();
-    m_viewports[1] = renderTexRight->addViewport(m_cameras[1]);
-
-    renderTexRight->getViewport(0)->setOverlaysEnabled(true);
-
-    m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
-    m_viewports[1]->setBackgroundColour(g_defaultViewportColour);
-
-
-    ovrFovPort fovLeft = eyeRenderDesc[0].Fov;
-    ovrFovPort fovRight = eyeRenderDesc[1].Fov;
-
-    float combinedTanHalfFovHorizontal = std::max( fovLeft.LeftTan, fovLeft.RightTan );
-    float combinedTanHalfFovVertical = std::max( fovLeft.UpTan, fovLeft.DownTan );
-
-    float aspectRatio = combinedTanHalfFovHorizontal / combinedTanHalfFovVertical;
-
-    m_cameras[0]->setAspectRatio( aspectRatio );
-    m_cameras[1]->setAspectRatio( aspectRatio );
-
-    // Get projection matrices for each eye
-    for (size_t eyeIndex(0); eyeIndex < ovrEye_Count; eyeIndex++)
-    {
-        // get projection matrix for each eye from oculus
-        ovrMatrix4f proj = ovrMatrix4f_Projection(eyeRenderDesc[eyeIndex].Fov,
-            g_defaultNearClip,
-            g_defaultFarClip,
-            true);
-
-        // convert to Ogre matrix
-        Ogre::Matrix4 OgreProj;
-        for (size_t x = 0; x < 4; x++)
+        const Ogre::Vector3 camPos(g_defaultIPD * (i - 0.5f), 0, 0);
+        m_cameras[i]->setPosition(camPos);
+        m_cameras[i]->setNearClipDistance(g_defaultNearClip);
+        m_cameras[i]->setFarClipDistance(g_defaultFarClip);
+        m_cameras[i]->setAutoAspectRatio(true);
+        m_cameras[i]->detachFromParent();
+        m_cameraNode->attachObject(m_cameras[i]);
+        m_cameras[i]->setDirection(0, 0, -1);
+        m_cameraNode->setOrientation(Ogre::Quaternion::IDENTITY);
+        ovrMatrix4f ovrm = ovrMatrix4f_Projection(
+                            mHmdDesc.DefaultEyeFov[i],
+                            g_defaultNearClip,
+                            g_defaultFarClip,
+                            0
+                          );
+        for (size_t y = 0; y < 4; y++)
         {
-            for (size_t y = 0; y < 4; y++)
+            for (size_t x = 0; x < 4; x++)
             {
-                OgreProj[x][y] = proj.M[x][y];
+                proj[y][x] = ovrm.M[y][x];
             }
         }
-        // set projection on each corresponding camera
-        m_cameras[eyeIndex]->setCustomProjectionMatrix(true, OgreProj);
+        m_cameras[i]->setCustomProjectionMatrix(true, proj);
     }
-}
 
+	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup oculus cameras complete");
+}
 
 
 bool Oculus::InitOculusVR()
 {
-    ovrResult res = ovr_Initialize(NULL);
-    if (OVR_FAILURE(res))
+    ovrInitParams params;
+    params.Flags = ovrInit_Debug;
+    params.ConnectionTimeoutMS = 0;
+    params.RequestedMinorVersion = 6;
+    params.UserData = 0;
+    params.LogCallback = 0;
+    ovrResult res = ovr_Initialize(&params);
+    if (!OVR_SUCCESS(res))
     {
-        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Initalization for LibOVR is failed.");
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Initalization for LibOVR is failed.");
         return false;
     }
 
     res = ovr_Create(&mSession, &mLuid);
-    if (OVR_FAILURE(res))
+    if (!OVR_SUCCESS(res))
     {
-        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Creation of OVR session failed.");
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Creation of OVR session failed.");
         return false;
     }
 
     mHmdDesc = ovr_GetHmdDesc(mSession);
 
+    ovrSizei recommendedTex0Size = ovr_GetFovTextureSize(mSession, ovrEye_Left, mHmdDesc.DefaultEyeFov[0], 1.0f);
+    ovrSizei recommendedTex1Size = ovr_GetFovTextureSize(mSession, ovrEye_Right, mHmdDesc.DefaultEyeFov[1], 1.0f);
+    mIdealTextureSize.w = recommendedTex0Size.w + recommendedTex0Size.w;
+    mIdealTextureSize.h = std::max(recommendedTex0Size.h, recommendedTex1Size.h);
+
+    mEyeRenderDesc[0] = ovr_GetRenderDesc(mSession, ovrEye_Left, mHmdDesc.DefaultEyeFov[0]);
+    mEyeRenderDesc[1] = ovr_GetRenderDesc(mSession, ovrEye_Right, mHmdDesc.DefaultEyeFov[1]);
+
+	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: OVR Session Initialization complete");
     return true;
 }
 
+bool Oculus::InitOculusTextures()
+{
+    ovrResult res;
+
+    ovrTextureSwapChainDesc desc = {};
+    desc.Type = ovrTexture_2D;
+    desc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+    desc.ArraySize = 1;
+    desc.Width = mIdealTextureSize.w;
+    desc.Height = mIdealTextureSize.h;
+    desc.MipLevels = 1;
+    desc.SampleCount = 1;
+    desc.StaticImage = ovrFalse;
+
+    res = ovr_CreateTextureSwapChainGL(mSession, &desc, &mTextureSwapChain);
+
+    if (!OVR_SUCCESS(res))
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Creation of OVR texture swapchain failed.");
+        return false;
+    }
+
+	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Created OVR texture swapchain");
+    return true;
+}
+
+bool Oculus::InitOgreTextures()
+{
+    mOgreRenderTexture[0] = Ogre::TextureManager::getSingleton().createManual(
+                                "Oculus Eye Texture LEFT",
+                                "General",
+                                Ogre::TextureType::TEX_TYPE_2D,
+                                mIdealTextureSize.w, mIdealTextureSize.h,
+                                0,
+                                Ogre::PixelFormat::PF_R8G8B8A8,
+                                Ogre::TextureUsage::TU_RENDERTARGET
+                            );
+
+    mOgreRenderTexture[1] = Ogre::TextureManager::getSingleton().createManual(
+                                "Oculus Eye Texture RIGHT",
+                                "General",
+                                Ogre::TextureType::TEX_TYPE_2D,
+                                mIdealTextureSize.w, mIdealTextureSize.h,
+                                0,
+                                Ogre::PixelFormat::PF_R8G8B8A8,
+                                Ogre::TextureUsage::TU_RENDERTARGET
+                            );
+
+    return true;
+}
+
+bool Oculus::InitOculusLayers()
+{
+    mLayer.Header.Type = ovrLayerType_EyeFov;
+    mLayer.Header.Flags = 0;
+    for (size_t eye = 0; eye < 2; ++eye)
+    {
+        mLayer.ColorTexture[eye] = mTextureSwapChain;
+        mLayer.Viewport[eye].Pos.x = (mIdealTextureSize.w / 2)*eye;
+        mLayer.Viewport[eye].Pos.y = 0;
+        mLayer.Viewport[eye].Size.w = mIdealTextureSize.w / 2;
+        mLayer.Viewport[eye].Size.h = mIdealTextureSize.h;
+        mLayer.Fov[eye] = mHmdDesc.DefaultEyeFov[eye];
+    }
+
+	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Oculus layers setup complete");
+    return true;
+}
+
+bool Oculus::InitOgreViewports()
+{
+	Ogre::RenderTexture* renderTexLeft = mOgreRenderTexture[0]->getBuffer()->getRenderTarget();
+	Ogre::RenderTexture* renderTexRight = mOgreRenderTexture[1]->getBuffer()->getRenderTarget();
+
+	m_viewports[0] = renderTexLeft->addViewport(m_cameras[0]);
+	m_viewports[1] = renderTexRight->addViewport(m_cameras[1]);
+
+	renderTexLeft->getViewport(0)->setOverlaysEnabled(true);
+	renderTexRight->getViewport(0)->setOverlaysEnabled(true);
+	renderTexLeft->setAutoUpdated(true);
+	renderTexRight->setAutoUpdated(true);
+
+	m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
+	m_viewports[0]->setAutoUpdated(true);
+	m_viewports[1]->setBackgroundColour(g_defaultViewportColour);
+	m_viewports[1]->setAutoUpdated(true);
+
+	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup RTT viewports for ogre oculus textures");
+	return true;
+}
 
 bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Root *mRoot, Ogre::SceneNode *parent)
 {
-    InitOculusVR();
-
+	gl3wInit();
     m_window = win;
     m_sceneManager = sm;
 
-    setupOgreOculus( m_sceneManager, m_window,mRoot);
-
-    if(parent)
+    if (parent)
     {
         m_cameraNode = parent->createChildSceneNode("CameraNode");
     }
@@ -233,30 +253,131 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Roo
     {
         m_cameraNode = sm->getRootSceneNode()->createChildSceneNode("CameraNode");
     }
-    m_cameras[0] = sm->createCamera("Camera1");
-    m_cameras[1] = sm->createCamera("Camera2");
 
-
-    for(int i=0;i<2;++i)
+    if (!InitOculusVR())
     {
-        m_cameraNode->attachObject(m_cameras[i]);
-        m_cameras[i]->setNearClipDistance(g_defaultNearClip);
-        m_cameras[i]->setFarClipDistance(g_defaultFarClip);			
-        m_cameras[i]->setPosition((i * 2 - 1) * mIPD * 0.5f, 0, 0);
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize HMD!");
+        return false;
+    }
+
+    if (!InitOculusTextures())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Oculus Textures!");
+        return false;
+    }
+
+    if (!InitOgreTextures())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Ogre Textures!");
+        return false;
+    }
+
+    if (!InitOculusLayers())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Oculus Layers!");
+        return false;
     }
 
 
-    setCameras( );
 
-    Ogre::LogManager::getSingleton().logMessage("Oculus: Oculus setup completed successfully");
+    /*if (!InitOgreCameras())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Ogre Cameras!");
+        return false;
+    }*/
+
+    /*if (!InitOgreWorkspace())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Ogre Workspace!");
+        return false;
+    }*/
+
+    setupOgreOculus( m_sceneManager, m_window,mRoot );
+
+	if (!InitOgreViewports())
+	{
+		Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to initialize RTT viewports for ogre oculus textures");
+	}
+
+    Ogre::LogManager::getSingleton().logMessage("OgreOculus: Oculus setup completed successfully");
     return true;
 }
-
-
 
 Ogre::SceneNode *Oculus::getCameraNode()
 {
 	return m_cameraNode;
 }
 
+double Oculus::updateHMDState()
+{
+    double ftiming = ovr_GetPredictedDisplayTime(mSession, mFrameIndex);
 
+    double sensorSampleTime = ovr_GetTimeInSeconds();
+    mHMDState = ovr_GetTrackingState(mSession, ftiming, ovrTrue);
+    ovrVector3f viewOffset[2] = { mEyeRenderDesc[0].HmdToEyeOffset, mEyeRenderDesc[1].HmdToEyeOffset };
+    ovr_CalcEyePoses(mHMDState.HeadPose.ThePose, viewOffset, mEyeRenderPose);
+
+    return sensorSampleTime;
+}
+
+void Oculus::Update()
+{
+    double sensorSampleTime = updateHMDState();
+
+    Ogre::Quaternion poseNeutralOrientation = { 1.0f, 0.0f, 0.0f, 0.0f };
+    Ogre::Vector3    poseNeutralPosition = { 0.0f, 0.0f, 0.0f };
+
+    Ogre::Quaternion q = poseNeutralOrientation.Inverse() * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    m_cameraNode->setOrientation(q);
+    m_cameraNode->setPosition((convertVector3(mHMDState.HeadPose.ThePose.Position) - poseNeutralPosition) + Ogre::Vector3(0, 1.7f, 0)); // + position?
+
+    sensorSampleTime = updateHMDState();
+
+    for (size_t i = 0; i < 2; ++i)
+    {
+        mLayer.RenderPose[i] = mEyeRenderPose[i];
+        mLayer.SensorSampleTime = sensorSampleTime;
+    }
+
+    // RENDER!
+    Ogre::Root::getSingleton().renderOneFrame();
+	
+    int index = 0;
+    ovr_GetTextureSwapChainCurrentIndex(mSession, mTextureSwapChain, &index);
+
+    Ogre::GL3PlusTexture* gt = ((Ogre::GL3PlusTexture*)mOgreRenderTexture[0].get());
+    GLuint srcid = gt->getGLID();
+
+    unsigned int dstid;// = ((ovrGLTexture *)g_textureSet[0]->Textures)[g_textureSet[0]->CurrentIndex].OGL.TexId;
+    ovr_GetTextureSwapChainBufferGL(mSession, mTextureSwapChain, index, &dstid);
+    Ogre::GL3PlusFBOManager* fboMan = static_cast<Ogre::GL3PlusFBOManager*>(Ogre::GL3PlusRTTManager::getSingletonPtr());
+
+	if (!fboMan)
+	{
+		Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Failed to get FBOManager!");
+		return;
+	}
+    
+	GLuint tFBO1 = fboMan->getTemporaryFBO(0);
+	GLuint tFBO2 = fboMan->getTemporaryFBO(1);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, tFBO1);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, tFBO2);
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, srcid, 0);
+    glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dstid, 0);
+    glBlitFramebuffer(0, 0, mIdealTextureSize.w - 1, mIdealTextureSize.h - 1, 0, 0, mIdealTextureSize.w - 1, mIdealTextureSize.h - 1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+    ovr_CommitTextureSwapChain(mSession, mTextureSwapChain);
+
+    ovrLayerHeader* layers = &mLayer.Header;
+    ovrResult result = ovr_SubmitFrame(mSession, mFrameIndex, 0, &layers, 1);
+
+    if (!OVR_SUCCESS(result))
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to submit frame " + std::to_string(mFrameIndex));
+    }
+
+    mFrameIndex++;
+}

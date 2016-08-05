@@ -20,15 +20,16 @@ This source file is part of the
 //#include "OgreOculus/OgreOculus.h"
 //-------------------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
-    : mRoot(0),
-    mCamera(0),
-    mSceneMgr(0),
-    mWindow(0),
-    mResourcesCfg(Ogre::StringUtil::BLANK),
-    mPluginsCfg(Ogre::StringUtil::BLANK),
-    mInputManager(0),
-    mMouse(0),
-    mKeyboard(0),
+	: mRoot(0),
+	mCamera(0),
+	mSceneMgr(0),
+	mWindow(0),
+	mResourcesCfg(Ogre::StringUtil::BLANK),
+	mPluginsCfg(Ogre::StringUtil::BLANK),
+	mInputManager(0),
+	mMouse(0),
+	mKeyboard(0),
+	mSetupSuccessful(false),
     mBackGroundColor(0.5f,0.5f,0.7f,1.0f),
     oculusMode(false),
     fullscreenMode(false),
@@ -56,7 +57,14 @@ bool BaseApplication::configure(void)
     // You can skip this and use root.restoreConfig() to load configuration
     // settings if you were sure there are valid ones saved in ogre.cfg
 
-    Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
+    Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)"); // "OpenGL Rendering Subsystem");
+    Ogre::RenderSystemList renderers = mRoot->getAvailableRenderers();
+    Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Available Renderers:");
+    for (size_t i = 0; i < renderers.size(); i++)
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, renderers[i]->getName());
+    }
+
     mRoot->setRenderSystem(rs);
     
     if(fullscreenMode){
@@ -147,6 +155,8 @@ void BaseApplication::createFrameListener(void)
     Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
     mRoot->addFrameListener(this);
+
+	Ogre::LogManager::getSingletonPtr()->logMessage("*** OIS Initialization Complete ***");
 }
 //-------------------------------------------------------------------------------------
 void BaseApplication::destroyScene(void)
@@ -213,7 +223,21 @@ void BaseApplication::go(void)
     if (!setup())
         return;
 
-    mRoot->startRendering();
+    if (oculusMode)
+    {
+		Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == TRUE)");
+        while (!this->mWindow->isClosed())
+        {
+			Ogre::WindowEventUtilities::messagePump();
+            oculus.Update();
+        }
+    }
+    else
+    {
+		Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == FALSE)");
+        mRoot->startRendering();
+    }
+    
 
     // clean up
     destroyScene();
@@ -243,8 +267,11 @@ bool BaseApplication::setup(void)
         Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media","FileSystem");
         // Load resources
         loadResources();
-        //oculus.setupOculus();
-        oculus.setupOgre(mSceneMgr, mWindow,mRoot);
+        
+		if (!oculus.setupOgre(mSceneMgr, mWindow, mRoot))
+		{
+			return false;
+		}
 
         createCamera();
     }
@@ -266,6 +293,9 @@ bool BaseApplication::setup(void)
 
     createFrameListener();
 
+	mSetupSuccessful = true;
+
+	Ogre::LogManager::getSingleton().logMessage("Application Setup Complete!");
     return true;
 };
 //-------------------------------------------------------------------------------------

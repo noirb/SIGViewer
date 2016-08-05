@@ -416,7 +416,7 @@ ac $dev_script 'rem This is a script-generated file! Edit at your own risk!'
 ac $dev_script 'rem --------------------------------------------------------'
 ac $dev_script "set SIGVERSE_ROOT=""$projectRoot"""
 ac $dev_script 'echo Checking for JDK path...'
-ac $dev_script 'call .\find_jdk.bat'
+ac $dev_script "call $scriptPath\scripts\find_jdk.bat"
 
 ac $dev_script "set CMAKE=$cmake"
 ac $dev_script "set VS_VERSION=""$vsVersion"""
