@@ -244,15 +244,15 @@ protected:
 	bool mMovingSubView;
 
 	// Socket to receive entity data 
-	sigverse::SgvSocket *mSock;
+	sigverse::SgvSocket *mSock = 0;
 
 	// Services held by SIGViewer
-	Sgv::ViewerService *mService;
+	Sgv::ViewerService *mService = 0;
 
 	// All the entities
 	std::map<std::string ,Sgv::SgvEntity*> mAllEntities;
 
-	Sgv::X3D *m_pX3D;
+	Sgv::X3D *m_pX3D = 0;
 
 	std::vector<Ogre::Viewport*> mViews;
 
