@@ -187,8 +187,8 @@ bool Oculus::InitOgreTextures()
         return false;
     }
 
-    mOgreRenderTexture[0] = Ogre::TextureManager::getSingleton().createManual(
-                                "Oculus Eye Texture LEFT",
+    mOgreRenderTexture = Ogre::TextureManager::getSingleton().createManual(
+                                "Oculus Eye Texture",
                                 Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                 Ogre::TextureType::TEX_TYPE_2D,
                                 mIdealTextureSize.w, mIdealTextureSize.h,
@@ -196,17 +196,6 @@ bool Oculus::InitOgreTextures()
                                 Ogre::PixelFormat::PF_R8G8B8A8,
                                 Ogre::TextureUsage::TU_RENDERTARGET
                             );
-
-    mOgreRenderTexture[1] = Ogre::TextureManager::getSingleton().createManual(
-                                "Oculus Eye Texture RIGHT",
-                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-                                Ogre::TextureType::TEX_TYPE_2D,
-                                mIdealTextureSize.w, mIdealTextureSize.h,
-                                0,
-                                Ogre::PixelFormat::PF_R8G8B8A8,
-                                Ogre::TextureUsage::TU_RENDERTARGET
-                            );
-
     return true;
 }
 
@@ -230,16 +219,14 @@ bool Oculus::InitOculusLayers()
 
 bool Oculus::InitOgreViewports()
 {
-    Ogre::RenderTexture* renderTexLeft = mOgreRenderTexture[0]->getBuffer()->getRenderTarget();
-    Ogre::RenderTexture* renderTexRight = mOgreRenderTexture[1]->getBuffer()->getRenderTarget();
+    Ogre::RenderTexture* renderTex = mOgreRenderTexture->getBuffer()->getRenderTarget();
 
-    m_viewports[0] = renderTexLeft->addViewport(m_cameras[0], 0, 0.0f, 0.0f, 0.5f, 1.0f);
-    m_viewports[1] = renderTexLeft->addViewport(m_cameras[1], 1, 0.5f, 0.0f, 0.5f, 1.0f);
-    
-    
+    // configure the two viewports to each render to half of the render target
+    // each half corresponds to one eye, and we submit both in one big texture to OVR
+    m_viewports[0] = renderTex->addViewport(m_cameras[0], 0, 0.0f, 0.0f, 0.5f, 1.0f);
+    m_viewports[1] = renderTex->addViewport(m_cameras[1], 1, 0.5f, 0.0f, 0.5f, 1.0f);
 
-    renderTexLeft->setAutoUpdated(true);
-    renderTexRight->setAutoUpdated(true);
+    renderTex->setAutoUpdated(true);
 
     m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
     m_viewports[0]->setOverlaysEnabled(true);
@@ -349,7 +336,7 @@ void Oculus::Update()
     int index = 0;
     ovr_GetTextureSwapChainCurrentIndex(mSession, mTextureSwapChain, &index);
 
-    Ogre::GLTexture* gt = ((Ogre::GLTexture*)mOgreRenderTexture[0].get());
+    Ogre::GLTexture* gt = ((Ogre::GLTexture*)mOgreRenderTexture.get());
     GLuint srcid = gt->getGLID();
 
     unsigned int dstid;// = ((ovrGLTexture *)g_textureSet[0]->Textures)[g_textureSet[0]->CurrentIndex].OGL.TexId;

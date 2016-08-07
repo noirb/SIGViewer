@@ -74,7 +74,7 @@ public:
 
     // Ogre stuff needed for VR
     Ogre::Camera    *m_cameras[2];
-    Ogre::TexturePtr mOgreRenderTexture[2];
+    Ogre::TexturePtr mOgreRenderTexture;
 
     // Oculus stuff
     ovrSession          mSession;
