@@ -16,16 +16,16 @@ Briefly, the following changes have been made:
 
 #### Project Setup
 
-Due to the large number of dependencies the project has, and the need to ensure that many of them are compiled together with the same settings, a setup script to automatically download and configure as many dependencies as possible was written.
+Due to the large number of dependencies the project has, and the need to ensure that many of them are compiled together with the same settings, a setup script, `setup_env.ps1`, to automatically download and configure as many dependencies as possible was written.
 
 Relevant Commits:
 
-e6c0f21f21bbd38828ae2d1a66f89430fce6812c
-ae23891e7cde9a9841397ac5de17ced8533da903
-f20731adfae56888e6bd2a0784b56613e2a50c17
-5c1cca4dcb3103010591f7e45022cc5cec754bad
-d00362eeebeafb6a169bc027e5fd4328d6ca7801
-62bb212daef592921c666308859e6ce61adac9ae
+[e6c0f21f21bbd38828ae2d1a66f89430fce6812c](https://github.com/noirb/SIGViewer/commit/e6c0f21f21bbd38828ae2d1a66f89430fce6812c)
+[ae23891e7cde9a9841397ac5de17ced8533da903](https://github.com/noirb/SIGViewer/commit/ae23891e7cde9a9841397ac5de17ced8533da903)
+[f20731adfae56888e6bd2a0784b56613e2a50c17](https://github.com/noirb/SIGViewer/commit/f20731adfae56888e6bd2a0784b56613e2a50c17)
+[5c1cca4dcb3103010591f7e45022cc5cec754bad](https://github.com/noirb/SIGViewer/commit/5c1cca4dcb3103010591f7e45022cc5cec754bad)
+[d00362eeebeafb6a169bc027e5fd4328d6ca7801](https://github.com/noirb/SIGViewer/commit/d00362eeebeafb6a169bc027e5fd4328d6ca7801)
+[62bb212daef592921c666308859e6ce61adac9ae](https://github.com/noirb/SIGViewer/commit/62bb212daef592921c666308859e6ce61adac9ae)
 
 #### Building
 
@@ -35,8 +35,8 @@ Similar changes were also made in forks of [SIGService](https://github.com/noirb
 
 Relevant Commits:
 
-87e230ec738a142b762921a7eff2470b14ee8acd
-32fbb54b4478d8b369cb0856685ba6646eab8e37
+[87e230ec738a142b762921a7eff2470b14ee8acd](https://github.com/noirb/SIGViewer/commit/87e230ec738a142b762921a7eff2470b14ee8acd)
+[32fbb54b4478d8b369cb0856685ba6646eab8e37](https://github.com/noirb/SIGViewer/commit/32fbb54b4478d8b369cb0856685ba6646eab8e37)
 
 ### CEGUI 0.8+
 
@@ -44,9 +44,9 @@ The project used to build against a very old version of CEGUI, which is no longe
 
 Relevant Commits:
 
-1d49867d330861f59d0db5467968dfa086436579
-599255e686edbaf59c3e08e6287dde02fe54d0cf
-143626840266b5eeb60263b869d2fa03d1346739
+[1d49867d330861f59d0db5467968dfa086436579](https://github.com/noirb/SIGViewer/commit/1d49867d330861f59d0db5467968dfa086436579)
+[599255e686edbaf59c3e08e6287dde02fe54d0cf](https://github.com/noirb/SIGViewer/commit/599255e686edbaf59c3e08e6287dde02fe54d0cf)
+[143626840266b5eeb60263b869d2fa03d1346739](https://github.com/noirb/SIGViewer/commit/143626840266b5eeb60263b869d2fa03d1346739)
 
 ### Oculus CV1 Support
 
@@ -56,8 +56,8 @@ Now, a large Ogre texture is generated at startup to hold images for both eyes, 
 
 Relevant Commits:
 
-7aefd4e916cf34629e59ade864b29fb68f1e8abc
-d8bfe66bb96ce8830ca62250c84679672c5fac10
-bb7e9f840f4828d9db1f1df56e8c69b054690a6d
-e6b71b33d2d1531523e29fe4621e7bc0c32833db
-a327d53e9097e8dcdece918a8ed166d9bcdbb288
+[7aefd4e916cf34629e59ade864b29fb68f1e8abc](https://github.com/noirb/SIGViewer/commit/7aefd4e916cf34629e59ade864b29fb68f1e8abc)
+[d8bfe66bb96ce8830ca62250c84679672c5fac10](https://github.com/noirb/SIGViewer/commit/d8bfe66bb96ce8830ca62250c84679672c5fac10)
+[bb7e9f840f4828d9db1f1df56e8c69b054690a6d](https://github.com/noirb/SIGViewer/commit/bb7e9f840f4828d9db1f1df56e8c69b054690a6d)
+[e6b71b33d2d1531523e29fe4621e7bc0c32833db](https://github.com/noirb/SIGViewer/commit/e6b71b33d2d1531523e29fe4621e7bc0c32833db)
+[a327d53e9097e8dcdece918a8ed166d9bcdbb288](https://github.com/noirb/SIGViewer/commit/a327d53e9097e8dcdece918a8ed166d9bcdbb288)
