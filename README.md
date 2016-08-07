@@ -152,7 +152,7 @@ The most recently-tested versions of all dependecies found to work together were
 * [Boost](http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip) 1.61.0
 * [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
 * [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
-* [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+* [Oculus SDK](https://static.oculus.com/sdk-downloads/1.6.0/Public/1468518301/ovr_sdk_win_1.6.0_public.zip) 1.6.0
 * [CMake](https://cmake.org/download/) 3.6.1
     
 #### With Visual Studio 2012
@@ -162,5 +162,5 @@ The most recently-tested versions of all dependecies found to work together were
 * [Boost](http://www.boost.org/users/history/version_1_55_0.html) 1.55.0
 * [libssh2](https://www.libssh2.org/download/libssh2-1.7.0.tar.gz) 1.7.0
 * [openssl](https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip) 0.9.8k
-* [Oculus SDK](https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip) 0.8.0
+* [Oculus SDK](https://static.oculus.com/sdk-downloads/1.6.0/Public/1468518301/ovr_sdk_win_1.6.0_public.zip) 1.6.0
 * [CMake](https://cmake.org/download/) 3.6.1
