@@ -1,22 +1,13 @@
 SIGVerse/SIGViewer
 =============
+See CHANGES.md for an overview of the differences between this fork and the original [SIGVerse SIGViewer](https://github.com/SIGVerse/SIGViewer).
 
-How to change normal SIGViewer to oculus SIGViewer.
 
-open: SIGViewer\Release\SIGVerse.ini
+### To Enable Oculus Rift Mode
 
-change  
-OCULUS_MODE=false  
-to  
-OCULUS_MODE=true  
-then you can use oculus rift in SIGVerse!
+open: `SIGVerse.ini`
 
-and if you want fullscreen mode  
-change  
-FULLSCREEN_MODE=false  
-to  
-FULLSCREEN_MODE=true
-
+And then change `OCULUS_MODE=false` to `OCULUS_MODE=true`
 
 ## Dependencies
 To build this project and its dependecies, you need:
