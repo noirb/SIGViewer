@@ -16,9 +16,9 @@
 #include <Ogre.h>
 #include <OgreRectangle2D.h>
 
-#include <RenderSystems\GL3Plus\OgreGL3PlusTextureManager.h>
-#include <RenderSystems\GL3Plus\OgreGL3PlusRenderSystem.h>
-#include <RenderSystems\GL3Plus\OgreGL3PlusTexture.h>
+#include <RenderSystems\GL\OgreGLTextureManager.h>
+#include <RenderSystems\GL\OgreGLRenderSystem.h>
+#include <RenderSystems\GL\OgreGLTexture.h>
 
 namespace Ogre
 {
@@ -68,7 +68,6 @@ public:
 
     Ogre::Viewport *m_viewports[2];
     ovrVector2f mUVScaleOffset[2][2];
-    Ogre::SceneManager* mSceneMgr;
 
     Ogre::Camera* mCamera;
     Ogre::Viewport* mViewport;
@@ -89,6 +88,8 @@ public:
     ovrPosef            mEyeRenderPose[2];
     ovrTrackingState    mHMDState;
     long long           mFrameIndex = 0;
+    GLuint              readFBO     = 0;
+    GLuint              writeFBO    = 0;
 
 protected:
     Ogre::SceneManager *m_sceneManager;

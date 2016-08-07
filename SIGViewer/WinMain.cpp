@@ -1233,12 +1233,11 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
         if (mShift)
         {
             if (oculusMode) {
-                Ogre::Vector3 pos   = oculus.m_cameras[0]->getPosition();
+                Ogre::Vector3 pos   = oculus.m_cameras[0]->getParentNode()->getPosition();
                 Ogre::Vector3 right = oculus.m_cameras[0]->getRight();
                 Ogre::Vector3 up    = oculus.m_cameras[0]->getUp();
                 pos += right* -xrel * mMoveXYSpeed + up * yrel * mMoveXYSpeed;
-                oculus.m_cameras[0]->setPosition(pos);
-                oculus.m_cameras[1]->setPosition(pos);
+                oculus.m_cameras[0]->getParentNode()->setPosition(pos);
             }
             Ogre::Vector3 pos = mCamera->getPosition();
             Ogre::Vector3 right = mCamera->getRight();
@@ -1249,11 +1248,10 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
         else if (mCtrl)
         {
             if (oculusMode) {
-                Ogre::Vector3 pos = oculus.m_cameras[0]->getPosition();
+                Ogre::Vector3 pos = oculus.m_cameras[0]->getParentNode()->getPosition();
                 Ogre::Vector3 dir = oculus.m_cameras[0]->getDirection();
                 pos += dir * yrel * mMoveZSpeed;
-                oculus.m_cameras[0]->setPosition(pos);
-                oculus.m_cameras[1]->setPosition(pos);
+                oculus.m_cameras[0]->getParentNode()->setPosition(pos);
             }
             Ogre::Vector3 pos = mCamera->getPosition();
             Ogre::Vector3 dir = mCamera->getDirection();
@@ -1263,10 +1261,10 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
         else
         { 
             if (oculusMode) {
-                oculus.m_cameras[0]->yaw(Ogre::Degree(-xrel * mRotateSpeed));
-                oculus.m_cameras[1]->yaw(Ogre::Degree(-xrel * mRotateSpeed));
-                oculus.m_cameras[0]->pitch(Ogre::Degree(yrel * mRotateSpeed));
-                oculus.m_cameras[1]->pitch(Ogre::Degree(yrel * mRotateSpeed));
+                oculus.m_cameras[0]->getParentNode()->yaw(Ogre::Degree(-xrel * mRotateSpeed));
+                oculus.m_cameras[1]->getParentNode()->yaw(Ogre::Degree(-xrel * mRotateSpeed));
+                oculus.m_cameras[0]->getParentNode()->pitch(Ogre::Degree(yrel * mRotateSpeed));
+                oculus.m_cameras[1]->getParentNode()->pitch(Ogre::Degree(yrel * mRotateSpeed));
             }
             mCamera->yaw(Ogre::Degree(-xrel * mRotateSpeed));
             mCamera->pitch(Ogre::Degree(yrel * mRotateSpeed));

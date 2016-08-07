@@ -57,7 +57,7 @@ bool BaseApplication::configure(void)
     // You can skip this and use root.restoreConfig() to load configuration
     // settings if you were sure there are valid ones saved in ogre.cfg
 
-    Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL 3+ Rendering Subsystem (EXPERIMENTAL)"); // "OpenGL Rendering Subsystem");
+    Ogre::RenderSystem *rs = mRoot->getRenderSystemByName("OpenGL Rendering Subsystem");
     Ogre::RenderSystemList renderers = mRoot->getAvailableRenderers();
     Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Available Renderers:");
     for (size_t i = 0; i < renderers.size(); i++)
@@ -225,16 +225,16 @@ void BaseApplication::go(void)
 
     if (oculusMode)
     {
-		Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == TRUE)");
+        Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == TRUE)");
         while (!this->mWindow->isClosed())
         {
-			Ogre::WindowEventUtilities::messagePump();
             oculus.Update();
+            Ogre::WindowEventUtilities::messagePump();
         }
     }
     else
     {
-		Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == FALSE)");
+        Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == FALSE)");
         mRoot->startRendering();
     }
     

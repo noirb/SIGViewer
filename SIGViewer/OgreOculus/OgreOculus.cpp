@@ -1,9 +1,9 @@
 #include "OgreOculus.h"
 #include <OgreTextureManager.h>
 #include <OgreHardwarePixelBuffer.h>
-#include <RenderSystems\GL3Plus\OgreGL3PlusRenderTexture.h>
-#include <RenderSystems\GL3Plus\OgreGL3PlusFBORenderTexture.h>
-#include <RenderSystems\GL3Plus\OgreGL3PlusFrameBufferObject.h>
+#include <RenderSystems\GL\OgreGLRenderTexture.h>
+#include <RenderSystems\GL\OgreGLFBORenderTexture.h>
+#include <RenderSystems\GL\OgreGLFrameBufferObject.h>
 #include "OgreSceneManager.h"
 #include "OgreRenderWindow.h"
 #include <OgreViewport.h>
@@ -73,17 +73,19 @@ void Oculus::shutDownOgre()
 
 void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, Ogre::Root* root )
 {
-    mSceneMgr = root->createSceneManager(Ogre::ST_GENERIC);
-    mSceneMgr->setAmbientLight( Ogre::ColourValue( 0.5, 0.5, 0.5 ) );
-    mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+    m_sceneManager->setAmbientLight( Ogre::ColourValue( 0.5, 0.5, 0.5 ) );
+    m_sceneManager->setShadowTechnique(Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 
-    m_cameras[0] = mSceneMgr->createCamera("Oculus Left Eye");
-    m_cameras[1] = mSceneMgr->createCamera("Oculus Right Eye");
+    m_cameras[0] = m_sceneManager->createCamera("Oculus Left Eye");
+    m_cameras[1] = m_sceneManager->createCamera("Oculus Right Eye");
+    
+    m_cameraNode->setOrientation(Ogre::Quaternion::IDENTITY);
+    m_cameraNode->setPosition(0, 0, 0);
 
     Ogre::Matrix4 proj;
-    for (size_t i = 0; i < 2; ++i)
+    for (size_t i = 0; i < 2; i++)
     {
-        const Ogre::Vector3 camPos(g_defaultIPD * (i - 0.5f), 0, 0);
+        const Ogre::Vector3 camPos(g_defaultIPD * ((float)i - 0.5f), 0, 0);
         m_cameras[i]->setPosition(camPos);
         m_cameras[i]->setNearClipDistance(g_defaultNearClip);
         m_cameras[i]->setFarClipDistance(g_defaultFarClip);
@@ -91,12 +93,12 @@ void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, O
         m_cameras[i]->detachFromParent();
         m_cameraNode->attachObject(m_cameras[i]);
         m_cameras[i]->setDirection(0, 0, -1);
-        m_cameraNode->setOrientation(Ogre::Quaternion::IDENTITY);
+        
         ovrMatrix4f ovrm = ovrMatrix4f_Projection(
                             mHmdDesc.DefaultEyeFov[i],
                             g_defaultNearClip,
                             g_defaultFarClip,
-                            0
+                            ovrProjection_None
                           );
         for (size_t y = 0; y < 4; y++)
         {
@@ -108,7 +110,7 @@ void Oculus::setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win, O
         m_cameras[i]->setCustomProjectionMatrix(true, proj);
     }
 
-	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup oculus cameras complete");
+    Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup oculus cameras complete");
 }
 
 
@@ -144,7 +146,7 @@ bool Oculus::InitOculusVR()
     mEyeRenderDesc[0] = ovr_GetRenderDesc(mSession, ovrEye_Left, mHmdDesc.DefaultEyeFov[0]);
     mEyeRenderDesc[1] = ovr_GetRenderDesc(mSession, ovrEye_Right, mHmdDesc.DefaultEyeFov[1]);
 
-	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: OVR Session Initialization complete");
+    Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: OVR Session Initialization complete");
     return true;
 }
 
@@ -176,9 +178,18 @@ bool Oculus::InitOculusTextures()
 
 bool Oculus::InitOgreTextures()
 {
+    glGenFramebuffers(1, &readFBO);
+    glGenFramebuffers(1, &writeFBO);
+
+    if (readFBO < 1 || writeFBO < 1)
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to generate GL Framebuffers for OVR texture swap!");
+        return false;
+    }
+
     mOgreRenderTexture[0] = Ogre::TextureManager::getSingleton().createManual(
                                 "Oculus Eye Texture LEFT",
-                                "General",
+                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                 Ogre::TextureType::TEX_TYPE_2D,
                                 mIdealTextureSize.w, mIdealTextureSize.h,
                                 0,
@@ -188,7 +199,7 @@ bool Oculus::InitOgreTextures()
 
     mOgreRenderTexture[1] = Ogre::TextureManager::getSingleton().createManual(
                                 "Oculus Eye Texture RIGHT",
-                                "General",
+                                Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
                                 Ogre::TextureType::TEX_TYPE_2D,
                                 mIdealTextureSize.w, mIdealTextureSize.h,
                                 0,
@@ -219,29 +230,31 @@ bool Oculus::InitOculusLayers()
 
 bool Oculus::InitOgreViewports()
 {
-	Ogre::RenderTexture* renderTexLeft = mOgreRenderTexture[0]->getBuffer()->getRenderTarget();
-	Ogre::RenderTexture* renderTexRight = mOgreRenderTexture[1]->getBuffer()->getRenderTarget();
+    Ogre::RenderTexture* renderTexLeft = mOgreRenderTexture[0]->getBuffer()->getRenderTarget();
+    Ogre::RenderTexture* renderTexRight = mOgreRenderTexture[1]->getBuffer()->getRenderTarget();
 
-	m_viewports[0] = renderTexLeft->addViewport(m_cameras[0]);
-	m_viewports[1] = renderTexRight->addViewport(m_cameras[1]);
+    m_viewports[0] = renderTexLeft->addViewport(m_cameras[0], 0, 0.0f, 0.0f, 0.5f, 1.0f);
+    m_viewports[1] = renderTexLeft->addViewport(m_cameras[1], 1, 0.5f, 0.0f, 0.5f, 1.0f);
+    
+    
 
-	renderTexLeft->getViewport(0)->setOverlaysEnabled(true);
-	renderTexRight->getViewport(0)->setOverlaysEnabled(true);
-	renderTexLeft->setAutoUpdated(true);
-	renderTexRight->setAutoUpdated(true);
+    renderTexLeft->setAutoUpdated(true);
+    renderTexRight->setAutoUpdated(true);
 
-	m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
-	m_viewports[0]->setAutoUpdated(true);
-	m_viewports[1]->setBackgroundColour(g_defaultViewportColour);
-	m_viewports[1]->setAutoUpdated(true);
+    m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
+    m_viewports[0]->setOverlaysEnabled(true);
+    m_viewports[0]->setAutoUpdated(true);
+    m_viewports[1]->setBackgroundColour(g_defaultViewportColour);
+    m_viewports[1]->setOverlaysEnabled(true);
+    m_viewports[1]->setAutoUpdated(true);
 
-	Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup RTT viewports for ogre oculus textures");
-	return true;
+    Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: Setup RTT viewports for ogre oculus textures");
+    return true;
 }
 
 bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Root *mRoot, Ogre::SceneNode *parent)
 {
-	gl3wInit();
+    glewInit();
     m_window = win;
     m_sceneManager = sm;
 
@@ -278,26 +291,12 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Roo
         return false;
     }
 
-
-
-    /*if (!InitOgreCameras())
-    {
-        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Ogre Cameras!");
-        return false;
-    }*/
-
-    /*if (!InitOgreWorkspace())
-    {
-        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to intialize Ogre Workspace!");
-        return false;
-    }*/
-
     setupOgreOculus( m_sceneManager, m_window,mRoot );
 
-	if (!InitOgreViewports())
-	{
-		Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to initialize RTT viewports for ogre oculus textures");
-	}
+    if (!InitOgreViewports())
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to initialize RTT viewports for ogre oculus textures");
+    }
 
     Ogre::LogManager::getSingleton().logMessage("OgreOculus: Oculus setup completed successfully");
     return true;
@@ -313,6 +312,11 @@ double Oculus::updateHMDState()
     double ftiming = ovr_GetPredictedDisplayTime(mSession, mFrameIndex);
 
     double sensorSampleTime = ovr_GetTimeInSeconds();
+    
+    // update eye states
+    mEyeRenderDesc[0] = ovr_GetRenderDesc(mSession, ovrEye_Left, mHmdDesc.DefaultEyeFov[0]);
+    mEyeRenderDesc[1] = ovr_GetRenderDesc(mSession, ovrEye_Right, mHmdDesc.DefaultEyeFov[1]);
+
     mHMDState = ovr_GetTrackingState(mSession, ftiming, ovrTrue);
     ovrVector3f viewOffset[2] = { mEyeRenderDesc[0].HmdToEyeOffset, mEyeRenderDesc[1].HmdToEyeOffset };
     ovr_CalcEyePoses(mHMDState.HeadPose.ThePose, viewOffset, mEyeRenderPose);
@@ -327,11 +331,11 @@ void Oculus::Update()
     Ogre::Quaternion poseNeutralOrientation = { 1.0f, 0.0f, 0.0f, 0.0f };
     Ogre::Vector3    poseNeutralPosition = { 0.0f, 0.0f, 0.0f };
 
-    Ogre::Quaternion q = poseNeutralOrientation.Inverse() * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    Ogre::Quaternion q = poseNeutralOrientation * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
     m_cameraNode->setOrientation(q);
     m_cameraNode->setPosition((convertVector3(mHMDState.HeadPose.ThePose.Position) - poseNeutralPosition) + Ogre::Vector3(0, 1.7f, 0)); // + position?
 
-    sensorSampleTime = updateHMDState();
+    Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: HeadPos:  " + std::to_string(m_cameraNode->_getDerivedPosition().x) + "," + std::to_string(m_cameraNode->_getDerivedPosition().y) + "," + std::to_string(m_cameraNode->_getDerivedPosition().z));
 
     for (size_t i = 0; i < 2; ++i)
     {
@@ -341,27 +345,18 @@ void Oculus::Update()
 
     // RENDER!
     Ogre::Root::getSingleton().renderOneFrame();
-	
+
     int index = 0;
     ovr_GetTextureSwapChainCurrentIndex(mSession, mTextureSwapChain, &index);
 
-    Ogre::GL3PlusTexture* gt = ((Ogre::GL3PlusTexture*)mOgreRenderTexture[0].get());
+    Ogre::GLTexture* gt = ((Ogre::GLTexture*)mOgreRenderTexture[0].get());
     GLuint srcid = gt->getGLID();
 
     unsigned int dstid;// = ((ovrGLTexture *)g_textureSet[0]->Textures)[g_textureSet[0]->CurrentIndex].OGL.TexId;
     ovr_GetTextureSwapChainBufferGL(mSession, mTextureSwapChain, index, &dstid);
-    Ogre::GL3PlusFBOManager* fboMan = static_cast<Ogre::GL3PlusFBOManager*>(Ogre::GL3PlusRTTManager::getSingletonPtr());
 
-	if (!fboMan)
-	{
-		Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Failed to get FBOManager!");
-		return;
-	}
-    
-	GLuint tFBO1 = fboMan->getTemporaryFBO(0);
-	GLuint tFBO2 = fboMan->getTemporaryFBO(1);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, tFBO1);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, tFBO2);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, readFBO);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, writeFBO);
     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, srcid, 0);
     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, dstid, 0);
     glBlitFramebuffer(0, 0, mIdealTextureSize.w - 1, mIdealTextureSize.h - 1, 0, 0, mIdealTextureSize.w - 1, mIdealTextureSize.h - 1, GL_COLOR_BUFFER_BIT, GL_NEAREST);

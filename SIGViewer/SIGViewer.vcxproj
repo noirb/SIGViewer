@@ -130,7 +130,7 @@
         $(BUILD_OGRE_INC)\OGRE\Overlay;
         $(BUILD_OGRE_INC)\OIS;
         $(BUILD_OGRE_INC)\OGRE;
-        $(BUILD_OGRE_INC)\OGRE\RenderSystems\GL3Plus\include;
+        $(BUILD_OGRE_INC)\OGRE\RenderSystems\GL;
         $(OGRE_SDK)\Samples\Common\include;
         $(BUILD_CEGUI_INC);
         $(BUILD_LIBSSH2_INC);
@@ -144,20 +144,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>
-	    OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;gl3w.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL3Plus.lib;%(AdditionalDependencies)
+	    OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>
-	    $(BUILD_SIGSERVICE_LIB);
-		$(BUILD_X3D_LIB);
-		$(JDK_ROOT_PATH)\lib;
-		$(BUILD_BOOST_LIB);
-		$(BUILD_OGRE_LIB)\$(Configuration);
+        $(BUILD_SIGSERVICE_LIB);
+        $(BUILD_X3D_LIB);
+        $(JDK_ROOT_PATH)\lib;
+        $(BUILD_BOOST_LIB);
+        $(BUILD_OGRE_LIB)\$(Configuration);
         $(BUILD_OGRE_LIB)\$(Configuration)\opt;
-		$(BUILD_CEGUI_LIB);
-		$(BUILD_LIBSSH2_LIB);
-		$(BUILD_LIBOVR_LIB);
-        $(BUILD_GL3W_LIB);
-		%(AdditionalLibraryDirectories)
+        $(BUILD_CEGUI_LIB);
+        $(BUILD_LIBSSH2_LIB);
+        $(BUILD_LIBOVR_LIB);
+        $(BUILD_GLEW_LIB);
+        %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
