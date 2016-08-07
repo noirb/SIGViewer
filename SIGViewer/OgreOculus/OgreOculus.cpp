@@ -315,12 +315,9 @@ void Oculus::Update()
 {
     double sensorSampleTime = updateHMDState();
 
-    Ogre::Quaternion poseNeutralOrientation = { 1.0f, 0.0f, 0.0f, 0.0f };
-    Ogre::Vector3    poseNeutralPosition = { 0.0f, 0.0f, 0.0f };
-
-    Ogre::Quaternion q = poseNeutralOrientation * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    Ogre::Quaternion q = m_headOrientation * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
     m_cameraNode->setOrientation(q);
-    m_cameraNode->setPosition((convertVector3(mHMDState.HeadPose.ThePose.Position) - poseNeutralPosition) + Ogre::Vector3(0, 1.7f, 0)); // + position?
+    m_cameraNode->setPosition(convertVector3(mHMDState.HeadPose.ThePose.Position) + Ogre::Vector3(0, 1.7f, 0) + m_headPosition);
 
     Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: HeadPos:  " + std::to_string(m_cameraNode->_getDerivedPosition().x) + "," + std::to_string(m_cameraNode->_getDerivedPosition().y) + "," + std::to_string(m_cameraNode->_getDerivedPosition().z));
 

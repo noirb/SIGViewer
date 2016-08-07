@@ -35,9 +35,7 @@ class Oculus
 public:
     Oculus(void);
     ~Oculus(void);
-    bool setupOculus();
     bool setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Root *mRoot, Ogre::SceneNode *parent = 0);
-    void shutDownOculus();
     void shutDownOgre();
     bool InitOculusVR();
     bool InitOculusTextures();
@@ -45,9 +43,29 @@ public:
 	bool InitOgreViewports();
     bool InitOculusLayers();
     void setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win,Ogre::Root* root);
-    void setCameras(  );
     double updateHMDState();
     void Update();
+
+    Ogre::Vector3 GetPosition()
+    {
+        return m_headPosition;
+    }
+
+    void SetPosition(Ogre::Vector3 newPos)
+    {
+        m_headPosition = newPos;
+    }
+
+    Ogre::Quaternion GetOrientation()
+    {
+        return m_headOrientation;
+    }
+
+    void SetOrientation(Ogre::Quaternion newOrientation)
+    {
+        m_headOrientation = newOrientation;
+    }
+
     /// Reset orientation of the sensor.
     void resetOrientation();
     /// Retrieve the SceneNode that contains the two cameras used for stereo rendering.
@@ -95,6 +113,8 @@ protected:
     Ogre::SceneManager *m_sceneManager;
     Ogre::RenderWindow *m_window;
     Ogre::SceneNode    *m_cameraNode;
+    Ogre::Vector3       m_headPosition;
+    Ogre::Quaternion    m_headOrientation;
 
     Ogre::Vector3 convertVector3(const ovrVector3f &v)
     {
