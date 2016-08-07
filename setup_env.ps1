@@ -18,6 +18,7 @@ if ( !(Test-Path $projectDepsRoot) ) {
 # environment variables used to build the project
 $build_vars = @{
     "OGRE_SDK"             = "";
+    "GLEW_ROOT_PATH"       = "";
     "CEGUI_ROOT_PATH"      = "";
     "CEGUI_DEPS_ROOT"      = "";
     "LIBSSH2_ROOT_PATH"    = "";
@@ -199,6 +200,7 @@ $libSSH2_www    = "https://www.libssh2.org/download/libssh2-1.7.0.tar.gz"
 $openSSL_www    = "https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip"
 $boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip"
 $libovr_www     = "https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip"
+$glew_www       = "http://downloads.sourceforge.net/project/glew/glew/2.0.0/glew-2.0.0-win32.zip"
 
 # set download URL for Ogre only if we're using VS 2010 or 2012
 if ($vsVersion -eq "Visual Studio 11 2012")
@@ -239,6 +241,7 @@ doDownload -url $libSSH2_www    -destFile $libSSH2_www.Substring($libSSH2_www.La
 doDownload -url $openSSL_www    -destFile $openSSL_www.Substring($openSSL_www.LastIndexOf("/") + 1)       -destDir $tmp_dir -wc $net
 doDownload -url $boost_www      -destFile $boost_www.Substring($boost_www.LastIndexOf("/") + 1)           -destDir $tmp_dir -wc $net
 doDownload -url $libovr_www     -destFile $libovr_www.Substring($libovr_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
+doDownload -url $glew_www       -destFile $glew_www.Substring($glew_www.LastIndexOf("/") + 1)             -destDir $tmp_dir -wc $net
 
 # only download Ogre if we're using VS 2012 or earlier
 if ($vsVersion -eq "Visual Studio 10 2010" -Or $vsVersion -eq "Visual Studio 11 2012")
@@ -338,6 +341,15 @@ foreach ($item in (dir $projectDepsRoot)) {
             remove-item "$projectDepsRoot\$($item.Name)"
         }
     }
+    elseif ($item.Name.ToLower() -like "*glew*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the GLEW root directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("GLEW_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)"
+        }
+    }
 }
 
 
@@ -365,6 +377,11 @@ if (!($build_vars.Get_Item("CEGUI_ROOT_PATH"))) {
 if (!($build_vars.Get_Item("CEGUI_DEPS_ROOT"))) {
     iex "$7zX -o$projectDepsRoot $tmp_dir\$($CEGUI_deps_www.Substring($CEGUI_deps_www.LastIndexOf(""/"") + 1))"
     $build_vars.Set_Item("CEGUI_DEPS_ROOT", "$projectDepsRoot\cegui-deps-0.8.x-src")
+}
+
+if (!($build_vars.Get_Item("GLEW_ROOT_PATH"))) {
+    iex "$7zX -o$projectDepsRoot $tmp_dir\$($glew_www.Substring($glew_www.LastIndexOf(""/"") + 1))"
+    $build_vars.Set_Item("GLEW_ROOT_PATH", "$projectDepsRoot\glew-2.0.0")
 }
 
 if (!($build_vars.Get_Item("LIBSSH2_ROOT_PATH"))) {
@@ -449,6 +466,7 @@ ac $dev_script "set BUILD_LIBSSH2_LIB=$($build_vars.Get_Item(""LIBSSH2_ROOT_PATH
 ac $dev_script "set BUILD_OPENSSL_LIB=$($build_vars.Get_Item(""OPENSSL_ROOT_DIR""))\lib"
 ac $dev_script "set BUILD_ZLIB_LIB=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\dependencies\lib\static"
 ac $dev_script "set BUILD_LIBOVR_LIB=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Lib\Windows\Win32\Release\VS2015"
+ac $dev_script "set BUILD_GLEW_LIB=$($build_vars.Get_Item(""GLEW_ROOT_PATH""))\lib\Release\Win32"
 
 ac $dev_script "call %VS_TOOLS_PATH%\VsDevCmd.bat"
 
