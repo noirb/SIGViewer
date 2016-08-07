@@ -1,6 +1,6 @@
 SIGVerse/SIGViewer
 =============
-See CHANGES.md for an overview of the differences between this fork and the original [SIGVerse SIGViewer](https://github.com/SIGVerse/SIGViewer).
+See [CHANGES.md](CHANGES.md) for an overview of the differences between this fork and the original [SIGVerse SIGViewer](https://github.com/SIGVerse/SIGViewer).
 
 
 ### To Enable Oculus Rift Mode
