@@ -172,8 +172,6 @@ void BaseApplication::createViewports(void)
     // Alter the camera aspect ratio to match the viewport
     mCamera->setAspectRatio(Ogre::Real(mViewPort->getActualWidth()) / Ogre::Real(mViewPort->getActualHeight()));
 
-    //mCamera->setDirection(1.0f, -1.0f, 1.0f);
-    //mCamera->setPosition(50.0f, 50.0f, 50.0f);
 }
 //-------------------------------------------------------------------------------------
 void BaseApplication::setupResources(void)
@@ -268,10 +266,10 @@ bool BaseApplication::setup(void)
         // Load resources
         loadResources();
         
-		if (!oculus.setupOgre(mSceneMgr, mWindow, mRoot))
-		{
-			return false;
-		}
+        if (!oculus.setupOgre(mSceneMgr, mWindow, mRoot))
+        {
+            return false;
+        }
 
         createCamera();
     }

@@ -641,7 +641,8 @@ void SgvMain::createInitWindow()
     std::vector<CEGUI::Window*> tmp_subwin;
 
     char tmp_name1[MAX_STRING_NUM], tmp_name2[MAX_STRING_NUM];
-
+    static bool createdSubviews = false;
+    if (createdSubviews) { return; }
     for (int i = 0; i < MAX_SUBVIEW; i++) 
     {
         sprintf(tmp_name1, "RTT_%d",i);
@@ -664,18 +665,19 @@ void SgvMain::createInitWindow()
         view->setOverlaysEnabled(false);
         view->setClearEveryFrame(true);
         mViews.push_back(view);
-        CEGUI::Texture &guiTex = mRenderer->createTexture(tmp_name1, tex);
-
-        //CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create(tmp_name1, guiTex);
-        //
-        //if (imageSet.isImageDefined("RTTImage")) {
-        //    imageSet.getImage("RTTImage");
-        //} else {
-        //    imageSet.defineImage("RTTImage",
-        //        CEGUI::Vector2f(0.0f, 0.0f),
-        //        CEGUI::USize(guiTex.getSize().d_width, guiTex.getSize().d_height),
-        //        CEGUI::Vector2f(0.0f, 0.0f));
-        //}
+        CEGUI::Texture& guiTex = mRenderer->createTexture(tmp_name1, tex);
+        CEGUI::BasicImage* rtImage = static_cast<CEGUI::BasicImage*>(&CEGUI::ImageManager::getSingleton().create("BasicImage", "RTTImages/" + std::string(tmp_name1)));
+        CEGUI::OgreRenderer* ogreRenderer = static_cast<CEGUI::OgreRenderer*>(CEGUI::System::getSingleton().getRenderer());
+        bool isTextureTargetVerticallyFlipped = ogreRenderer->isTexCoordSystemFlipped();
+        CEGUI::Rectf imageArea;
+        
+        if (isTextureTargetVerticallyFlipped)
+            imageArea = CEGUI::Rectf(0.0, tex->getHeight(), tex->getWidth(), 0.0f);
+        else
+            imageArea = CEGUI::Rectf(0.0f, 0.0f, tex->getWidth(), tex->getHeight());
+        rtImage->setArea(imageArea);
+        rtImage->setAutoScaled(CEGUI::ASM_Disabled);
+        rtImage->setTexture(&guiTex);
 
         CEGUI::Window *si = CEGUI::WindowManager::getSingleton().createWindow("TaharezLook/StaticImage", tmp_name1);
         si->setVisible(false);
@@ -715,6 +717,7 @@ void SgvMain::createInitWindow()
         mSubViews[i]->subscribeEvent(CEGUI::Window::EventMouseButtonUp,   CEGUI::Event::Subscriber(&SgvMain::cameraView_Up,   this));
         mSubViews[i]->subscribeEvent(CEGUI::Window::EventMouseLeavesArea, CEGUI::Event::Subscriber(&SgvMain::cameraView_Up,   this));
     }
+    createdSubviews = true;
 }
 
 bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
@@ -1335,7 +1338,7 @@ bool SgvMain::connect(const CEGUI::EventArgs &e)
     CEGUI::String snameString = sname->getText();
     CEGUI::String ipString    = ip->getText();
     CEGUI::String portString  = port->getText();
-    CEGUI::Window *main = root_win; //->getChildRecursive("MainSheet");
+    CEGUI::Window *main = root_win;
 
     int portnum = atoi(portString.c_str());
 
@@ -2321,14 +2324,14 @@ bool SgvMain::changeTimeUnit(const CEGUI::EventArgs &e)
 }
 
 bool SgvMain::messageTray(const CEGUI::EventArgs &e)
-{
+ {
     CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
     CEGUI::Window* root_win = CEGUI::System::getSingleton().getDefaultGUIContext().getRootWindow();
 
     CEGUI::Window *main = root_win; //->getChildRecursive("MainSheet");
 
     CEGUI::Window* msg_tray_win = root_win->getChildRecursive("MessageTray");
-    if (msg_tray_win != NULL && !wmgr.isAlive(msg_tray_win))
+    if (msg_tray_win == NULL || !wmgr.isAlive(msg_tray_win))
     {
         CEGUI::FrameWindow *msg = static_cast<CEGUI::FrameWindow*>(wmgr.createWindow("Vanilla/FrameWindow", "MessageTray"));
         msg->setText("Send Message");
@@ -2351,7 +2354,7 @@ bool SgvMain::messageTray(const CEGUI::EventArgs &e)
 
         CEGUI::Listbox *elist;
         CEGUI::Window* ent_lst_win = root_win->getChildRecursive("EntityList");
-        if (ent_lst_win != NULL && !wmgr.isAlive(ent_lst_win)) {
+        if (ent_lst_win == NULL || !wmgr.isAlive(ent_lst_win)) {
             elist = static_cast<CEGUI::Listbox *>(wmgr.createWindow("OgreTray/Listbox", "EntityList"));
             elist->setText("Send Message");
             elist->setSize(CEGUI::USize(CEGUI::UDim(0.9f, 0.0f), CEGUI::UDim(0.375f, 0.0f)));
@@ -2934,11 +2937,8 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
     {
         if (oculusMode) 
         {
-            oculus.m_cameras[0]->setPosition(0.0f,0.0f,0.0f);
-            oculus.m_cameras[1]->setPosition(0.0f,0.0f,0.0f);
-            oculus.getCameraNode()->setPosition(mCamera->getRealPosition());
-            oculus.m_cameras[0]->setOrientation(mCamera->getRealOrientation());
-            oculus.m_cameras[1]->setOrientation(mCamera->getRealOrientation());
+            oculus.SetPosition(Ogre::Vector3(0, 0, 0));
+            oculus.SetOrientation(Ogre::Quaternion::IDENTITY);
         }
         else{
             mViewPort->setCamera(mCamera);
@@ -2988,8 +2988,11 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
     if (mSended) mSended = false;
 
     CEGUI::Window *dview = root_win->getChildRecursive("dynamicsview");
-    dview->setEnabled(false);
-    m_dynamicsView = 0;
+    if (dview != NULL)
+    {
+        dview->setEnabled(false);
+        m_dynamicsView = 0;
+    }
 
     std::map<std::string, sigverse::SgvSocket*>::iterator it;
     it = mServices.begin();
