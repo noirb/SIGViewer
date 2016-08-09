@@ -93,25 +93,25 @@ If you didn't use the setup script and have built or obtained the dependencies a
 
 ### Used for Include Directories:
 
-    BUILD_SIGSERVICE_INC -- Path to SIGService\Windows\SIGService
-    BUILD_X3D_INC        -- Path to X3D\parser\cpp\X3DParser
+    SIGBUILD_SIGSERVICE_INC -- Path to SIGService\Windows\SIGService
+    SIGBUILD_X3D_INC        -- Path to X3D\parser\cpp\X3DParser
     JDK_ROOT_PATH        -- Path to your JDK installation directory
-    BUILD_BOOST_INC      -- Path to Boost root
-    BUILD_OGRE_INC       -- Path to OgreSDK\include
-    BUILD_CEGUI_INC      -- Path to Cegui-src\cegui\include
-    BUILD_LIBSSH2_INC    -- Path to libSSH2\include
-    BUILD_LIBOVR_INC     -- Path to OculusSDK\LibOVR\Include
+    SIGBUILD_BOOST_INC      -- Path to Boost root
+    SIGBUILD_OGRE_INC       -- Path to OgreSDK\include
+    SIGBUILD_CEGUI_INC      -- Path to Cegui-src\cegui\include
+    SIGBUILD_LIBSSH2_INC    -- Path to libSSH2\include
+    SIGBUILD_LIBOVR_INC     -- Path to OculusSDK\LibOVR\Include
 
 
 ### Used for Lib Directories
 
-    BUILD_SIGSERVICE_LIB -- Path to SIGService\Windows\<Target>\
-    BUILD_X3D_LIB        -- Path to X3D\parser\cpp\<Target>\
+    SIGBUILD_SIGSERVICE_LIB -- Path to SIGService\Windows\<Target>\
+    SIGBUILD_X3D_LIB        -- Path to X3D\parser\cpp\<Target>\
     JDK_ROOT_PATH        -- Path to your JDK installation directory
-    BUILD_BOOST_LIB      -- Path to Boost\<staging_dir>\lib
-    BUILD_OGRE_LIB       -- Path to OgreSDK\lib
-    BUILD_LIBSSH2_LIB    -- Path to libSSH2\<build_dir>\src\<Target>\
-    BUILD_LIBOVR_LIB     -- Path to OculusSDK\LibOVR\Lib\Windows\Win32\Release\<VS_Version>\
+    SIGBUILD_BOOST_LIB      -- Path to Boost\<staging_dir>\lib
+    SIGBUILD_OGRE_LIB       -- Path to OgreSDK\lib
+    SIGBUILD_LIBSSH2_LIB    -- Path to libSSH2\<build_dir>\src\<Target>\
+    SIGBUILD_LIBOVR_LIB     -- Path to OculusSDK\LibOVR\Lib\Windows\Win32\Release\<VS_Version>\
 
 
 Either set these globally or through a batch script before launching Visual Studio and everything should be fine.
