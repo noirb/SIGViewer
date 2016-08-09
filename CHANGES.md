@@ -37,6 +37,7 @@ Relevant Commits:
 
 [87e230ec738a142b762921a7eff2470b14ee8acd](https://github.com/noirb/SIGViewer/commit/87e230ec738a142b762921a7eff2470b14ee8acd)
 [32fbb54b4478d8b369cb0856685ba6646eab8e37](https://github.com/noirb/SIGViewer/commit/32fbb54b4478d8b369cb0856685ba6646eab8e37)
+[3dd9beec29bfd892cc85f5ce2ed3c47719696ce4](https://github.com/noirb/SIGViewer/commit/3dd9beec29bfd892cc85f5ce2ed3c47719696ce4)
 
 ### CEGUI 0.8+
 
