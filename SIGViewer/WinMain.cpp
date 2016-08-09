@@ -691,10 +691,10 @@ void SgvMain::createInitWindow()
         
         //si->setProperty("Image", CEGUI::PropertyHelper<CEGUI::Image*>::toString(&imageSet.getImage("RTTImage")));
         
-        float rx = (0.24f * (1.0f - R_DX)) / 2.0f;
-        float ry = (0.24f * (1.0f - R_DY)) / 2.0f;
+        float rx = (0.24f * (1.0f - (float)R_DX)) / 2.0f;
+        float ry = (0.24f * (1.0f - (float)R_DY)) / 2.0f;
 
-        si->setSize(CEGUI::USize(CEGUI::UDim(0.24f * R_DX, 0), CEGUI::UDim(0.24f * R_DY, 0)));
+        si->setSize(CEGUI::USize(CEGUI::UDim(0.24f * (float)R_DX, 0), CEGUI::UDim(0.24f * (float)R_DY, 0)));
         si->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f + rx, 0), CEGUI::UDim(0.04 + (0.24f * i) + ry, 0)));
 
         si->addChild(fb);
@@ -1694,7 +1694,7 @@ bool SgvMain::createAllEntities()
             {
                 if (!downloadFileRequest(tmp_sfile)) {
                     char tmp[MAX_STRING_NUM];
-                    sprintf(tmp, "Failed to download shape file [%s]", tmp_sfile);
+                    sprintf(tmp, "Failed to download shape file [%s]", tmp_sfile.c_str());
                     MessageBox( NULL, tmp, _T("Error"), MB_OK);
                 }
             }
