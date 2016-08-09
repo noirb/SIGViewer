@@ -80,34 +80,39 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>
-			$(OGRE_SDK)\include;
-			$(OGRE_SDK)\include\OGRE\Overlay;
-			$(OGRE_SDK)\include\OIS;
-			$(OGRE_SDK)\include\OGRE;
-			$(OGRE_SDK)\Samples\Common\include;
-			$(CEGUI_ROOT_PATH)\cegui\include;
-			$(JDK_ROOT_PATH)\include;
-			$(JDK_ROOT_PATH)\include\win32;
-			$(X3D_ROOT_PATH)\parser\cpp\X3DParser;
-			$(LIBSSH2_ROOT_PATH)\include;
-			$(SIGSERVICE_ROOT_PATH)\Windows\SIGService;
-			$(BOOST_ROOT);
-			$(LIBOVR_ROOT_PATH)\Include
+			$(SIGBUILD_SIGSERVICE_INC);
+            $(SIGBUILD_X3D_INC);
+            $(JDK_ROOT_PATH)\include;
+            $(JDK_ROOT_PATH)\include\win32;
+            $(SIGBUILD_BOOST_INC);
+            $(SIGBUILD_OGRE_INC);
+            $(SIGBUILD_OGRE_INC)\OGRE\Overlay;
+            $(SIGBUILD_OGRE_INC)\OIS;
+            $(SIGBUILD_OGRE_INC)\OGRE;
+            $(SIGBUILD_OGRE_INC)\OGRE\RenderSystems\GL;
+            $(OGRE_SDK)\Samples\Common\include;
+            $(SIGBUILD_CEGUI_INC);
+            $(SIGBUILD_LIBSSH2_INC);
+            $(SIGBUILD_LIBOVR_INC)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>
-		$(OGRE_SDK_PATH)\lib\$(ConfigurationName);
-		$(CEGUI_ROOT_PATH)\lib;
-		$(JDK_ROOT_PATH)\lib;
-		$(BOOST_ROOT)\stage\lib;
-		$(LIBSSH2_ROOT_PATH)\lib;
-		$(SIGSERVICE_ROOT_PATH)\Windows\Release_2010;
-		$(LIBOVR_ROOT_PATH)\Lib\Win32
+		$(SIGBUILD_SIGSERVICE_LIB);
+        $(SIGBUILD_X3D_LIB);
+        $(JDK_ROOT_PATH)\lib;
+        $(SIGBUILD_BOOST_LIB);
+        $(SIGBUILD_OGRE_LIB)\$(Configuration);
+        $(SIGBUILD_OGRE_LIB)\$(Configuration)\opt;
+        $(SIGBUILD_CEGUI_LIB);
+        $(SIGBUILD_LIBSSH2_LIB);
+        $(SIGBUILD_LIBOVR_LIB);
+        $(SIGBUILD_GLEW_LIB);
+        %(AdditionalLibraryDirectories)
 	  </AdditionalLibraryDirectories>
       <AdditionalDependencies>
-	    OgreMain.lib OIS.lib OgreTerrain.lib comctl32.lib ws2_32.lib winmm.lib CEGUIBase.lib CEGUIOgreRenderer.lib jvm.lib zlib.lib SIGService.lib libovr.lib
+	    OgreMain_d.lib;OIS_d.lib;OgreTerrain_d.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL_d.lib;%(AdditionalDependencies)
 	  </AdditionalDependencies>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -121,20 +126,21 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <AdditionalIncludeDirectories>
-        $(BUILD_SIGSERVICE_INC);
-        $(BUILD_X3D_INC);
+        $(SIGBUILD_SIGSERVICE_INC);
+        $(SIGBUILD_X3D_INC);
         $(JDK_ROOT_PATH)\include;
         $(JDK_ROOT_PATH)\include\win32;
-        $(BUILD_BOOST_INC);
-        $(BUILD_OGRE_INC);
-        $(BUILD_OGRE_INC)\OGRE\Overlay;
-        $(BUILD_OGRE_INC)\OIS;
-        $(BUILD_OGRE_INC)\OGRE;
-        $(BUILD_OGRE_INC)\OGRE\RenderSystems\GL;
+        $(SIGBUILD_BOOST_INC);
+        $(SIGBUILD_OGRE_INC);
+        $(SIGBUILD_OGRE_INC)\OGRE\Overlay;
+        $(SIGBUILD_OGRE_INC)\OIS;
+        $(SIGBUILD_OGRE_INC)\OGRE;
+        $(SIGBUILD_OGRE_INC)\OGRE\RenderSystems\GL;
         $(OGRE_SDK)\Samples\Common\include;
-        $(BUILD_CEGUI_INC);
-        $(BUILD_LIBSSH2_INC);
-        $(BUILD_LIBOVR_INC)</AdditionalIncludeDirectories>
+        $(SIGBUILD_CEGUI_INC);
+        $(SIGBUILD_LIBSSH2_INC);
+        $(SIGBUILD_LIBOVR_INC)
+      </AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <ProgramDataBaseFileName>$(IntDir)vc$(PlatformToolsetVersion).pdb</ProgramDataBaseFileName>
@@ -147,16 +153,16 @@
 	    OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>
-        $(BUILD_SIGSERVICE_LIB);
-        $(BUILD_X3D_LIB);
+        $(SIGBUILD_SIGSERVICE_LIB);
+        $(SIGBUILD_X3D_LIB);
         $(JDK_ROOT_PATH)\lib;
-        $(BUILD_BOOST_LIB);
-        $(BUILD_OGRE_LIB)\$(Configuration);
-        $(BUILD_OGRE_LIB)\$(Configuration)\opt;
-        $(BUILD_CEGUI_LIB);
-        $(BUILD_LIBSSH2_LIB);
-        $(BUILD_LIBOVR_LIB);
-        $(BUILD_GLEW_LIB);
+        $(SIGBUILD_BOOST_LIB);
+        $(SIGBUILD_OGRE_LIB)\$(Configuration);
+        $(SIGBUILD_OGRE_LIB)\$(Configuration)\opt;
+        $(SIGBUILD_CEGUI_LIB);
+        $(SIGBUILD_LIBSSH2_LIB);
+        $(SIGBUILD_LIBOVR_LIB);
+        $(SIGBUILD_GLEW_LIB);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
     </Link>
