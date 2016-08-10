@@ -28,6 +28,7 @@ $build_vars = @{
     "BOOST_ROOT"           = "";
     "LIBOVR_ROOT_PATH"     = "";
     "VS_TOOLS_PATH"        = "";
+    "OPENCV_ROOT"          = "";
 }
 
 # These are used as an argument to CMake when generating project files
@@ -201,6 +202,7 @@ $openSSL_www    = "https://openssl-for-windows.googlecode.com/files/openssl-0.9.
 $boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip"
 $libovr_www     = "https://static.oculus.com/sdk-downloads/0.8.0.0/Public/1445451746/ovr_sdk_win_0.8.0.0.zip"
 $glew_www       = "http://downloads.sourceforge.net/project/glew/glew/2.0.0/glew-2.0.0-win32.zip"
+$opencv_www     = "http://downloads.sourceforge.net/project/opencvlibrary/opencv-win/2.4.13/opencv-2.4.13.exe"
 
 # set download URL for Ogre only if we're using VS 2010 or 2012
 if ($vsVersion -eq "Visual Studio 11 2012")
@@ -242,6 +244,7 @@ doDownload -url $openSSL_www    -destFile $openSSL_www.Substring($openSSL_www.La
 doDownload -url $boost_www      -destFile $boost_www.Substring($boost_www.LastIndexOf("/") + 1)           -destDir $tmp_dir -wc $net
 doDownload -url $libovr_www     -destFile $libovr_www.Substring($libovr_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
 doDownload -url $glew_www       -destFile $glew_www.Substring($glew_www.LastIndexOf("/") + 1)             -destDir $tmp_dir -wc $net
+doDownload -url $opencv_www     -destFile $opencv_www.Substring($opencv_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
 
 # only download Ogre if we're using VS 2012 or earlier
 if ($vsVersion -eq "Visual Studio 10 2010" -Or $vsVersion -eq "Visual Studio 11 2012")
@@ -283,6 +286,15 @@ foreach ($item in (dir $projectDepsRoot)) {
         $conf = Read-Host -prompt "Should this be used as-is as the Ogre SDK directory? (y/n)"
         if (($conf.ToLower().StartsWith("y"))) {
             $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)"
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*opencv*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the OpenCV source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("OPENCV_ROOT", "$projectDepsRoot\$($item.Name)")
         } else {
             remove-item "$projectDepsRoot\$($item.Name)"
         }
@@ -367,6 +379,11 @@ if (!($build_vars.Get_Item("X3D_ROOT_PATH"))) {
 if (!($build_vars.Get_Item("OGRE_SDK"))) {
     iex "$tmp_dir\$($Ogre_SDK_www.Substring($Ogre_SDK_www.LastIndexOf(""/"") + 1)) -o$projectDepsRoot -y"
     $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\OgreSDK_vc11_v1-9-0")
+}
+
+if (!($build_vars.Get_Item("OPENCV_ROOT"))) {
+    iex "$tmp_dir\$($opencv_www.Substring($opencv_www.LastIndexOf(""/"") +1)) -o$projectDepsRoot -y"
+    $build_vars.Set_Item("OPENCV_ROOT", "$projectDepsRoot\opencv")
 }
 
 if (!($build_vars.Get_Item("CEGUI_ROOT_PATH"))) {
@@ -518,6 +535,13 @@ if ( $lastexitcode -ne 0) {
 cmd /C 'build_sigservice.bat'
 if ( $lastexitcode -ne 0) {
     echo 'ERROR: SIGService build failed! Terminating build scripts'
+    cd $projectRoot
+    exit
+}
+
+cmd /C 'build_opencv.bat'
+if ( $lastexitcode -ne 0) {
+    echo 'ERROR: OpenCV build failed! Terminating build scripts'
     cd $projectRoot
     exit
 }
