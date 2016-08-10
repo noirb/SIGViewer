@@ -84,8 +84,7 @@ The script will first check to ensure Visual Studio, CMake, and 7-zip are instal
 
 If you ran the `setup_env.ps1` script above and it completed without errors, then you're ready to build the SIGViewer project!
 
-1. Launch a new command prompt and run `setenv.bat` (located in the `scripts` directory of the SIGViewer project)
-2. Invoke `devenv SIGViewer_2010.sln` to launch Visual Studio with all the correct environment variables set
+A shortcut to launch a command prompt with the correct SIGVerse build environment will be created in your SIGVerse root after running `setup_env.ps1`. Launch it, then invoke `devenv SIGViewer.sln` to launch Visual Studio with all the correct environment variables set
 
 This will ensure Visual Studio is launched with the correct environment for building against all of the dependencies above, and if you have multiple versions of VS installed it will only launch the one used to build all the dependencies so there's no chance of mixing up compiler versions. There are forks of [X3D](https://github.com/noirb/x3d/tree/dev) and [SIGService](https://github.com/noirb/SIGService/tree/dev) available which use the same environment variables for their builds, so everything can be built from the same command prompt.
 

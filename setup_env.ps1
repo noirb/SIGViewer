@@ -478,6 +478,12 @@ ac $dev_script 'exit /B 1'
 
 ac $dev_script ':end'
 
+# make shortcut to setenv.bat
+$WScriptShell = New-Object -ComObject WScript.Shell
+$dev_script_shortcut = $WScriptShell.CreateShortcut("$projectRoot\SIGVerse_x86_Release.lnk")
+$dev_script_shortcut.TargetPath = $env:ComSpec
+$dev_script_shortcut.Arguments = "/K $dev_script"
+$dev_script_shortcut.Save()
 
 # Attempt to build all dependencies
 cd "$scriptPath\scripts"
