@@ -100,7 +100,7 @@ protected:
     bool mRMouseDown; // True if it clicked
     bool mWindowResized; // True if just after the window is resized. (For preventing the automatic click after resizing.)
 
-	bool mSetupSuccessful;
+    bool mSetupSuccessful;
 
     //mode flag
     bool oculusMode;     //treate as oculus rift viewing

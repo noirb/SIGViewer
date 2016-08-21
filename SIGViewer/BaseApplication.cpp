@@ -20,16 +20,16 @@ This source file is part of the
 //#include "OgreOculus/OgreOculus.h"
 //-------------------------------------------------------------------------------------
 BaseApplication::BaseApplication(void)
-	: mRoot(0),
-	mCamera(0),
-	mSceneMgr(0),
-	mWindow(0),
-	mResourcesCfg(Ogre::StringUtil::BLANK),
-	mPluginsCfg(Ogre::StringUtil::BLANK),
-	mInputManager(0),
-	mMouse(0),
-	mKeyboard(0),
-	mSetupSuccessful(false),
+    : mRoot(0),
+    mCamera(0),
+    mSceneMgr(0),
+    mWindow(0),
+    mResourcesCfg(Ogre::StringUtil::BLANK),
+    mPluginsCfg(Ogre::StringUtil::BLANK),
+    mInputManager(0),
+    mMouse(0),
+    mKeyboard(0),
+    mSetupSuccessful(false),
     mBackGroundColor(0.5f,0.5f,0.7f,1.0f),
     oculusMode(false),
     fullscreenMode(false),
@@ -130,6 +130,7 @@ void BaseApplication::createFrameListener(void)
     std::ostringstream windowHndStr;
  
     mWindow->getCustomAttribute("WINDOW", &windowHnd);
+
     windowHndStr << windowHnd;
 
     pl.insert(std::make_pair(std::string("w32_mouse"), std::string("DISCL_FOREGROUND" )));
@@ -156,7 +157,7 @@ void BaseApplication::createFrameListener(void)
 
     mRoot->addFrameListener(this);
 
-	Ogre::LogManager::getSingletonPtr()->logMessage("*** OIS Initialization Complete ***");
+    Ogre::LogManager::getSingletonPtr()->logMessage("*** OIS Initialization Complete ***");
 }
 //-------------------------------------------------------------------------------------
 void BaseApplication::destroyScene(void)
@@ -465,4 +466,3 @@ void BaseApplication::windowClosed(Ogre::RenderWindow* rw)
         }
     }
 }
-
