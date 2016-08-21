@@ -202,7 +202,7 @@ if ( !((Read-Host -Prompt "Proceed with this configuration? (y/n)").ToLower().St
 
 # Locations to download dependencies from
 ## TODO: check for git and prefer cloning over downloading when possible
-$SIGViewer_www  = "https://github.com/noirb/sigverse-SIGViewer/archive/dev.zip"
+$SIGViewer_www  = "https://github.com/noirb/sigverse-SIGViewer/archive/master.zip"
 $SIGService_www = "https://github.com/noirb/sigverse-SIGService/archive/master.zip"
 $X3D_www        = "https://github.com/noirb/sigverse-x3d/archive/master.zip"
 $SIGPlugin_www  = "https://github.com/noirb/sigverse-plugin/archive/master.zip"
