@@ -648,24 +648,28 @@ void SgvMain::createInitWindow()
         sprintf(tmp_name1, "RTT_%d",i);
         sprintf(tmp_name2, "cam%d", i + 1);
 
-        Ogre::TexturePtr tex = mRoot->getTextureManager()->createManual(
+        Ogre::TexturePtr tex = Ogre::TextureManager::getSingleton().createManual(
             tmp_name1,
             Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-            Ogre::TEX_TYPE_2D,
+            Ogre::TextureType::TEX_TYPE_2D,
             512,
             512,
             0,
-            Ogre::PF_R8G8B8,
-            Ogre::TU_RENDERTARGET);
+            Ogre::PixelFormat::PF_R8G8B8,
+            Ogre::TextureUsage::TU_RENDERTARGET
+        );
 
         Ogre::RenderTexture *rtex = tex->getBuffer()->getRenderTarget();
+        rtex->setAutoUpdated(true);
         Ogre::Viewport *view  = rtex->addViewport(tmp_cam);
 
         view->setBackgroundColour(mBackGroundColor);
-        view->setOverlaysEnabled(false);
-        view->setClearEveryFrame(true);
+        view->setOverlaysEnabled(true);
+        view->setAutoUpdated(true);
         mViews.push_back(view);
+
         CEGUI::Texture& guiTex = mRenderer->createTexture(tmp_name1, tex);
+        
         CEGUI::BasicImage* rtImage = static_cast<CEGUI::BasicImage*>(&CEGUI::ImageManager::getSingleton().create("BasicImage", "RTTImages/" + std::string(tmp_name1)));
         CEGUI::OgreRenderer* ogreRenderer = static_cast<CEGUI::OgreRenderer*>(CEGUI::System::getSingleton().getRenderer());
         bool isTextureTargetVerticallyFlipped = ogreRenderer->isTexCoordSystemFlipped();
@@ -694,9 +698,10 @@ void SgvMain::createInitWindow()
         float rx = (0.24f * (1.0f - (float)R_DX)) / 2.0f;
         float ry = (0.24f * (1.0f - (float)R_DY)) / 2.0f;
 
+
         si->setSize(CEGUI::USize(CEGUI::UDim(0.24f * (float)R_DX, 0), CEGUI::UDim(0.24f * (float)R_DY, 0)));
         si->setPosition(CEGUI::UVector2(CEGUI::UDim(0.0f + rx, 0), CEGUI::UDim(0.04 + (0.24f * i) + ry, 0)));
-
+        si->setProperty("Image", "RTTImages/" + std::string(tmp_name1));
         si->addChild(fb);
         si->setMaxSize(CEGUI::USize(CEGUI::UDim(1.0f, 0), CEGUI::UDim(1.0f, 0)));
         si->setUserString("SubViewIndex", std::to_string((long long)i));
