@@ -227,7 +227,7 @@ bool Oculus::InitOgreViewports()
     m_viewports[1] = renderTex->addViewport(m_cameras[1], 1, 0.5f, 0.0f, 0.5f, 1.0f);
 
     renderTex->setAutoUpdated(true);
-
+    
     m_viewports[0]->setBackgroundColour(g_defaultViewportColour);
     m_viewports[0]->setOverlaysEnabled(true);
     m_viewports[0]->setAutoUpdated(true);
@@ -284,6 +284,7 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Roo
     {
         Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to initialize RTT viewports for ogre oculus textures");
     }
+
 
     Ogre::LogManager::getSingleton().logMessage("OgreOculus: Oculus setup completed successfully");
     return true;

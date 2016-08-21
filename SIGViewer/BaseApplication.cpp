@@ -167,7 +167,10 @@ void BaseApplication::destroyScene(void)
 void BaseApplication::createViewports(void)
 {
     // Create one viewport, entire window
-    mViewPort= mWindow->addViewport(mCamera);
+    if (oculusMode)
+        mViewPort = mWindow->addViewport(oculus.m_cameras[0]);
+    else
+        mViewPort= mWindow->addViewport(mCamera);
     mViewPort->setBackgroundColour(mBackGroundColor);
 
     // Alter the camera aspect ratio to match the viewport
@@ -273,6 +276,7 @@ bool BaseApplication::setup(void)
         }
 
         createCamera();
+        createViewports();
     }
     else{
         createCamera();
