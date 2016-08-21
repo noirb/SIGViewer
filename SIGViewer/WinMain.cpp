@@ -1085,11 +1085,8 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
     BaseApplication::frameRenderingQueued(evt);
 
     if (oculusMode && oculusCameraFlag) {
-        oculus.m_cameras[0]->setPosition(0.0f,0.0f,0.0f);
-        oculus.m_cameras[1]->setPosition(0.0f,0.0f,0.0f);
-        oculus.getCameraNode()->setPosition(oculusCamera->getRealPosition());
-        oculus.m_cameras[0]->setOrientation(oculusCamera->getRealOrientation());
-        oculus.m_cameras[1]->setOrientation(oculusCamera->getRealOrientation());
+        oculus.SetPosition(oculusCamera->getRealPosition());
+        oculus.SetOrientation(oculusCamera->getRealOrientation());
     }
 
 
