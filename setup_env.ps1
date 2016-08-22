@@ -38,6 +38,7 @@ $build_vars = @{
 if ($setup -eq 'complete') {
     $build_vars.Add("OPENCV_ROOT",      "");
     $build_vars.Add("PLUGIN_ROOT_PATH", "");
+    $build_vars.Add("NEURON_SDK_ROOT",  "");
 }
 
 # These are used as an argument to CMake when generating project files
@@ -214,6 +215,7 @@ $boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/b
 $libovr_www     = "https://static.oculus.com/sdk-downloads/1.7.0/Public/1470946240/ovr_sdk_win_1.7.0_public.zip"
 $glew_www       = "http://downloads.sourceforge.net/project/glew/glew/2.0.0/glew-2.0.0-win32.zip"
 $opencv_www     = "http://downloads.sourceforge.net/project/opencvlibrary/opencv-win/2.4.13/opencv-2.4.13.exe"
+$neuron_sdk_www = "https://neuronmocap.com/sites/default/files/software/NeuronDataReader%20SDK%20b15.zip"
 
 # set download URL for Ogre only if we're using VS 2010 or 2012
 if ($vsVersion -eq "Visual Studio 11 2012")
@@ -264,8 +266,9 @@ if ($vsVersion -eq "Visual Studio 10 2010" -Or $vsVersion -eq "Visual Studio 11 
 
 # download additional dependencies if complete build was specified
 if ($setup -eq 'complete') {
-    doDownload -url $SIGPlugin_www  -destFile "sigPlugin.zip"                                          -destDir $tmp_dir -wc $net
-    doDownload -url $opencv_www     -destFile $opencv_www.Substring($opencv_www.LastIndexOf("/") + 1)  -destDir $tmp_dir -wc $net
+    doDownload -url $SIGPlugin_www  -destFile "sigPlugin.zip"                                                 -destDir $tmp_dir -wc $net
+    doDownload -url $opencv_www     -destFile $opencv_www.Substring($opencv_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
+    doDownload -url $neuron_sdk_www -destFile $neuron_sdk_www.Substring($neuron_sdk_www.LastIndexOf("/") + 1) -destDir $tmp_dir -wc $net
 }
 
 # check for existing code
@@ -387,6 +390,15 @@ foreach ($item in (dir $projectDepsRoot)) {
             remove-item "$projectDepsRoot\$($item.Name)"
         }
     }
+    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*NeuronDataReader*")) {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the Perception Neuron DataReader SDK directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("NEURON_SDK_ROOT", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)"
+        }
+    }
 }
 
 
@@ -454,6 +466,11 @@ if ($setup -eq 'complete') {
         iex "$tmp_dir\$($opencv_www.Substring($opencv_www.LastIndexOf(""/"") +1)) -o$projectDepsRoot -y"
         $build_vars.Set_Item("OPENCV_ROOT", "$projectDepsRoot\opencv")
     }
+    
+    if (!($build_vars.Get_Item("NEURON_SDK_ROOT"))) {
+        iex "$7zX -o$projectDepsRoot $tmp_dir\$($neuron_sdk_www.Substring($neuron_sdk_www.LastIndexOf(""/"") + 1))"
+        $build_vars.Set_Item("NEURON_SDK_ROOT", "$projectDepsRoot\NeuronDataReader SDK b15")
+    }
 }
 
 echo ''
@@ -496,6 +513,7 @@ foreach ($item in $build_vars.GetEnumerator()) {
 }
 
 # Include paths used by VS
+ac $dev_script "rem Include Paths:"
 ac $dev_script "set SIGBUILD_SIGSERVICE_INC=$($build_vars.Get_Item(""SIGSERVICE_ROOT_PATH""))\Windows\SIGService"
 ac $dev_script "set SIGBUILD_X3D_INC=$($build_vars.Get_Item(""X3D_ROOT_PATH""))\parser\cpp\X3DParser"
 ac $dev_script "set SIGBUILD_OGRE_INC=$($build_vars.Get_Item(""OGRE_SDK""))\include"
@@ -505,7 +523,12 @@ ac $dev_script "set SIGBUILD_LIBSSH2_INC=$($build_vars.Get_Item(""LIBSSH2_ROOT_P
 ac $dev_script "set SIGBUILD_OPENSSL_INC=$($build_vars.Get_Item(""OPENSSL_ROOT_DIR""))\include"
 ac $dev_script "set SIGBUILD_LIBOVR_INC=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Include;$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\LibOVRKernel\Src"
 
+if ($setup -eq 'complete') {
+    ac $dev_script "set SIGBUILD_NEURONDATAREADER_INC=$($build_vars.Get_Item(""NEURON_SDK_ROOT""))\Windows\include"
+}
+
 # Lib paths used by VS
+ac $dev_script "rem Library Paths:"
 ac $dev_script "set SIGBUILD_SIGSERVICE_LIB=$($build_vars.Get_Item(""SIGSERVICE_ROOT_PATH""))\Windows\Release_2010"
 ac $dev_script "set SIGBUILD_X3D_LIB=$($build_vars.Get_Item(""X3D_ROOT_PATH""))\parser\cpp\Release"
 ac $dev_script "set SIGBUILD_OGRE_LIB=$($build_vars.Get_Item(""OGRE_SDK""))\lib"
@@ -516,6 +539,10 @@ ac $dev_script "set SIGBUILD_OPENSSL_LIB=$($build_vars.Get_Item(""OPENSSL_ROOT_D
 ac $dev_script "set SIGBUILD_ZLIB_LIB=$($build_vars.Get_Item(""CEGUI_ROOT_PATH""))\dependencies\lib\static"
 ac $dev_script "set SIGBUILD_LIBOVR_LIB=$($build_vars.Get_Item(""LIBOVR_ROOT_PATH""))\Lib\Windows\Win32\Release\VS2015"
 ac $dev_script "set SIGBUILD_GLEW_LIB=$($build_vars.Get_Item(""GLEW_ROOT_PATH""))\lib\Release\Win32"
+
+if ($setup -eq 'complete') {
+    ac $dev_script "set SIGBUILD_NEURONDATAREADER_LIB=$($build_vars.Get_Item(""NEURON_SDK_ROOT""))\Windows\lib\x86"
+}
 
 ac $dev_script "call %VS_TOOLS_PATH%\VsDevCmd.bat"
 
