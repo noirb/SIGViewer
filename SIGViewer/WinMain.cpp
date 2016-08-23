@@ -2841,7 +2841,7 @@ bool SgvMain::downloadFileRequest(std::string name)
     char msg[MAX_STRING_NUM];
     char *p = msg;
 
-    unsigned short ssize = name.size();
+    unsigned short ssize = (unsigned short)name.size();
 
     BINARY_SET_DATA_S_INCR(p, unsigned short, DOWNLOAD);
     BINARY_SET_DATA_S_INCR(p, unsigned short, ssize);
