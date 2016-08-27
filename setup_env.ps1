@@ -8,6 +8,10 @@ $scriptPath = split-path -parent $MyInvocation.MyCommand.Definition
 # The root directory of the whole project
 $projectRoot = $PWD.Path
 
+# Whether to use git to clone SIGVerse projects
+# Set to True if git can be found, and will prefer cloning over downloading .zips
+$useGit = $false
+
 # A directory to store temporary downloaded files
 $tmp_dir = "$projectRoot\setup_tmp"
 if ( !(Test-Path $tmp_dir) ) {
@@ -179,6 +183,14 @@ if (!$cmakePath) {
 }
 $cmake = """$cmakePath\cmake.exe"""
 
+# Find Git
+$gitPath = ''
+foreach ($path in (($Env:path).split(";"))) {
+    if ($path -like "*git*" ) {
+        $gitPath = "$path\git.exe"
+        $useGit = $true
+    }
+}
 
 $build_vars.Set_Item("VS_TOOLS_PATH", $vsToolsPath)
 
@@ -195,6 +207,10 @@ echo "                  Version: $vsVersion"
 echo "                  Tools:   $($build_vars.Get_Item(""VS_TOOLS_PATH""))"
 echo "    7-Zip Directory:                     $7zPath"
 echo "    CMake Directory:                     $cmakePath"
+echo "    Use Git for SIGVerse projects:       $useGit"
+if ($useGit) {
+echo "    Git Path:                            $gitPath"
+}
 echo "========================================================="
 
 if ( !((Read-Host -Prompt "Proceed with this configuration? (y/n)").ToLower().StartsWith("y")) ) {
@@ -202,18 +218,27 @@ if ( !((Read-Host -Prompt "Proceed with this configuration? (y/n)").ToLower().St
 }
 
 # Locations to download dependencies from
-## TODO: check for git and prefer cloning over downloading when possible
+    # SIGVERSE Projects
 $SIGViewer_www  = "https://github.com/noirb/sigverse-SIGViewer/archive/master.zip"
+$SIGViewer_git  = "https://github.com/noirb/sigverse-SIGViewer.git"
 $SIGService_www = "https://github.com/noirb/sigverse-SIGService/archive/master.zip"
+$SIGService_git = "https://github.com/noirb/sigverse-SIGService.git"
 $X3D_www        = "https://github.com/noirb/sigverse-x3d/archive/master.zip"
+$X3D_git        = "https://github.com/noirb/sigverse-x3d.git"
 $SIGPlugin_www  = "https://github.com/noirb/sigverse-plugin/archive/master.zip"
+$SIGPlugin_git  = "https://github.com/noirb/sigverse-plugin.git"
+
+    # EXTERNAL DEPENDENCIES
 $CEGUI_www      = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-0.8.7.zip"
 $CEGUI_deps_www = "http://prdownloads.sourceforge.net/crayzedsgui/cegui-deps-0.8.x-src.zip"
 $libSSH2_www    = "https://www.libssh2.org/download/libssh2-1.7.0.tar.gz"
-$openSSL_www    = "https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip"
+                  # OpenSSL rehosted here due to google code being discontinued. Original URL:  "https://openssl-for-windows.googlecode.com/files/openssl-0.9.8k_WIN32.zip"
+$openSSL_www    = "http://noirbear.com/tools/openssl-0.9.8k_WIN32.zip"
 $boost_www      = "http://downloads.sourceforge.net/project/boost/boost/1.61.0/boost_1_61_0.zip"
 $libovr_www     = "https://static.oculus.com/sdk-downloads/1.7.0/Public/1470946240/ovr_sdk_win_1.7.0_public.zip"
 $glew_www       = "http://downloads.sourceforge.net/project/glew/glew/2.0.0/glew-2.0.0-win32.zip"
+
+    # OPTIONAL DEPENDENCIES (used by plugins)
 $opencv_www     = "http://downloads.sourceforge.net/project/opencvlibrary/opencv-win/2.4.13/opencv-2.4.13.exe"
 $neuron_sdk_www = "https://neuronmocap.com/sites/default/files/software/NeuronDataReader%20SDK%20b15.zip"
 
@@ -226,8 +251,6 @@ if ($vsVersion -eq "Visual Studio 10 2010")
 {
 	$Ogre_SDK_www   = "http://downloads.sourceforge.net/project/ogre/ogre/1.9/1.9/OgreSDK_vc10_v1-9-0.exe"
 }
-
-$net = new-object System.Net.WebClient
 
 function doDownload
 {
@@ -246,10 +269,174 @@ function doDownload
     }
 }
 
+function doClone
+{
+    param( [string]$url, [string]$destDir, [string]$git )
+    
+    if ( Test-Path $destDir ) {
+        $conf = Read-Host -Prompt "An existing $destDir was found! Delete and clone again from scratch? (y/n)"
+        if ( $conf.ToLower().Startswith("y") ) {
+            echo "Deleting $destDir..."
+            remove-item $destDir -recurse -force
+            echo "Cloning $url into: $destDir..."
+            iex "& '$git' clone --recursive $url $destDir"
+        }
+    }
+    else {
+        echo "Cloning $url into: $destDir..."
+        iex "& '$git' clone --recursive $url $destDir"
+    }
+}
+
+# check for existing code
+foreach ($item in (dir $projectRoot)) {
+    if ($item.Name.ToLower() -like "*sigviewer*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the SIGViewer source directory? (y/n)"
+        if (!($conf.ToLower().StartsWith("y"))) {
+            remove-item "$projectRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*sigservice*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the SIGService source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("SIGSERVICE_ROOT_PATH", "$projectRoot\$($item.Name)")
+        } else {
+            remove-item "$projectRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*x3d*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = read-Host -prompt "Should this be used as-is as the X3D source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("X3D_ROOT_PATH", "$projectRoot\$($item.Name)")
+        } else {
+            remove-item "$projectRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*plugin*")) {
+        echo "Existing directory found: $($item.Name)"
+        $conf = read-Host -prompt "Should this be used as-is as the Sigverse Plugin source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("PLUGIN_ROOT_PATH", "$projectRoot\$($item.Name)")
+        } else {
+            remove-item "$projectRoot\$($item.Name)" -recurse -force
+        }
+    }
+}
+foreach ($item in (dir $projectDepsRoot)) {
+    if ($item.Name.ToLower() -like "*ogre*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the Ogre SDK directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*cegui-[0-9]*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the CEGUI source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("CEGUI_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*cegui-deps*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the CEGUI DEPS directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("CEGUI_DEPS_ROOT", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*libssh2*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the libSSH2 directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("LIBSSH2_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*openssl*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the OpenSSL directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("OPENSSL_ROOT_DIR", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*boost*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the Boost source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("BOOST_ROOT", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*oculussdk*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the Oculus SDK directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("LIBOVR_ROOT_PATH", "$projectDepsRoot\$($item.Name)\LibOVR")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif ($item.Name.ToLower() -like "*glew*") {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the GLEW root directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("GLEW_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*opencv*")) {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the OpenCV source directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("OPENCV_ROOT", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*NeuronDataReader*")) {
+        echo "Existing directory found: $($item.Name)"
+        $conf = Read-Host -prompt "Should this be used as-is as the Perception Neuron DataReader SDK directory? (y/n)"
+        if (($conf.ToLower().StartsWith("y"))) {
+            $build_vars.Set_Item("NEURON_SDK_ROOT", "$projectDepsRoot\$($item.Name)")
+        } else {
+            remove-item "$projectDepsRoot\$($item.Name)" -recurse -force
+        }
+    }
+}
+
+
+$net = new-object System.Net.WebClient
+
 # download all essential dependencies
-doDownload -url $SIGViewer_www  -destFile "sigviewer.zip"  -destDir $tmp_dir -wc $net
-doDownload -url $SIGService_www -destFile "sigservice.zip" -destDir $tmp_dir -wc $net
-doDownload -url $X3D_www        -destFile "x3d.zip"        -destDir $tmp_dir -wc $net
+if ($useGit)
+{
+    doClone -url $SIGViewer_git  -destDir "$projectRoot\SIGViewer"  -git $gitPath
+    doClone -url $SIGService_git -destDir "$projectRoot\SIGService" -git $gitPath
+    $build_vars.Set_Item("SIGSERVICE_ROOT_PATH", "$projectRoot\SIGService")
+    doClone -url $X3D_git        -destDir "$projectRoot\X3D"        -git $gitPath
+    $build_vars.Set_Item("X3D_ROOT_PATH", "$projectRoot\X3D")
+}
+else
+{
+    doDownload -url $SIGViewer_www  -destFile "sigviewer.zip"  -destDir $tmp_dir -wc $net
+    doDownload -url $SIGService_www -destFile "sigservice.zip" -destDir $tmp_dir -wc $net
+    doDownload -url $X3D_www        -destFile "x3d.zip"        -destDir $tmp_dir -wc $net
+}
+
 doDownload -url $CEGUI_www      -destFile $CEGUI_www.Substring($CEGUI_www.LastIndexOf("/") + 1)           -destDir $tmp_dir -wc $net
 doDownload -url $CEGUI_deps_www -destFile $CEGUI_deps_www.Substring($CEGUI_deps_www.LastIndexOf("/") + 1) -destDir $tmp_dir -wc $net
 doDownload -url $libSSH2_www    -destFile $libSSH2_www.Substring($libSSH2_www.LastIndexOf("/") + 1)       -destDir $tmp_dir -wc $net
@@ -266,140 +453,18 @@ if ($vsVersion -eq "Visual Studio 10 2010" -Or $vsVersion -eq "Visual Studio 11 
 
 # download additional dependencies if complete build was specified
 if ($setup -eq 'complete') {
-    doDownload -url $SIGPlugin_www  -destFile "sigPlugin.zip"                                                 -destDir $tmp_dir -wc $net
+    if ($useGit) {
+        doClone -url $SIGPlugin_git -destDir "$projectRoot\SIGPlugin" -git $gitPath
+        $build_vars.Set_Item("PLUGIN_ROOT_PATH", "$projectRoot\SIGPlugin")
+    }
+    else {
+        doDownload -url $SIGPlugin_www  -destFile "sigPlugin.zip"                                             -destDir $tmp_dir -wc $net
+    }
     doDownload -url $opencv_www     -destFile $opencv_www.Substring($opencv_www.LastIndexOf("/") + 1)         -destDir $tmp_dir -wc $net
     doDownload -url $neuron_sdk_www -destFile $neuron_sdk_www.Substring($neuron_sdk_www.LastIndexOf("/") + 1) -destDir $tmp_dir -wc $net
 }
 
-# check for existing code
-foreach ($item in (dir $projectRoot)) {
-    if ($item.Name.ToLower() -like "*sigviewer*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the SIGViewer source directory? (y/n)"
-        if (!($conf.ToLower().StartsWith("y"))) {
-            remove-item "$projectRoot\$($item.Name)" -recurse
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*sigservice*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the SIGService source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("SIGSERVICE_ROOT_PATH", "$projectRoot\$($item.Name)")
-        } else {
-            remove-item "$projectRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*x3d*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = read-Host -prompt "Should this be used as-is as the X3D source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("X3D_ROOT_PATH", "$projectRoot\$($item.Name)")
-        } else {
-            remove-item "$projectRoot\$($item.Name)"
-        }
-    }
-    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*plugin*")) {
-        echo "Existing directory found: $($item.Name)"
-        $conf = read-Host -prompt "Should this be used as-is as the Sigverse Plugin source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("PLUGIN_ROOT_PATH", "$projectRoot\$($item.Name)")
-        } else {
-            remove-item "$projectRoot\$($item.Name)"
-        }
-    }
-}
-foreach ($item in (dir $projectDepsRoot)) {
-    if ($item.Name.ToLower() -like "*ogre*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the Ogre SDK directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("OGRE_SDK", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*cegui-[0-9]*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the CEGUI source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("CEGUI_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*cegui-deps*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the CEGUI DEPS directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("CEGUI_DEPS_ROOT", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*libssh2*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the libSSH2 directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("LIBSSH2_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*openssl*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the OpenSSL directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("OPENSSL_ROOT_DIR", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*boost*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the Boost source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("BOOST_ROOT", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*oculussdk*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the Oculus SDK directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("LIBOVR_ROOT_PATH", "$projectDepsRoot\$($item.Name)\LibOVR")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif ($item.Name.ToLower() -like "*glew*") {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the GLEW root directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("GLEW_ROOT_PATH", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*opencv*")) {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the OpenCV source directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("OPENCV_ROOT", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-    elseif (($setup -eq 'complete') -and ($item.Name.ToLower() -like "*NeuronDataReader*")) {
-        echo "Existing directory found: $($item.Name)"
-        $conf = Read-Host -prompt "Should this be used as-is as the Perception Neuron DataReader SDK directory? (y/n)"
-        if (($conf.ToLower().StartsWith("y"))) {
-            $build_vars.Set_Item("NEURON_SDK_ROOT", "$projectDepsRoot\$($item.Name)")
-        } else {
-            remove-item "$projectDepsRoot\$($item.Name)"
-        }
-    }
-}
+
 
 
 # extract archives for any code not found above
@@ -487,7 +552,7 @@ echo "    Visual Studio:"
 echo "                  Version: $vsVersion"
 echo "                  Tools:   $($build_vars.Get_Item(""VS_TOOLS_PATH""))"
 echo ''
-$t = Read-Host "Press Enter to continue..."
+$t = Read-Host "Press Enter to continue (CTRL+C to exit)..."
 
 $dev_script = "$scriptPath\scripts\setenv.bat"
 
