@@ -316,7 +316,14 @@ void Oculus::Update()
 {
     double sensorSampleTime = updateHMDState();
 
-    Ogre::Quaternion q = m_headOrientation * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    Ogre::Quaternion q = m_headOrientation;
+
+    // include HMD orientation in new perspective if we're not locked to camera
+    if (!lockToCamera)
+    {
+        q = q * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    }
+
     m_cameraNode->setOrientation(q);
     m_cameraNode->setPosition(convertVector3(mHMDState.HeadPose.ThePose.Position) + m_headPosition);
 

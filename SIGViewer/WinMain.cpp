@@ -583,6 +583,29 @@ void SgvMain::createInitWindow()
 
     entity_pos->addChild(epm);
 
+    if (oculusMode)
+    {
+        // Oculus Camera Lock
+        CEGUI::MenuItem *ovr_lock_cam = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "OVR_LOCK_CAM"));
+        ovr_lock_cam->setText((oculus.lockToCamera ? "*" : " ") + std::string(" Lock Oculus to Camera"));
+        ovr_lock_cam->setAlwaysOnTop(true);
+        auto handleOculusCamLockClicked = [this, ovr_lock_cam](const CEGUI::EventArgs &args)->bool
+        {
+            this->oculus.lockToCamera = !this->oculus.lockToCamera;
+            if (this->oculus.lockToCamera)
+            {
+                ovr_lock_cam->setText("* Lock Oculus to Camera");
+            }
+            else
+            {
+                ovr_lock_cam->setText("  Lock Oculus to Camera");
+            }
+            return true;
+        };
+        ovr_lock_cam->subscribeEvent(CEGUI::PushButton::EventClicked, handleOculusCamLockClicked);
+
+        option_menu->addChild(ovr_lock_cam);
+    }
 
     subview     ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::subView,        this));
     overwrite   ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::overwriteShape, this));
