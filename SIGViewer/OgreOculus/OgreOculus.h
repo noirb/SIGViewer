@@ -128,7 +128,7 @@ public:
     GLuint              readFBO     = 0;
     GLuint              writeFBO    = 0;
 
-    bool                lockToCamera = true; // if true, head orientation is fixed to camera orientation, not HMD sensor orientation
+    bool                lockToCamera = false; // if true, head orientation is fixed to camera orientation, not HMD sensor orientation
 
 protected:
     Ogre::SceneManager *m_sceneManager;
