@@ -29,7 +29,7 @@ namespace
 }
 
 
-Oculus::Oculus(void):m_window(0), m_sceneManager(0), m_cameraNode(0)
+Oculus::Oculus(void):m_window(0), m_sceneManager(0), m_cameraNode(0), m_waist(0), m_neck(0)
 {
     for(int i=0;i<2;++i)
     {
@@ -319,7 +319,12 @@ void Oculus::Update()
     Ogre::Quaternion q = m_headOrientation;
 
     // include HMD orientation in new perspective if we're not locked to camera
-    if (!lockToCamera)
+    if (!lockToCamera && m_waist != NULL && m_neck != NULL)
+    {
+        Ogre::Quaternion q_hack; q_hack.FromAngleAxis(Ogre::Radian::Radian(Ogre::Degree(180)), Ogre::Vector3::UNIT_Y); // waist is backwards?
+        q = q_hack * m_waist->getOrientation() * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+    }
+    else if (!lockToCamera)
     {
         q = q * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
     }

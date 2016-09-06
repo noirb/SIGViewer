@@ -66,6 +66,25 @@ public:
         m_headOrientation = newOrientation;
     }
 
+    Ogre::Node* GetWaistNode()
+    {
+        return m_waist;
+    }
+
+    void SetWaistNode(Ogre::Node* waist)
+    {
+        m_waist = waist;
+    }
+
+    Ogre::Node* GetNeckNode()
+    {
+        return m_neck;
+    }
+
+    void SetNeckNode(Ogre::Node* neck)
+    {
+        m_neck = neck;
+    }
     /// Reset orientation of the sensor.
     void resetOrientation();
     /// Retrieve the SceneNode that contains the two cameras used for stereo rendering.
@@ -115,6 +134,8 @@ protected:
     Ogre::SceneManager *m_sceneManager;
     Ogre::RenderWindow *m_window;
     Ogre::SceneNode    *m_cameraNode;
+    Ogre::Node         *m_waist;
+    Ogre::Node         *m_neck;
     Ogre::Vector3       m_headPosition;
     Ogre::Quaternion    m_headOrientation;
 

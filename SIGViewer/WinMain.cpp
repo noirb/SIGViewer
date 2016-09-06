@@ -7,6 +7,7 @@
 #include "SIGService.h"
 #include "binary.h"
 #include "SIGVerse.h"
+#include "OgreUtils.h"
 
 #include <commdlg.h>
 #include <tchar.h>
@@ -2147,6 +2148,8 @@ bool SgvMain::agentView(const CEGUI::EventArgs &eventArgs)
     if (oculusMode) {
         oculusCamera = mViews[subViewIndex]->getCamera();
         oculusCameraFlag = true;
+        oculus.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
+        oculus.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); // HACK: Should not have waist node hardcoded!
     }
     else{
         Ogre::Camera *cam1 = mViews[subViewIndex]->getCamera();
@@ -2216,6 +2219,8 @@ bool SgvMain::selectCameraList(const CEGUI::EventArgs &eventArgs)
     {
         oculusCamera = cam;
         oculusCameraFlag = true;
+        oculus.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
+        oculus.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); /// HACK: Should not have waist node hardcoded!
     }
     else
     {
@@ -2962,6 +2967,8 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
     {
         if (oculusMode) 
         {
+            oculus.SetWaistNode(NULL);
+            oculus.SetNeckNode(NULL);
             oculus.SetPosition(Ogre::Vector3(0, 0, 0));
             oculus.SetOrientation(Ogre::Quaternion::IDENTITY);
         }
