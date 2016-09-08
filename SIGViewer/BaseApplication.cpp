@@ -352,6 +352,10 @@ bool BaseApplication::keyReleased( const OIS::KeyEvent &arg )
     {
         mCtrl = false;
     }
+    else if (arg.key == OIS::KC_R)
+    {
+        oculus.resetOrientation();
+    }
 
     return true;
 }

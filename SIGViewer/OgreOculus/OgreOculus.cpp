@@ -11,10 +11,10 @@
 #include <OgreManualObject.h>
 #include <OgreRoot.h>
 
-
 #include <math.h>
 #include <vector>
 
+#include "..\WindowUtils.h"
 
 /*
 	Oculus Setup & Update code based on Kojack's work from here: http://www.ogre3d.org/forums/viewtopic.php?f=5&t=81627&start=100#p525592
@@ -290,6 +290,36 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Roo
     return true;
 }
 
+void Oculus::resetOrientation()
+{
+    ovrResult res = ovr_RecenterTrackingOrigin(mSession);
+    if (!OVR_SUCCESS(res))
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "ERROR: Could not recenter HMD Pose!");
+    }
+    else
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Reset Oculus Orientation");
+        HWND oculus_svc = WindowHacks::FindWindowByName("\\OculusRiftCV1_vs2015.sig");
+        if (oculus_svc != NULL)
+        {
+            if (WindowHacks::SendKeyStroke(oculus_svc, 'r'))
+            {
+                Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Sent reset key to Oculus Service window!");
+            }
+            else
+            {
+                Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Failed to send reset key to oculus service window :(");
+            }
+        }
+        else
+        {
+            Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "Could not find Oculus Service window. Not sending reset key command.");
+        }
+    }
+
+}
+
 Ogre::SceneNode *Oculus::getCameraNode()
 {
 	return m_cameraNode;
@@ -316,13 +346,25 @@ void Oculus::Update()
 {
     double sensorSampleTime = updateHMDState();
 
+    ovrSessionStatus sessionStatus;
+    ovrResult res = ovr_GetSessionStatus(mSession, &sessionStatus);
+    if (!OVR_SUCCESS(res))
+    {
+        Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Could not retrieve OVR Session Status!");
+    }
+
+    if (sessionStatus.ShouldRecenter)
+    {
+        resetOrientation();
+    }
+
     Ogre::Quaternion q = m_headOrientation;
 
     // include HMD orientation in new perspective if we're not locked to camera
     if (!lockToCamera && m_waist != NULL && m_neck != NULL)
     {
         Ogre::Quaternion q_hack; q_hack.FromAngleAxis(Ogre::Radian::Radian(Ogre::Degree(180)), Ogre::Vector3::UNIT_Y); // waist is backwards?
-        q = q_hack * m_waist->getOrientation() * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation);
+        q =  q_hack * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation) * m_waist->getOrientation();
     }
     else if (!lockToCamera)
     {
@@ -330,6 +372,7 @@ void Oculus::Update()
     }
 
     m_cameraNode->setOrientation(q);
+    m_cameraNode->setPosition(m_headPosition);
     m_cameraNode->setPosition(convertVector3(mHMDState.HeadPose.ThePose.Position) + m_headPosition);
 
     Ogre::LogManager::getSingleton().logMessage(Ogre::LML_NORMAL, "OgreOculus: HeadPos:  " + std::to_string(m_cameraNode->_getDerivedPosition().x) + "," + std::to_string(m_cameraNode->_getDerivedPosition().y) + "," + std::to_string(m_cameraNode->_getDerivedPosition().z));
