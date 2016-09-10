@@ -38,6 +38,7 @@ This source file is part of the
 #include <SdkCameraMan.h>
 
 #include "OgreOculus/OgreOculus.h"
+#include "OgreOpenVR/OgreOpenVR.h"
 
 class BaseApplication : public Ogre::FrameListener, public Ogre::WindowEventListener, public OIS::KeyListener, public OIS::MouseListener, OgreBites::SdkTrayListener
 {
@@ -103,11 +104,13 @@ protected:
     bool mSetupSuccessful;
 
     //mode flag
-    bool oculusMode;     //treate as oculus rift viewing
+    bool oculusMode;     // Render through the Ocolus OVR Runtime
+    bool openvrMode;     // Render through the Valve OpenVR Runtime
     bool fullscreenMode; //fullscrean mode
 
     //oculus
     Oculus oculus;
+    OgreOpenVR openvr;
     bool oculusCameraFlag;
 };
 

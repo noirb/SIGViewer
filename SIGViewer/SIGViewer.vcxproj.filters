@@ -16,6 +16,9 @@
     <Filter Include="OgreOculus">
       <UniqueIdentifier>{21d03386-b4cc-4639-9f0f-54f6a003fdc4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="OgreOpenVR">
+      <UniqueIdentifier>{5f021aba-3a7d-4f87-ae8d-92e28c38ce20}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="OgreOculus\euler.h">
@@ -48,6 +51,9 @@
     <ClInclude Include="OgreOculus\OgreOculus.h">
       <Filter>OgreOculus</Filter>
     </ClInclude>
+    <ClInclude Include="OgreOpenVR\OgreOpenVR.h">
+      <Filter>OgreOpenVR</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseApplication.cpp">
@@ -70,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="OgreOculus\OgreOculus.cpp">
       <Filter>OgreOculus</Filter>
+    </ClCompile>
+    <ClCompile Include="OgreOpenVR\OgreOpenVR.cpp">
+      <Filter>OgreOpenVR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

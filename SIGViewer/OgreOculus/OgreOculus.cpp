@@ -239,7 +239,7 @@ bool Oculus::InitOgreViewports()
     return true;
 }
 
-bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Root *mRoot, Ogre::SceneNode *parent)
+bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win, Ogre::Root *mRoot, Ogre::SceneNode *parent)
 {
     glewInit();
     m_window = win;
@@ -278,7 +278,7 @@ bool Oculus::setupOgre(Ogre::SceneManager *sm, Ogre::RenderWindow *win,Ogre::Roo
         return false;
     }
 
-    setupOgreOculus( m_sceneManager, m_window,mRoot );
+    setupOgreOculus( m_sceneManager, m_window, mRoot );
 
     if (!InitOgreViewports())
     {

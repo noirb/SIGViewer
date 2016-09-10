@@ -40,7 +40,7 @@ public:
     bool InitOculusVR();
     bool InitOculusTextures();
     bool InitOgreTextures();
-	bool InitOgreViewports();
+    bool InitOgreViewports();
     bool InitOculusLayers();
     void setupOgreOculus( Ogre::SceneManager *sm, Ogre::RenderWindow* win,Ogre::Root* root);
     double updateHMDState();

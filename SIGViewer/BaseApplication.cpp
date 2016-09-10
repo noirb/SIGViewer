@@ -32,6 +32,7 @@ BaseApplication::BaseApplication(void)
     mSetupSuccessful(false),
     mBackGroundColor(0.5f,0.5f,0.7f,1.0f),
     oculusMode(false),
+    openvrMode(false),
     fullscreenMode(false),
     oculusCameraFlag(false)
 {
@@ -169,6 +170,8 @@ void BaseApplication::createViewports(void)
     // Create one viewport, entire window
     if (oculusMode)
         mViewPort = mWindow->addViewport(oculus.m_cameras[0]);
+    else if (openvrMode)
+        mViewPort = mWindow->addViewport(openvr.m_cameras[0]);
     else
         mViewPort= mWindow->addViewport(mCamera);
     mViewPort->setBackgroundColour(mBackGroundColor);
@@ -234,6 +237,15 @@ void BaseApplication::go(void)
             Ogre::WindowEventUtilities::messagePump();
         }
     }
+    else if (openvrMode)
+    {
+        Ogre::LogManager::getSingleton().logMessage("Render Start (OpenVRMode == TRUE)");
+        while (!this->mWindow->isClosed())
+        {
+            openvr.update();
+            Ogre::WindowEventUtilities::messagePump();
+        }
+    }
     else
     {
         Ogre::LogManager::getSingleton().logMessage("Rendering Start (OculusMode == FALSE)");
@@ -253,8 +265,9 @@ bool BaseApplication::setup(void)
     TCHAR SettingPath[256];
     sprintf_s(SettingPath, 128, inipath.c_str());
     TCHAR pathText[256];
-    GetPrivateProfileString("MODE","OCULUS_MODE",'\0', pathText, 1024, SettingPath);
-    if(strcmp(pathText,"true") == 0)  oculusMode = true;
+    GetPrivateProfileString("MODE","HMD_MODE",'\0', pathText, 1024, SettingPath);
+    if(strcmp(pathText,"oculus") == 0)  oculusMode = true;
+    if (strcmp(pathText, "openvr") == 0)  openvrMode = true;
     GetPrivateProfileString("MODE","FULLSCREEN_MODE",'\0', pathText, 1024, SettingPath);
     if(strcmp(pathText,"true") == 0)  fullscreenMode = true;
 
@@ -272,6 +285,20 @@ bool BaseApplication::setup(void)
         
         if (!oculus.setupOgre(mSceneMgr, mWindow, mRoot))
         {
+            Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Failed to initialize Oculus Rift!");
+            return false;
+        }
+
+        createCamera();
+        createViewports();
+    }
+    else if (openvrMode) {
+        Ogre::ResourceGroupManager::getSingleton().addResourceLocation("media", "FileSystem");
+        loadResources();
+
+        if (!openvr.initOpenVR(mSceneMgr, mWindow))
+        {
+            Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "Failed to initialize OpenVR!");
             return false;
         }
 
@@ -354,7 +381,10 @@ bool BaseApplication::keyReleased( const OIS::KeyEvent &arg )
     }
     else if (arg.key == OIS::KC_R)
     {
-        oculus.resetOrientation();
+        if (oculusMode)
+            oculus.resetOrientation();
+        else if (openvrMode)
+            openvr.resetOrientation();
     }
 
     return true;

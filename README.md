@@ -7,7 +7,13 @@ See [CHANGES.md](CHANGES.md) for an overview of the differences between this for
 
 open: `SIGVerse.ini`
 
-And then change `OCULUS_MODE=false` to `OCULUS_MODE=true`
+And then change `HMD_MODE=none` to `HMD_MODE=oculus`
+
+### To Enable OpenVR Mode (for HTC Vive or other headsets)
+
+open: `SIGVerse.ini`
+
+And then change `HMD_MODE=none` to `HMD_MODE=openvr`
 
 ## Dependencies
 To build this project and its dependecies, you need:
@@ -23,6 +29,7 @@ To build this project and its dependecies, you need:
 * [OpenSSL](https://www.openssl.org/)
 * [Zlib](http://www.zlib.net/) (actually included with CEGUI's dependencies, so not necessary to install separately)
 * [Oculus SDK](https://developer.oculus.com/downloads/), version 1.6.0
+* [OpenVR SDK](https://github.com/ValveSoftware/openvr)
 * [CMake](https://cmake.org/download/)
 * (recommended) [7-Zip](http://www.7-zip.org/)
 

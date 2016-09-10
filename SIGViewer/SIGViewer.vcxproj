@@ -14,6 +14,7 @@
     <ClInclude Include="BaseApplication.h" />
     <ClInclude Include="OgreOculus\euler.h" />
     <ClInclude Include="OgreOculus\OgreOculus.h" />
+    <ClInclude Include="OgreOpenVR\OgreOpenVR.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SgvEntity.h" />
     <ClInclude Include="SgvLog.h" />
@@ -25,6 +26,7 @@
   <ItemGroup>
     <ClCompile Include="BaseApplication.cpp" />
     <ClCompile Include="OgreOculus\OgreOculus.cpp" />
+    <ClCompile Include="OgreOpenVR\OgreOpenVR.cpp" />
     <ClCompile Include="SgvEntity.cpp" />
     <ClCompile Include="SgvLog.cpp" />
     <ClCompile Include="SgvX3D.cpp" />
@@ -93,7 +95,8 @@
             $(OGRE_SDK)\Samples\Common\include;
             $(SIGBUILD_CEGUI_INC);
             $(SIGBUILD_LIBSSH2_INC);
-            $(SIGBUILD_LIBOVR_INC)
+            $(SIGBUILD_LIBOVR_INC);
+			$(SIGBUILD_OPENVR_INC)
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -109,6 +112,7 @@
         $(SIGBUILD_LIBSSH2_LIB);
         $(SIGBUILD_LIBOVR_LIB);
         $(SIGBUILD_GLEW_LIB);
+		$(SIGBUILD_OPENVR_LIB)
         %(AdditionalLibraryDirectories)
 	  </AdditionalLibraryDirectories>
       <AdditionalDependencies>
@@ -139,7 +143,8 @@
         $(OGRE_SDK)\Samples\Common\include;
         $(SIGBUILD_CEGUI_INC);
         $(SIGBUILD_LIBSSH2_INC);
-        $(SIGBUILD_LIBOVR_INC)
+        $(SIGBUILD_LIBOVR_INC);
+		$(SIGBUILD_OPENVR_INC);
       </AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -150,7 +155,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>
-	    OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
+	    openvr_api.lib;OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>
         $(SIGBUILD_SIGSERVICE_LIB);
@@ -163,6 +168,7 @@
         $(SIGBUILD_LIBSSH2_LIB);
         $(SIGBUILD_LIBOVR_LIB);
         $(SIGBUILD_GLEW_LIB);
+		$(SIGBUILD_OPENVR_LIB);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
     </Link>
