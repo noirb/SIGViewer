@@ -187,10 +187,10 @@ bool OgreOpenVR::initOgreViewports()
 
     renderTex->setAutoUpdated(true);
 
-    m_viewports[0]->setBackgroundColour(Ogre::ColourValue::Green);
+    m_viewports[0]->setBackgroundColour(Ogre::ColourValue(97 / 255.0f, 200 / 255.0f, 200 / 255.0f));
     m_viewports[0]->setOverlaysEnabled(true);
     m_viewports[0]->setAutoUpdated(true);
-    m_viewports[1]->setBackgroundColour(Ogre::ColourValue::Green);
+    m_viewports[1]->setBackgroundColour(Ogre::ColourValue(97 / 255.0f, 200 / 255.0f, 200 / 255.0f));
     m_viewports[1]->setOverlaysEnabled(true);
     m_viewports[1]->setAutoUpdated(true);
 
@@ -218,7 +218,6 @@ void OgreOpenVR::updateHMDPos()
             m_iValidPoseCount++;
                 
             m_rmat4DevicePose[nDevice] = convertSteamVRMatrixToOgreMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-
             if (m_rDevClassChar[nDevice] == 0)
             {
                 switch (m_pHMD->GetTrackedDeviceClass(nDevice))
@@ -288,11 +287,22 @@ bool OgreOpenVR::handleInput()
 void OgreOpenVR::update()
 {
     // update the parent camera node's orientation and position with the new tracking data
-    m_orientation = m_poseNeutralOrientation.Inverse() * m_mat4HMDPose.extractQuaternion();
-    m_cameraNode->setOrientation(m_orientation);
+    Ogre::Quaternion q = m_orientation;
+    Ogre::Quaternion q_hack; q_hack.FromAngleAxis(Ogre::Radian(Ogre::Degree(180)), Ogre::Vector3::UNIT_Y);
+
+    if (!lockToCamera && m_waist != NULL)
+    {
+        q = q_hack * m_mat4HMDPose.extractQuaternion() * m_waist->getOrientation();
+    }
+    else if (!lockToCamera)
+    {
+        q = q_hack * m_poseNeutralOrientation.Inverse() * q * m_mat4HMDPose.extractQuaternion();
+    }
+
+    m_cameraNode->setOrientation(q);
         
-    m_position = m_mat4HMDPose.getTrans();
-    m_cameraNode->setPosition(m_position - m_poseNeutralPosition);
+    //m_position = m_mat4HMDPose.getTrans();
+    m_cameraNode->setPosition(m_position); // -m_poseNeutralPosition);
 
     Ogre::Root::getSingleton().renderOneFrame();
 
@@ -315,7 +325,7 @@ void OgreOpenVR::update()
     m_frameIndex++;
 
     // update the tracked device positions
-    updateHMDPos();        
+    updateHMDPos();
 }
 
 // ----------------------------------------------------------------
@@ -350,14 +360,26 @@ std::string OgreOpenVR::getTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedD
 void OgreOpenVR::resetOrientation()
 {
     m_pHMD->ResetSeatedZeroPose();
+    m_poseNeutralPosition = m_position;
+    m_poseNeutralOrientation = m_orientation;
 }
 
-Ogre::Vector3 OgreOpenVR::getPosition()
+void OgreOpenVR::SetPosition(Ogre::Vector3 pos)
+{
+    m_position = pos;
+}
+
+Ogre::Vector3 OgreOpenVR::GetPosition()
 {
     return m_position;
 }
 
-Ogre::Quaternion OgreOpenVR::getOrientation()
+void OgreOpenVR::SetOrientation(Ogre::Quaternion rot)
+{
+    m_orientation = rot;
+}
+
+Ogre::Quaternion OgreOpenVR::GetOrientation()
 {
     return m_orientation;
 }

@@ -584,28 +584,34 @@ void SgvMain::createInitWindow()
 
     entity_pos->addChild(epm);
 
-    if (oculusMode)
+    if (oculusMode || openvrMode)
     {
         // Oculus Camera Lock
-        CEGUI::MenuItem *ovr_lock_cam = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "OVR_LOCK_CAM"));
-        ovr_lock_cam->setText((oculus.lockToCamera ? "*" : " ") + std::string(" Lock Oculus to Camera"));
-        ovr_lock_cam->setAlwaysOnTop(true);
-        auto handleOculusCamLockClicked = [this, ovr_lock_cam](const CEGUI::EventArgs &args)->bool
+        CEGUI::MenuItem *vr_lock_cam = static_cast<CEGUI::MenuItem*>(wmgr.createWindow("TaharezLook/MenuItem", "VR_HMD_LOCK_CAM"));
+        if (oculusMode)
+            vr_lock_cam->setText((oculus.lockToCamera ? "*" : " ") + std::string(" Lock HMD to Camera"));
+        else if (openvrMode)
+            vr_lock_cam->setText((openvr.lockToCamera ? "*" : " ") + std::string(" Lock HMD to Camera"));
+        vr_lock_cam->setAlwaysOnTop(true);
+        auto handleOculusCamLockClicked = [this, vr_lock_cam](const CEGUI::EventArgs &args)->bool
         {
-            this->oculus.lockToCamera = !this->oculus.lockToCamera;
+            if (oculusMode)
+                this->oculus.lockToCamera = !this->oculus.lockToCamera;
+            else if (openvrMode)
+                this->openvr.lockToCamera = !this->openvr.lockToCamera;
             if (this->oculus.lockToCamera)
             {
-                ovr_lock_cam->setText("* Lock Oculus to Camera");
+                vr_lock_cam->setText("* Lock HMD to Camera");
             }
             else
             {
-                ovr_lock_cam->setText("  Lock Oculus to Camera");
+                vr_lock_cam->setText("  Lock HMD to Camera");
             }
             return true;
         };
-        ovr_lock_cam->subscribeEvent(CEGUI::PushButton::EventClicked, handleOculusCamLockClicked);
+        vr_lock_cam->subscribeEvent(CEGUI::PushButton::EventClicked, handleOculusCamLockClicked);
 
-        option_menu->addChild(ovr_lock_cam);
+        option_menu->addChild(vr_lock_cam);
     }
 
     subview     ->subscribeEvent(CEGUI::PushButton::EventClicked,  CEGUI::Event::Subscriber(&SgvMain::subView,        this));
@@ -772,6 +778,11 @@ bool SgvMain::mouseButtonDownForMainWindow(const CEGUI::EventArgs &eventArgs)
         if (oculusMode)
         {
             mouseCamera = oculus.m_cameras[0]; //Left eye camera
+            mouseViewport = mViewPort;
+        }
+        else if (openvrMode)
+        {
+            mouseCamera = openvr.m_cameras[0];
             mouseViewport = mViewPort;
         }
         else
@@ -1108,20 +1119,18 @@ bool SgvMain::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
     BaseApplication::frameRenderingQueued(evt);
 
-    if (oculusMode && oculusCameraFlag) {
-        oculus.SetPosition(oculusCamera->getRealPosition());
-        oculus.SetOrientation(oculusCamera->getRealOrientation());
+    if (oculusMode && hmdCameraFlag) {
+        oculus.SetPosition(hmdCamera->getRealPosition());
+        oculus.SetOrientation(hmdCamera->getRealOrientation());
     }
-
-
-
-            //static bool sended;
+    else if (openvrMode && hmdCameraFlag) {
+        openvr.SetPosition(hmdCamera->getRealPosition());
+        openvr.SetOrientation(hmdCamera->getRealOrientation());
+    }
 
     if (mWindow->isClosed()) {
         return false;
     }
-
-
 
     if (mSended && mConnectServer) {
         if (!recvMoveEntities()) {
@@ -1261,11 +1270,18 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
         if (mShift)
         {
             if (oculusMode) {
-                Ogre::Vector3 pos = oculus.GetPosition();
+                Ogre::Vector3 pos   = oculus.GetPosition();
                 Ogre::Vector3 right = oculus.m_cameras[0]->getRight();
                 Ogre::Vector3 up    = oculus.m_cameras[0]->getUp();
                 pos += right* -xrel * mMoveXYSpeed + up * yrel * mMoveXYSpeed;
                 oculus.SetPosition(pos);
+            }
+            else if (openvrMode) {
+                Ogre::Vector3 pos   = openvr.GetPosition();
+                Ogre::Vector3 right = openvr.m_cameras[0]->getRight();
+                Ogre::Vector3 up    = openvr.m_cameras[0]->getUp();
+                pos += right* -xrel * mMoveXYSpeed + up * yrel * mMoveXYSpeed;
+                openvr.SetPosition(pos);
             }
             Ogre::Vector3 pos = mCamera->getPosition();
             Ogre::Vector3 right = mCamera->getRight();
@@ -1280,6 +1296,12 @@ bool SgvMain::mouseMoved( const OIS::MouseEvent &arg )
                 Ogre::Vector3 dir = oculus.m_cameras[0]->getDirection();
                 pos += dir * yrel * mMoveZSpeed;
                 oculus.SetPosition(pos);
+            }
+            else if (openvrMode) {
+                Ogre::Vector3 pos = openvr.GetPosition();
+                Ogre::Vector3 dir = openvr.m_cameras[0]->getDirection();
+                pos += dir * yrel * mMoveZSpeed;
+                openvr.SetPosition(pos);
             }
             Ogre::Vector3 pos = mCamera->getPosition();
             Ogre::Vector3 dir = mCamera->getDirection();
@@ -2146,10 +2168,16 @@ bool SgvMain::agentView(const CEGUI::EventArgs &eventArgs)
     int subViewIndex = std::atoi(windowEventArgs.window->getUserString("SubViewIndex").c_str());
 
     if (oculusMode) {
-        oculusCamera = mViews[subViewIndex]->getCamera();
-        oculusCameraFlag = true;
+        hmdCamera = mViews[subViewIndex]->getCamera();
+        hmdCameraFlag = true;
         oculus.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
         oculus.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); // HACK: Should not have waist node hardcoded!
+    }
+    else if (openvrMode) {
+        hmdCamera = mViews[subViewIndex]->getCamera();
+        hmdCameraFlag = true;
+//        oculus.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
+//        oculus.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); // HACK: Should not have waist node hardcoded!
     }
     else{
         Ogre::Camera *cam1 = mViews[subViewIndex]->getCamera();
@@ -2217,10 +2245,17 @@ bool SgvMain::selectCameraList(const CEGUI::EventArgs &eventArgs)
 
     if (oculusMode)
     {
-        oculusCamera = cam;
-        oculusCameraFlag = true;
+        hmdCamera = cam;
+        hmdCameraFlag = true;
         oculus.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
         oculus.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); /// HACK: Should not have waist node hardcoded!
+    }
+    else if (openvrMode)
+    {
+        hmdCamera = cam;
+        hmdCameraFlag = true;
+//        openvr.SetNeckNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/NECK_JOINT"));
+//        openvr.SetWaistNode(findChildRecursive(mSceneMgr->getRootSceneNode(), "man_000/W_L1")); /// HACK: Should not have waist node hardcoded!
     }
     else
     {
@@ -2923,7 +2958,7 @@ bool SgvMain::downloadFileRequest(std::string name)
 
 bool SgvMain::disconnect(const CEGUI::EventArgs &e)
 {
-    oculusCameraFlag = false;
+    hmdCameraFlag = false;
     sendRequest(DISCONNECT);
 
     std::string tmp_name = mService->getName();
@@ -2971,6 +3006,13 @@ bool SgvMain::disconnect(const CEGUI::EventArgs &e)
             oculus.SetNeckNode(NULL);
             oculus.SetPosition(Ogre::Vector3(0, 0, 0));
             oculus.SetOrientation(Ogre::Quaternion::IDENTITY);
+        }
+        else if (openvrMode)
+        {
+            // openvr.SetWaistNode(NULL);
+            // openvr.SetNeckNode(NULL);
+            openvr.SetPosition(Ogre::Vector3(0, 0, 0));
+            openvr.SetOrientation(Ogre::Quaternion::IDENTITY);
         }
         else{
             mViewPort->setCamera(mCamera);

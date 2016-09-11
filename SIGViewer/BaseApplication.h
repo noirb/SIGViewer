@@ -111,7 +111,7 @@ protected:
     //oculus
     Oculus oculus;
     OgreOpenVR openvr;
-    bool oculusCameraFlag;
+    bool hmdCameraFlag;
 };
 
 #endif // #ifndef __BaseApplication_h_

@@ -292,8 +292,8 @@ protected:
 	//! Camera for distance sensor
 	Ogre::Camera  *mDistanceCamera;
 
-	//! Camera for OcurusRift
-	Ogre::Camera  *oculusCamera;
+	//! Camera for VR HMD
+	Ogre::Camera  *hmdCamera;
 
 	//! Ground (Grid)
 	Ogre::ManualObject* mPlane;

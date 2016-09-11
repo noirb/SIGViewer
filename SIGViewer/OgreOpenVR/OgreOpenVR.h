@@ -68,9 +68,11 @@ public:
     const unsigned int          RightEye = 1;
     const unsigned int          EyeCount = 2;
 
-    //void setPosition(Ogre::Vector3 pos);
-    Ogre::Vector3 getPosition();
-    Ogre::Quaternion getOrientation();
+    void SetPosition(Ogre::Vector3 pos);
+    Ogre::Vector3 GetPosition();
+
+    void SetOrientation(Ogre::Quaternion rot);
+    Ogre::Quaternion GetOrientation();
     Ogre::Matrix4 getHMDMat4();
 
     void resetOrientation();
@@ -78,6 +80,8 @@ public:
     Ogre::Camera*               m_cameras[2] = { nullptr, nullptr };
     Ogre::SceneNode*            m_cameraNode = nullptr;
     Ogre::Viewport*             m_viewports[2] = { nullptr, nullptr };
+
+    bool lockToCamera = false;
 
 private:
 
@@ -99,6 +103,7 @@ private:
     Ogre::Quaternion            m_orientation;
     Ogre::Vector3               m_poseNeutralPosition = Ogre::Vector3::ZERO;
     Ogre::Quaternion            m_poseNeutralOrientation = Ogre::Quaternion::IDENTITY;
+    Ogre::Node*                 m_waist = nullptr;
     float                       m_heightStanding = 1.7f;
     float                       m_heightSitting = 1.0;
     bool                        m_isStanding = true;

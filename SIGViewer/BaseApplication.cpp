@@ -34,7 +34,7 @@ BaseApplication::BaseApplication(void)
     oculusMode(false),
     openvrMode(false),
     fullscreenMode(false),
-    oculusCameraFlag(false)
+    hmdCameraFlag(false)
 {
 }
 
