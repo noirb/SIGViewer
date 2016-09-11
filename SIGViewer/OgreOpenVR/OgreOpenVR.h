@@ -39,7 +39,6 @@
 
 #include <openvr.h>
 
-
 class OgreOpenVR
 {
 public:

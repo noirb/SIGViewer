@@ -1,5 +1,6 @@
 #include "OgreOpenVR.h"
 
+
 bool OgreOpenVR::initOpenVR(Ogre::SceneManager *sm, Ogre::RenderWindow *rw, Ogre::SceneNode* parent)
 {
     // Loading OpenVR
@@ -43,6 +44,9 @@ bool OgreOpenVR::initOpenVR(Ogre::SceneManager *sm, Ogre::RenderWindow *rw, Ogre
         Ogre::LogManager::getSingleton().logMessage("OgreOpenVR: Failed to initialise OpenVR Compositor");
         return false;
     }
+
+    // Configure 'seated' mode so orientation resets will happen for us
+    vr::VRCompositor()->SetTrackingSpace(vr::ETrackingUniverseOrigin::TrackingUniverseSeated);
 
     if( !initOgreTextures())
     {
@@ -296,7 +300,7 @@ void OgreOpenVR::update()
     }
     else if (!lockToCamera)
     {
-        q = q_hack * m_poseNeutralOrientation.Inverse() * q * m_mat4HMDPose.extractQuaternion();
+        q = q * m_mat4HMDPose.extractQuaternion();
     }
 
     m_cameraNode->setOrientation(q);
