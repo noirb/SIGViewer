@@ -15,6 +15,12 @@ open: `SIGVerse.ini`
 
 And then change `HMD_MODE=none` to `HMD_MODE=openvr`
 
+### To record videos of a simulation
+
+With either Oculus Rift or OpenVR mode enabled, select **Options->Record Video**.
+
+Once you're connected to a server, pressing the `Start` button will now also begin recording a video. Pressing the `Stop` button will end the recording. Videos are created in the same directory as SIGViewer.exe.
+
 ## Dependencies
 To build this project and its dependecies, you need:
 
