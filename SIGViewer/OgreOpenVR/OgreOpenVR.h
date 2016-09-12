@@ -37,6 +37,7 @@
 #include "ogrerendertexture.h"
 #include "ogrerenderwindow.h"
 
+#include "..\ffmpeg_encoder.h"
 #include <openvr.h>
 
 class OgreOpenVR
@@ -63,6 +64,9 @@ public:
     void updateHMDPos();
     void update();
 
+    void startRecording(std::string filename);
+    void stopRecording();
+
     const unsigned int          LeftEye = 0;
     const unsigned int          RightEye = 1;
     const unsigned int          EyeCount = 2;
@@ -74,10 +78,13 @@ public:
     Ogre::Quaternion GetOrientation();
     Ogre::Matrix4 getHMDMat4();
 
+    void SetWaistNode(Ogre::Node* waist) { m_waist = waist; }
+    Ogre::Node* GetWaistNode() { return m_waist; }
+
     void resetOrientation();
 
-    Ogre::Camera*               m_cameras[2] = { nullptr, nullptr };
-    Ogre::SceneNode*            m_cameraNode = nullptr;
+    Ogre::Camera*               m_cameras[2]   = { nullptr, nullptr };
+    Ogre::SceneNode*            m_cameraNode   =   nullptr;
     Ogre::Viewport*             m_viewports[2] = { nullptr, nullptr };
 
     bool lockToCamera = false;
@@ -128,6 +135,9 @@ private:
 
     OgreOpenVR::FramebufferDesc leftEyeDesc;
     OgreOpenVR::FramebufferDesc rightEyeDesc;
+
+    // whether we should capture frames for video recording
+    bool m_recording = false;
 };
 
 #endif // OGRE_OPEN_VR_H_

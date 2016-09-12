@@ -15,6 +15,7 @@
     <ClInclude Include="OgreOculus\euler.h" />
     <ClInclude Include="OgreOculus\OgreOculus.h" />
     <ClInclude Include="OgreOpenVR\OgreOpenVR.h" />
+    <ClInclude Include="ffmpeg_encoder.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SgvEntity.h" />
     <ClInclude Include="SgvLog.h" />
@@ -82,21 +83,22 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>
-            $(SIGBUILD_SIGSERVICE_INC);
-            $(SIGBUILD_X3D_INC);
-            $(JDK_ROOT_PATH)\include;
-            $(JDK_ROOT_PATH)\include\win32;
-            $(SIGBUILD_BOOST_INC);
-            $(SIGBUILD_OGRE_INC);
-            $(SIGBUILD_OGRE_INC)\OGRE\Overlay;
-            $(SIGBUILD_OGRE_INC)\OIS;
-            $(SIGBUILD_OGRE_INC)\OGRE;
-            $(SIGBUILD_OGRE_INC)\OGRE\RenderSystems\GL;
-            $(OGRE_SDK)\Samples\Common\include;
-            $(SIGBUILD_CEGUI_INC);
-            $(SIGBUILD_LIBSSH2_INC);
-            $(SIGBUILD_LIBOVR_INC);
-            $(SIGBUILD_OPENVR_INC)
+        $(SIGBUILD_SIGSERVICE_INC);
+        $(SIGBUILD_X3D_INC);
+        $(JDK_ROOT_PATH)\include;
+        $(JDK_ROOT_PATH)\include\win32;
+        $(SIGBUILD_BOOST_INC);
+        $(SIGBUILD_OGRE_INC);
+        $(SIGBUILD_OGRE_INC)\OGRE\Overlay;
+        $(SIGBUILD_OGRE_INC)\OIS;
+        $(SIGBUILD_OGRE_INC)\OGRE;
+        $(SIGBUILD_OGRE_INC)\OGRE\RenderSystems\GL;
+        $(OGRE_SDK)\Samples\Common\include;
+        $(SIGBUILD_CEGUI_INC);
+        $(SIGBUILD_LIBSSH2_INC);
+        $(SIGBUILD_LIBOVR_INC);
+        $(SIGBUILD_OPENVR_INC);
+        $(SIGBUILD_FFMPEG_INC);
       </AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -112,11 +114,12 @@
         $(SIGBUILD_LIBSSH2_LIB);
         $(SIGBUILD_LIBOVR_LIB);
         $(SIGBUILD_GLEW_LIB);
-        $(SIGBUILD_OPENVR_LIB)
+        $(SIGBUILD_OPENVR_LIB);
+        $(SIGBUILD_FFMPEG_LIB);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
       <AdditionalDependencies>
-        OgreMain_d.lib;OIS_d.lib;OgreTerrain_d.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL_d.lib;%(AdditionalDependencies)
+        avcodec.lib;avutil.lib;swscale.lib;openvr_api.lib;OgreMain_d.lib;OIS_d.lib;OgreTerrain_d.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL_d.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -145,6 +148,7 @@
         $(SIGBUILD_LIBSSH2_INC);
         $(SIGBUILD_LIBOVR_INC);
         $(SIGBUILD_OPENVR_INC);
+        $(SIGBUILD_FFMPEG_INC);
       </AdditionalIncludeDirectories>
       <CompileAs>CompileAsCpp</CompileAs>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
@@ -155,7 +159,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>
-        openvr_api.lib;OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
+        avcodec.lib;avutil.lib;swscale.lib;openvr_api.lib;OgreMain.lib;OIS.lib;OgreTerrain.lib;Opengl32.lib;glew32s.lib;comctl32.lib;ws2_32.lib;winmm.lib;CEGUIBase-0.lib;CEGUIOgreRenderer-0.lib;zlib.lib;SIGService.lib;libovr.lib;libSgvX3D.lib;jvm.lib;RenderSystem_GL.lib;%(AdditionalDependencies)
       </AdditionalDependencies>
       <AdditionalLibraryDirectories>
         $(SIGBUILD_SIGSERVICE_LIB);
@@ -169,8 +173,10 @@
         $(SIGBUILD_LIBOVR_LIB);
         $(SIGBUILD_GLEW_LIB);
         $(SIGBUILD_OPENVR_LIB);
+        $(SIGBUILD_FFMPEG_LIB);
         %(AdditionalLibraryDirectories)
       </AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

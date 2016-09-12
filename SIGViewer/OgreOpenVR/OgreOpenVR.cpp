@@ -203,6 +203,24 @@ bool OgreOpenVR::initOgreViewports()
     return true;
 }
 
+void OgreOpenVR::startRecording(std::string filename)
+{
+    if (!m_recording)
+    {
+        ffmpeg_encoder_start(filename.c_str(), AVCodecID::AV_CODEC_ID_MPEG2VIDEO, 25, m_window->getWidth(), m_window->getHeight());
+        m_recording = true;
+    }
+}
+
+void OgreOpenVR::stopRecording()
+{
+    if (m_recording)
+    {
+        ffmpeg_encoder_finish();
+        m_recording = false;
+    }
+}
+
 // ----------------------------------------------------------------
 // gets the current position of all tracked devices
 // ----------------------------------------------------------------
@@ -323,10 +341,28 @@ void OgreOpenVR::update()
     vr::VRCompositor()->Submit(vr::Eye_Left, &stereoTexture, &lbounds);
     vr::VRCompositor()->Submit(vr::Eye_Right, &stereoTexture, &rbounds);
 
+    if (m_recording)
+    {
+        static auto pre = boost::posix_time::microsec_clock::local_time();
+        static auto now = boost::posix_time::microsec_clock::local_time();
+
+        now = boost::posix_time::microsec_clock::local_time();
+        if ((now - pre).total_milliseconds() > 40)
+        {
+            pre = now;
+            static uint8_t *rgb = NULL;
+            static GLubyte * pixels = NULL;
+            ffmpeg_encoder_glread_rgb(&rgb, &pixels, m_window->getWidth(), m_window->getHeight());
+            //ffmpeg_encoder_glgettexture_rgb(&rgb, &pixels, srcid, gt->getWidth(), gt->getHeight());
+            ffmpeg_encoder_encode_frame(rgb);
+        }
+    }
+
     glFlush();
     glFinish();
 
     m_frameIndex++;
+
 
     // update the tracked device positions
     updateHMDPos();

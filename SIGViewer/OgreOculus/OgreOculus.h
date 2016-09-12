@@ -20,6 +20,8 @@
 #include <RenderSystems\GL\OgreGLRenderSystem.h>
 #include <RenderSystems\GL\OgreGLTexture.h>
 
+#include "..\ffmpeg_encoder.h"
+
 namespace Ogre
 {
     class SceneManager;
@@ -76,15 +78,23 @@ public:
         m_waist = waist;
     }
 
-    Ogre::Node* GetNeckNode()
+    void startRecording(std::string filename)
     {
-        return m_neck;
+        if (!m_recording)
+        {
+            ffmpeg_encoder_start(filename.c_str(), AVCodecID::AV_CODEC_ID_MPEG2VIDEO, 25, m_window->getWidth(), m_window->getHeight());
+            m_recording = true;
+        }
+    }
+    void stopRecording()
+    {
+        if (m_recording)
+        {
+            ffmpeg_encoder_finish();
+            m_recording = false;
+        }
     }
 
-    void SetNeckNode(Ogre::Node* neck)
-    {
-        m_neck = neck;
-    }
     /// Reset orientation of the sensor.
     void resetOrientation();
     /// Retrieve the SceneNode that contains the two cameras used for stereo rendering.
@@ -135,9 +145,9 @@ protected:
     Ogre::RenderWindow *m_window;
     Ogre::SceneNode    *m_cameraNode;
     Ogre::Node         *m_waist;
-    Ogre::Node         *m_neck;
     Ogre::Vector3       m_headPosition;
     Ogre::Quaternion    m_headOrientation;
+    bool                m_recording = false;
 
     Ogre::Vector3 convertVector3(const ovrVector3f &v)
     {

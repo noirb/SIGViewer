@@ -54,6 +54,9 @@
     <ClInclude Include="OgreOpenVR\OgreOpenVR.h">
       <Filter>OgreOpenVR</Filter>
     </ClInclude>
+    <ClInclude Include="ffmpeg_encoder.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseApplication.cpp">

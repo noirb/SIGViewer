@@ -29,7 +29,7 @@ namespace
 }
 
 
-Oculus::Oculus(void):m_window(0), m_sceneManager(0), m_cameraNode(0), m_waist(0), m_neck(0)
+Oculus::Oculus(void):m_window(0), m_sceneManager(0), m_cameraNode(0), m_waist(0)
 {
     for(int i=0;i<2;++i)
     {
@@ -361,7 +361,7 @@ void Oculus::Update()
     Ogre::Quaternion q = m_headOrientation;
 
     // include HMD orientation in new perspective if we're not locked to camera
-    if (!lockToCamera && m_waist != NULL && m_neck != NULL)
+    if (!lockToCamera && m_waist != NULL)
     {
         Ogre::Quaternion q_hack; q_hack.FromAngleAxis(Ogre::Radian::Radian(Ogre::Degree(180)), Ogre::Vector3::UNIT_Y); // waist is backwards?
         q =  q_hack * convertQuaternion(mHMDState.HeadPose.ThePose.Orientation) * m_waist->getOrientation();
@@ -412,6 +412,23 @@ void Oculus::Update()
     if (!OVR_SUCCESS(result))
     {
         Ogre::LogManager::getSingleton().logMessage(Ogre::LML_CRITICAL, "OgreOculus: Failed to submit frame " + std::to_string(mFrameIndex));
+    }
+
+    if (m_recording)
+    {
+        static auto pre = boost::posix_time::microsec_clock::local_time();
+        static auto now = boost::posix_time::microsec_clock::local_time();
+
+        now = boost::posix_time::microsec_clock::local_time();
+        if ((now - pre).total_milliseconds() > 40)
+        {
+            pre = now;
+            static uint8_t *rgb = NULL;
+            static GLubyte * pixels = NULL;
+            ffmpeg_encoder_glread_rgb(&rgb, &pixels, m_window->getWidth(), m_window->getHeight());
+            //ffmpeg_encoder_glgettexture_rgb(&rgb, &pixels, srcid, gt->getWidth(), gt->getHeight());
+            ffmpeg_encoder_encode_frame(rgb);
+        }
     }
 
     mFrameIndex++;

@@ -112,6 +112,9 @@ protected:
     Oculus oculus;
     OgreOpenVR openvr;
     bool hmdCameraFlag;
+
+    // whether to record video on experiment start
+    bool recordVideo = false;
 };
 
 #endif // #ifndef __BaseApplication_h_
